@@ -18,11 +18,11 @@
     </header>
     <main>
       <h2>Bienvenido!</h2>
-      <article>
-        <section>
+      <section>
+        <article>
           <p>Esta es la página de bienvenida de la aplicación</p>
-        </section>
-      </article>
+        </article>
+      </section>
     </main>
   </v-container>
 </template>
