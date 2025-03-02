@@ -30,36 +30,24 @@
 
     <v-list density="compact" nav>
       <v-list-item>
-        <v-btn prepend-icon="mdi-account-group-outline">Mis pacientes</v-btn>
+        <router-link to="/misPacientes">
+          <v-btn prepend-icon="mdi-account-group-outline">Mis pacientes</v-btn>
+        </router-link>
       </v-list-item>
       <v-list-item>
-        <v-btn prepend-icon="mdi-folder">Estudios</v-btn>
+        <router-link to="/estudios">
+          <v-btn prepend-icon="mdi-folder">Estudios</v-btn>
+        </router-link>
       </v-list-item>
       <v-list-item>
-        <v-btn prepend-icon="mdi-list-box-outline">Seguimientos</v-btn>
+        <router-link to="/seguimientos">
+          <v-btn prepend-icon="mdi-list-box-outline">Seguimientos</v-btn>
+        </router-link>
       </v-list-item>
       <v-list-item>
-        <v-btn prepend-icon="mdi-chat-question">Mis consultas</v-btn>
-      </v-list-item>
-    </v-list>
-
-    <v-divider />
-
-    <v-list density="compact" nav>
-      <v-list-item>
-        <v-btn prepend-icon="mdi-bell">Alertas</v-btn>
-      </v-list-item>
-      <v-list-item>
-        <v-btn prepend-icon="mdi-folder">Estudios</v-btn>
-      </v-list-item>
-      <v-list-item>
-        <v-btn prepend-icon="mdi-list-box-outline">Rellenar seguimiento</v-btn>
-      </v-list-item>
-      <v-list-item>
-        <v-btn prepend-icon="mdi-medication">Mis tratamientos</v-btn>
-      </v-list-item>
-      <v-list-item>
-        <v-btn prepend-icon="mdi-chat-question">Consultas</v-btn>
+        <router-link to="/misConsultas">
+          <v-btn prepend-icon="mdi-chat-question">Mis consultas</v-btn>
+        </router-link>
       </v-list-item>
     </v-list>
 
@@ -67,10 +55,44 @@
 
     <v-list density="compact" nav>
       <v-list-item>
-        <v-btn prepend-icon="mdi-cog">Configuración</v-btn>
+        <router-link to="/misAlertas">
+          <v-btn prepend-icon="mdi-bell">Mis alertas</v-btn>
+        </router-link>
       </v-list-item>
       <v-list-item>
-        <v-btn prepend-icon="mdi-information">Información</v-btn>
+        <router-link to="/misEstudios">
+          <v-btn prepend-icon="mdi-folder">Mis estudios</v-btn>
+        </router-link>
+      </v-list-item>
+      <v-list-item>
+        <router-link to="/rellenarSeguimiento">
+          <v-btn prepend-icon="mdi-list-box-outline">Rellenar seguimiento</v-btn>
+        </router-link>
+      </v-list-item>
+      <v-list-item>
+        <router-link to="/misTratamientos">
+          <v-btn prepend-icon="mdi-medication">Mis tratamientos</v-btn>
+        </router-link>
+      </v-list-item>
+      <v-list-item>
+        <router-link to="/misConsultas">
+          <v-btn prepend-icon="mdi-chat-question">Consultas</v-btn>
+        </router-link>
+      </v-list-item>
+    </v-list>
+
+    <v-divider />
+
+    <v-list density="compact" nav>
+      <v-list-item>
+        <router-link to="/configuracion">
+          <v-btn prepend-icon="mdi-cog">Configuración</v-btn>
+        </router-link>
+      </v-list-item>
+      <v-list-item>
+        <router-link to="/informacion">
+          <v-btn prepend-icon="mdi-information">Información</v-btn>
+        </router-link>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>

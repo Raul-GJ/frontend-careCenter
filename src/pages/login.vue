@@ -21,10 +21,11 @@
 <template>
   <v-container>
     <h1>Página de Login</h1>
+    <p>* Indica que un campo es obligatorio</p>
     <v-form @submit.prevent @submit="login">  
       <v-text-field 
         v-model="correo"  
-        label="Correo electrónico" 
+        label="Correo electrónico *" 
         :rules="[reglas.necesario, reglas.email]"
       />
       <v-text-field
@@ -32,7 +33,7 @@
         :append-icon="mostrarContrasenya ? 'mdi-eye' : 'mdi-eye-off'"
         :rules="[reglas.necesario, reglas.caracteresMinimos]"
         :type="mostrarContrasenya ? 'text' : 'password'"
-        label="Contraseña"
+        label="Contraseña *"
         counter
         @click:append="mostrarContrasenya = !mostrarContrasenya"
       />
