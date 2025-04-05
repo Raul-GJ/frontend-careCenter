@@ -1,7 +1,22 @@
 <script setup>
   import { ref } from 'vue'
-  
+  import axios from 'axios'
+  import { useAppStore } from '../stores/app'
+
+  const appStore = useAppStore()
+
+  const urlApi = appStore.getUrlApi()
+  const urlEspecialistas = urlApi + "usuarios/especialistas/"
+  const idEspecialista = "67f0e0995b95213262208374"
+
   const drawer = ref(false)
+
+  async function loadEspecialista() {
+    let response = await axios.get(urlEspecialistas + idEspecialista)
+    appStore.setUsuario(response.data)
+  }
+
+  loadEspecialista()
 
 </script>
 
@@ -30,22 +45,22 @@
 
     <v-list density="compact" nav>
       <v-list-item>
-        <router-link to="/misPacientes">
+        <router-link to="/sanitarios/misPacientes">
           <v-btn prepend-icon="mdi-account-group-outline">Mis pacientes</v-btn>
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/estudios">
+        <router-link to="/sanitarios/estudios">
           <v-btn prepend-icon="mdi-folder">Estudios</v-btn>
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/seguimientos">
+        <router-link to="/sanitarios/seguimientos">
           <v-btn prepend-icon="mdi-list-box-outline">Seguimientos</v-btn>
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/misConsultas">
+        <router-link to="/sanitarios/misConsultas">
           <v-btn prepend-icon="mdi-chat-question">Mis consultas</v-btn>
         </router-link>
       </v-list-item>
@@ -55,27 +70,22 @@
 
     <v-list density="compact" nav>
       <v-list-item>
-        <router-link to="/misAlertas">
+        <router-link to="/pacientes/misAlertas">
           <v-btn prepend-icon="mdi-bell">Mis alertas</v-btn>
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/misEstudios">
+        <router-link to="/pacientes/misEstudios">
           <v-btn prepend-icon="mdi-folder">Mis estudios</v-btn>
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/rellenarSeguimiento">
+        <router-link to="/pacientes/rellenarSeguimiento">
           <v-btn prepend-icon="mdi-list-box-outline">Rellenar seguimiento</v-btn>
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/misTratamientos">
-          <v-btn prepend-icon="mdi-medication">Mis tratamientos</v-btn>
-        </router-link>
-      </v-list-item>
-      <v-list-item>
-        <router-link to="/misConsultas">
+        <router-link to="/pacientes/consultas">
           <v-btn prepend-icon="mdi-chat-question">Consultas</v-btn>
         </router-link>
       </v-list-item>
@@ -92,6 +102,11 @@
       <v-list-item>
         <router-link to="/informacion">
           <v-btn prepend-icon="mdi-information">Información</v-btn>
+        </router-link>
+      </v-list-item>
+      <v-list-item>
+        <router-link to="/ayuda">
+          <v-btn prepend-icon="mdi-help-circle">Ayuda</v-btn>
         </router-link>
       </v-list-item>
     </v-list>

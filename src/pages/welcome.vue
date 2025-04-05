@@ -8,10 +8,10 @@
       <v-app-bar>
         <h1>Mi app</h1>
         <v-spacer />
-        <router-link to="/login">
+        <router-link to="/auth/login">
           <v-btn>Login</v-btn>
         </router-link>
-        <router-link to="/register">
+        <router-link to="/auth/register">
           <v-btn>Registro</v-btn>
         </router-link>
       </v-app-bar>
