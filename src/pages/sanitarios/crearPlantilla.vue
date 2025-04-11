@@ -10,6 +10,12 @@
           },
         })
 
+  const headers = {
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }
+
   const urlApi = "http://localhost:8080/salud/api/"
   const urlPlantillas = urlApi + "plantillas/"
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
@@ -34,6 +40,20 @@
   const cont = ref(0)
   const agregarPregunta = ref(false)
 
+  const limpiarPlantillaValue = ref(false)
+
+  function limpiarPlantilla() {
+    nombre.value = ""
+    descripcion.value = ""
+    preguntas.value = []
+    strPregunta.value = ""
+    rangoMinValue.value = 1
+    rangoMaxValue.value = 100
+    enumValues.value = []
+    newEnumValue.value = ""
+    cont.value = 0
+  }
+
   function addEnumValue() {
     if (newEnumValue.value != "" && !enumValues.value.includes(newEnumValue.value)) {
       enumValues.value.push(newEnumValue.value)
@@ -51,14 +71,13 @@
 
   function addPregunta() {
     if (strPregunta.value != "" && tiposPregunta.value.includes(tipoPregunta.value)) {
-      let tipoFormal = tiposPreguntaFormal.value[tiposPregunta.value.indexOf(tipoPregunta.value)]
-      let regla = { tipoDato: tipoFormal }
-      if (tipoFormal == "RANGO") {
+      let regla = { tipoDato: tipoPregunta.value }
+      if (tipoPregunta.value == "RANGO") {
         regla.minValue = rangoMinValue.value 
         regla.maxValue = rangoMaxValue.value
         rangoMinValue.value = 1
         rangoMaxValue.value = 100
-      } else if (tipoFormal == "ENUMERADO") {
+      } else if (tipoPregunta.value == "ENUMERADO") {
         regla.values = enumValues.value
         enumValues.value = []
       }
@@ -81,6 +100,7 @@
   }
 
   async function publicarPlantilla() {
+    
     // Publicar plantilla
     
     alert("Creando plantilla")
@@ -88,11 +108,7 @@
     let response = await axios.post(urlPlantillas, {
       "nombre": nombre.value,
       "descripcion": descripcion.value
-    }, {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
+    }, headers)
     if (response.status != 201) {
       alert("Ha habido un error al crear esta plantilla")
       return
@@ -119,11 +135,7 @@
     alert("Agregando plantilla a especialista")
 
     let ids = [idPlantilla]
-    let response2 = await axios.patch(urlEspecialistas + idEspecialista + "/plantillas/agregar", ids, {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
+    let response2 = await axios.patch(urlEspecialistas + idEspecialista + "/plantillas/agregar", ids, headers)
     if (response2.status != 204) {
       alert("Ha habido un error al crear esta plantilla")
       return
@@ -134,44 +146,34 @@
     alert("Plantilla creada correctamente")
   }
 
+  function replacerPreguntas(key, value) {
+    if (key == "id") {
+      return undefined
+    }
+    if (key == "tipoDato") {
+      return (tiposPreguntaFormal.value[tiposPregunta.value.indexOf(value)])
+    }
+    return value
+  }
+
   async function publicarPregunta(idPlantilla, pregunta) {
-    let body = JSON.stringify(pregunta)
+    let body = JSON.stringify(pregunta, replacerPreguntas)
     let response
     switch(pregunta.regla.tipoDato) {
       case "CADENA": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/cadena", body, {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        response = await axios.post(urlPlantillas + idPlantilla + "/datos/cadena", body, headers)
         break
       case "NUMERAL": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/numeral", body, {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        response = await axios.post(urlPlantillas + idPlantilla + "/datos/numeral", body, headers)
         break
       case "BOOLEANO": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/booleano", body, {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        response = await axios.post(urlPlantillas + idPlantilla + "/datos/booleano", body, headers)
         break
       case "RANGO": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/rango", body, {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        response = await axios.post(urlPlantillas + idPlantilla + "/datos/rango", body, headers)
         break
       case "ENUMERADO": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/enumerado", body, {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
+        response = await axios.post(urlPlantillas + idPlantilla + "/datos/enumerado", body, headers)
         break
       default:
         return false
@@ -202,12 +204,12 @@
           <p>Pregunta: {{ pregunta.pregunta }}</p>
           <p>Tipo: {{ pregunta.regla.tipoDato }}</p>
 
-          <v-container v-if="pregunta.regla.tipoDato == 'RANGO'">
+          <v-container v-if="pregunta.regla.tipoDato == 'rango numérico'">
             <p>Valor mínimo: {{ pregunta.regla.minValue }}</p>
             <p>Valor máximo: {{ pregunta.regla.maxValue }}</p>
           </v-container>
 
-          <v-container v-if="pregunta.regla.tipoDato == 'ENUMERADO'">
+          <v-container v-if="pregunta.regla.tipoDato == 'selección'">
             <p>Posibles valores:</p>
             <v-list>
               <v-list-item v-for="value of pregunta.regla.values" :key="value">
@@ -298,6 +300,31 @@
         >
           Guardar
         </v-btn>
+        <v-btn 
+          prepend-icon="mdi-delete"
+          @click="limpiarPlantillaValue = true"
+        >
+          Limpiar plantilla
+        </v-btn>
+        <v-dialog
+          v-model="limpiarPlantillaValue"
+          max-width="400"
+          persistent
+        >
+          <v-card
+            prepend-icon="mdi-map-alert"
+            text="¿Estás seguro de que deseas limpiar la plantilla? Se eliminarán todo el progreso de esta plantilla"
+            title="Advertencia"
+          >
+            <v-btn @click="limpiarPlantillaValue = false">
+              Cancelar
+            </v-btn>
+
+            <v-btn @click="limpiarPlantilla()">
+              Aceptar
+            </v-btn>
+          </v-card>
+        </v-dialog>
       </v-container>
     </v-form>
   </v-container>

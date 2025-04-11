@@ -59,8 +59,12 @@
           <td>
             <v-btn icon="mdi-folder-plus" title="Añadir a estudio" />
             <v-btn icon="mdi-bell-plus" title="Añadir alerta" />
-            <v-btn icon="mdi-list-box-outline" title="Ver seguimiento" />
-            <v-btn icon="mdi-text-box-edit" title="Modificar datos clinicos" />
+            <router-link to="./verPaciente">
+              <v-btn 
+                icon="mdi-list-box-outline" 
+                title="Ver datos"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>

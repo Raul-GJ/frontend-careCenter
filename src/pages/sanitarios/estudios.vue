@@ -45,8 +45,16 @@
 
 <template>
   <v-container>
+    <router-link to="./crearEstudio">
+      <v-btn prepend-icon="mdi-plus-circle">
+        Crear estudio
+      </v-btn>
+    </router-link>
     <p>Estudios</p>
-    <v-table height="200" fixed-header>
+    <v-table 
+      height="200" 
+      fixed-header
+    >
       <thead>
         <tr>
           <th>
