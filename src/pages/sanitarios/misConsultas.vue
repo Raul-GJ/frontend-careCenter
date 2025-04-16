@@ -1,27 +1,30 @@
 <script setup>
   import { computed, ref } from 'vue'
   import axios from 'axios'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
-  import { consultaStore } from '../../stores/consultaStore'
+  import { useConsultaStore } from '../../stores/consultaStore'
 
-  const urlApi = "http://localhost:8080/salud/api/"
+  const usuarioStore = useUsuarioStore()
+
+  const urlApi = usuarioStore.getUrlApi()
   const urlConsultas = urlApi + "consultas/"
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const idEspecialista = "67f0e0995b95213262208374"
+  const idEspecialista = usuarioStore.getId()
 
   const especialista = ref(null)
   
-  const cStore = consultaStore()
-  const { consultas } = storeToRefs(cStore)
+  const consultaStore = useConsultaStore()
+  const { consultas } = storeToRefs(consultaStore)
 
   async function loadConsultas() {
     let lista = especialista.value.consultas
     for (let id of lista) {
-      if (!cStore.getConsulta(id)) {
+      if (!consultaStore.getConsulta(id)) {
         let response2 = await axios.get(urlConsultas + id)
         let newConsulta = response2.data
         newConsulta.id = id
-        cStore.addConsulta(newConsulta)
+        consultaStore.addConsulta(newConsulta)
       }
     }
   }

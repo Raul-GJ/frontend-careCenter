@@ -1,23 +1,7 @@
 <script setup>
   import { ref } from 'vue'
-  import axios from 'axios'
-  import { useAppStore } from '../stores/app'
-
-  const appStore = useAppStore()
-
-  const urlApi = appStore.getUrlApi()
-  const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const idEspecialista = "67f0e0995b95213262208374"
 
   const drawer = ref(false)
-
-  async function loadEspecialista() {
-    let response = await axios.get(urlEspecialistas + idEspecialista)
-    appStore.setUsuario(response.data)
-  }
-
-  loadEspecialista()
-
 </script>
 
 <template>
@@ -50,13 +34,13 @@
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/sanitarios/estudios">
-          <v-btn prepend-icon="mdi-folder">Estudios</v-btn>
+        <router-link to="/sanitarios/misEstudios">
+          <v-btn prepend-icon="mdi-folder">Mis estudios</v-btn>
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/sanitarios/seguimientos">
-          <v-btn prepend-icon="mdi-list-box-outline">Seguimientos</v-btn>
+        <router-link to="/sanitarios/misPlantillas">
+          <v-btn prepend-icon="mdi-list-box-outline">Mis plantillas</v-btn>
         </router-link>
       </v-list-item>
       <v-list-item>
@@ -75,18 +59,13 @@
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/pacientes/misEstudios">
-          <v-btn prepend-icon="mdi-folder">Mis estudios</v-btn>
+        <router-link to="/pacientes/misSeguimientos">
+          <v-btn prepend-icon="mdi-list-box-outline">Mis seguimientos</v-btn>
         </router-link>
       </v-list-item>
       <v-list-item>
-        <router-link to="/pacientes/rellenarSeguimiento">
-          <v-btn prepend-icon="mdi-list-box-outline">Rellenar seguimiento</v-btn>
-        </router-link>
-      </v-list-item>
-      <v-list-item>
-        <router-link to="/pacientes/consultas">
-          <v-btn prepend-icon="mdi-chat-question">Consultas</v-btn>
+        <router-link to="/pacientes/misConsultas">
+          <v-btn prepend-icon="mdi-chat-question">Mis consultas</v-btn>
         </router-link>
       </v-list-item>
     </v-list>

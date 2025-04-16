@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const pacienteStore = defineStore('pacientes', {
+export const usePacienteStore = defineStore('pacientes', {
   state: () => ({
     /** @type {{ id: String, nombre: String, apellido1: String, apellido2: String, email: String, telefono: String, medico: String, alertas: Array, consultas: Array, especialistas: Array, seguimientos: Array}[]} */
     pacientes: []

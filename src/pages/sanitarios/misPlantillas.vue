@@ -1,27 +1,30 @@
 <script setup>
   import { ref } from 'vue'
   import axios from 'axios'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
-  import { plantillaStore } from '../../stores/plantillaStore'
+  import { usePlantillaStore } from '../../stores/plantillaStore'
 
-  const urlApi = "http://localhost:8080/salud/api/"
+  const usuarioStore = useUsuarioStore()
+  
+  const urlApi = usuarioStore.getUrlApi()
   const urlPlantillas = urlApi + "plantillas/"
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const idEspecialista = "67f0e0995b95213262208374"
+  const idEspecialista = usuarioStore.getId()
 
   const especialista = ref(null)
   
-  const pStore = plantillaStore()
-  const { plantillas } = storeToRefs(pStore)
+  const plantillaStore = usePlantillaStore()
+  const { plantillas } = storeToRefs(plantillaStore)
 
   async function loadPlantillas() {
     let lista = especialista.value.plantillas
     for (let id of lista) {
-      if (!pStore.getPlantilla(id)) {
+      if (!plantillaStore.getPlantilla(id)) {
         let response2 = await axios.get(urlPlantillas + id)
         let newPlantilla = response2.data
         newPlantilla.id = id
-        pStore.addPlantilla(newPlantilla)
+        plantillaStore.addPlantilla(newPlantilla)
       }
     }
   }

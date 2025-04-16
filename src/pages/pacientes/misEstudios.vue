@@ -1,24 +1,27 @@
 <script setup>
   import { ref } from 'vue'
   import axios from 'axios'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
-  import { estudioStore } from '../../stores/estudioStore'
+  import { useEstudioStore } from '../../stores/estudioStore'
 
-  const urlApi = "http://localhost:8080/salud/api/"
+  const usuarioStore = useUsuarioStore()
+  
+  const urlApi = usuarioStore.getUrlApi()
   const urlEstudios = urlApi + "estudios/"
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const idEspecialista = "67e3e13e39eebc4e6bdaf121"
+  const idEspecialista = usuarioStore.getId()
 
   const especialista = ref(null)
   
-  const eStore = estudioStore()
-  const { estudios } = storeToRefs(eStore)
+  const estudioStore = useEstudioStore()
+  const { estudios } = storeToRefs(estudioStore)
 
   async function loadEstudios() {
     let response2 = await axios.get(urlEstudios)
     for (let estudio of response2.data) {
       let newEstudio = { nombre: estudio.nombre, descripcion: estudio.descripcion }
-      eStore.addEstudio(newEstudio)
+      estudioStore.addEstudio(newEstudio)
     }
     
   }

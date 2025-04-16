@@ -1,27 +1,30 @@
 <script setup>
   import { ref } from 'vue'
   import axios from 'axios'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
-  import { pacienteStore } from '../../stores/pacienteStore'
+  import { usePacienteStore } from '../../stores/pacienteStore'
+  
+  const usuarioStore = useUsuarioStore()
   
   const especialista = ref(null)
 
-  const urlApi = "http://localhost:8080/salud/api/"
+  const urlApi = usuarioStore.getUrlApi()
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
   const urlPacientes = urlApi + "usuarios/pacientes/"
-  const idEspecialista = "67f0e0995b95213262208374"
+  const idEspecialista = usuarioStore.getId()
 
-  const pStore = pacienteStore()
-  const { pacientes } = storeToRefs(pStore)
+  const pacienteStore = usePacienteStore()
+  const { pacientes } = storeToRefs(pacienteStore)
 
   async function loadPacientes() {
     let lista = especialista.value.pacientes
     for (let id of lista) {
-      if (!pStore.getPaciente(id)) {
+      if (!pacienteStore.getPaciente(id)) {
         let response2 = await axios.get(urlPacientes + id)
         let newPaciente = response2.data
         newPaciente.id = id
-        pStore.addPaciente(newPaciente)
+        pacienteStore.addPaciente(newPaciente)
       }
     }
   }
@@ -59,7 +62,7 @@
           <td>
             <v-btn icon="mdi-folder-plus" title="Añadir a estudio" />
             <v-btn icon="mdi-bell-plus" title="Añadir alerta" />
-            <router-link to="./verPaciente">
+            <router-link :to="`./verPaciente/${paciente.id}`">
               <v-btn 
                 icon="mdi-list-box-outline" 
                 title="Ver datos"

@@ -1,0 +1,51 @@
+# .gitignore para un proyecto Vue.js
+
+# Node modules
+/node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build files
+/dist/
+/build/
+/public/build/
+
+# Local env files
+.env
+.env.*.local
+
+# IDE configs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Optional: si usas npm o yarn para guardar dependencias
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Test coverage
+/coverage/
+
+# Cache
+/.cache/
+/.cache-loader/
+
+# Editor backups
+*~
+*.swp
+*.bak
+
+# Others
+npm-debug.log
+yarn-error.log
+lerna-debug.log

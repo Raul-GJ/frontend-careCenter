@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const seguimientoStore = defineStore('seguimientos', {
+export const useSeguimientoStore = defineStore('seguimientos', {
   state: () => ({
     /** @type {{ id: String, fecha: Date, plazo: Date, formulario: Object}[]} */
     seguimientos: []

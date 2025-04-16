@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const plantillaStore = defineStore('plantillas', {
+export const usePlantillaStore = defineStore('plantillas', {
   state: () => ({
     /** @type {{ id: String, nombre: String, descripcion: String, publico: Boolean, preguntas: Array}[]} */
     plantillas: []

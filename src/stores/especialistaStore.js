@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const especialistaStore = defineStore('especialistas', {
+export const uesEspecialistaStore = defineStore('especialistas', {
   state: () => ({
     /** @type {{ id: String, nombre: String, apellido1: String, apellido2: String, email: String, telefono: String, nCol: String, pacientes: Array, espceialidad: String, infoEstudios: Array, plantillas: Array, consultas: Array}[]} */
     especialistas: []

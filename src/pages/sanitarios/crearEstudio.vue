@@ -2,10 +2,13 @@
   import { ref, computed } from 'vue'
   import axios from 'axios'
   import { useDate } from 'vuetify'
-  import { pacienteStore } from '../../stores/pacienteStore'
-  import { plantillaStore } from '../../stores/plantillaStore'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
+  import { usePacienteStore } from '../../stores/pacienteStore'
+  import { usePlantillaStore } from '../../stores/plantillaStore'
   import { storeToRefs } from 'pinia'
 
+  const usuarioStore = useUsuarioStore();
+  
   const adapter = useDate()
 
   const headers = {
@@ -14,14 +17,14 @@
     }
   }
   
-  const urlApi = "http://localhost:8080/salud/api/"
+  const urlApi = usuarioStore.getUrlApi()
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
   const urlPacientes = urlApi + "usuarios/pacientes/"
   const urlPlantillas = urlApi + "plantillas/"
   const urlEstudios = urlApi + "estudios/"
   const urlSeguimientos = urlApi + "seguimientos/"
   const urlAlertas = urlApi + "alertas/"
-  const idEspecialista = "67f0e0995b95213262208374"
+  const idEspecialista = usuarioStore.getId()
   const especialista = ref(null)
 
   const nombre = ref("")
@@ -44,10 +47,10 @@
   const asuntoAlerta = ref("")
   const mensajeAlerta = ref("")
   
-  const pStore = pacienteStore()
-  const { pacientes } = storeToRefs(pStore)
-  const plStore = plantillaStore()
-  const { plantillas } = storeToRefs(plStore)
+  const pacienteStore = usePacienteStore()
+  const { pacientes } = storeToRefs(pacienteStore)
+  const plantillaStore = usePlantillaStore()
+  const { plantillas } = storeToRefs(plantillaStore)
 
   const pacientesEstudio = ref([])
   const seguimientosEstudio = ref([])
@@ -63,7 +66,7 @@
       let response = await axios.get(urlPacientes + id)
       let paciente = response.data
       paciente.id = id
-      pStore.addPaciente(paciente)
+      pacienteStore.addPaciente(paciente)
     }
   }
 
@@ -73,7 +76,7 @@
       let response = await axios.get(urlPlantillas + id)
       let plantilla = response.data
       plantilla.id = id
-      plStore.addPlantilla(plantilla)
+      plantillaStore.addPlantilla(plantilla)
     }
   }
 

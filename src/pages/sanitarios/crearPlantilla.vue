@@ -1,6 +1,9 @@
 <script setup>
   import { ref } from 'vue'
   import axios from 'axios'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
+
+  const usuarioStore = useUsuarioStore()
 
   const reglas = ref({
           necesario: value => !!value || 'Campo necesario.',
@@ -16,10 +19,10 @@
     }
   }
 
-  const urlApi = "http://localhost:8080/salud/api/"
+  const urlApi = usuarioStore.getUrlApi()
   const urlPlantillas = urlApi + "plantillas/"
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const idEspecialista = "67f0e0995b95213262208374"
+  const idEspecialista = usuarioStore.getId()
 
   const especialista = ref(null)
   const nombre = ref("")
