@@ -3,8 +3,8 @@
   import axios from 'axios'
   import { useDate } from 'vuetify'
   import { useUsuarioStore } from '@/stores/usuarioStore'
-  import { usePacienteStore } from '../../stores/pacienteStore'
-  import { usePlantillaStore } from '../../stores/plantillaStore'
+  import { usePacienteStore } from '@/stores/pacienteStore'
+  import { usePlantillaStore } from '@/stores/plantillaStore'
   import { storeToRefs } from 'pinia'
 
   const usuarioStore = useUsuarioStore();
@@ -19,8 +19,6 @@
   
   const urlApi = usuarioStore.getUrlApi()
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const urlPacientes = urlApi + "usuarios/pacientes/"
-  const urlPlantillas = urlApi + "plantillas/"
   const urlEstudios = urlApi + "estudios/"
   const urlSeguimientos = urlApi + "seguimientos/"
   const urlAlertas = urlApi + "alertas/"
@@ -60,26 +58,6 @@
     return pacientes.value.filter((p) => !pacientesEstudio.value.includes(p))
   })
 
-  async function cargarPacientes() {
-    let ids = especialista.value.pacientes
-    for (let id of ids) {
-      let response = await axios.get(urlPacientes + id)
-      let paciente = response.data
-      paciente.id = id
-      pacienteStore.addPaciente(paciente)
-    }
-  }
-
-  async function cargarPlantillas() {
-    let ids = especialista.value.plantillas
-    for (let id of ids) {
-      let response = await axios.get(urlPlantillas + id)
-      let plantilla = response.data
-      plantilla.id = id
-      plantillaStore.addPlantilla(plantilla)
-    }
-  }
-
   function agregarPaciente(paciente) {
     pacientesEstudio.value.push(paciente)
     agregarPacienteValue.value = false
@@ -115,8 +93,8 @@
     let response = await axios.get(urlEspecialistas + idEspecialista)
     especialista.value = response.data
 
-    cargarPacientes()
-    cargarPlantillas()
+    pacienteStore.loadPacientes()
+    plantillaStore.loadPlantillas()
   }
 
   async function crearEstudio() {

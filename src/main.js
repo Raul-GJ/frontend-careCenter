@@ -13,9 +13,11 @@ import App from './App.vue'
 // Composables
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import piniaPersistedstate from 'pinia-plugin-persistedstate'
 
 const app = createApp(App)
 const pinia = createPinia()
+pinia.use(piniaPersistedstate)
 
 registerPlugins(app)
 

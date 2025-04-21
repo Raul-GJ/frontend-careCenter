@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia'
+import axios from 'axios'
+import { useUsuarioStore } from './usuarioStore'
 
 export const usePlantillaStore = defineStore('plantillas', {
   state: () => ({
     /** @type {{ id: String, nombre: String, descripcion: String, publico: Boolean, preguntas: Array}[]} */
-    plantillas: []
+    plantillas: [],
+    isLoaded: false
   }),
   actions: {
     addPlantilla(p) {
@@ -22,5 +25,26 @@ export const usePlantillaStore = defineStore('plantillas', {
     deletePlantilla(id) {
       this.plantillas = this.plantillas.filter(p => p.id != id)
     },
+    async loadPlantillas() {
+      if (this.isLoaded)
+        return
+      const usuarioStore = useUsuarioStore()
+      let usuario = usuarioStore.getUsuario()
+      let urlApi = usuarioStore.getUrlApi()
+      try {
+        for (let idPlantilla of usuario.plantillas) {
+          let response = await axios.get(urlApi + "plantillas/" + idPlantilla)
+          console.log(JSON.stringify(response.data))
+          this.addPlantilla(response.data)
+        }
+        this.isLoaded = true
+      } catch (error) {
+        console.error('Error cargando plantillas: ', error)
+      }
+    },
+    clearPlantillas() {
+      this.plantillas = []
+      this.isLoaded = false
+    }
   },
 })

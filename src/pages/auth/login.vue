@@ -1,5 +1,10 @@
 <script setup>
   import { ref } from 'vue'
+  import axios from 'axios'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
+
+  const usuarioStore = useUsuarioStore()
+  
   const reglas = ref({
           necesario: value => !!value || 'Campo necesario.',
           caracteresMinimos: v => v.length >= 8 || 'Minimo 8 caracteres',
@@ -12,10 +17,11 @@
   const correo = ref('')
   const contrasenya = ref('')
 
-  function login() {
-
+  async function login() {
+    usuarioStore.loadUsuario()
   }
 
+  login()
 </script>
 
 <template>

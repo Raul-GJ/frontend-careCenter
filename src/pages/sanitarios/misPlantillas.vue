@@ -3,12 +3,11 @@
   import axios from 'axios'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
-  import { usePlantillaStore } from '../../stores/plantillaStore'
+  import { usePlantillaStore } from '@/stores/plantillaStore'
 
   const usuarioStore = useUsuarioStore()
   
   const urlApi = usuarioStore.getUrlApi()
-  const urlPlantillas = urlApi + "plantillas/"
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
   const idEspecialista = usuarioStore.getId()
 
@@ -17,22 +16,10 @@
   const plantillaStore = usePlantillaStore()
   const { plantillas } = storeToRefs(plantillaStore)
 
-  async function loadPlantillas() {
-    let lista = especialista.value.plantillas
-    for (let id of lista) {
-      if (!plantillaStore.getPlantilla(id)) {
-        let response2 = await axios.get(urlPlantillas + id)
-        let newPlantilla = response2.data
-        newPlantilla.id = id
-        plantillaStore.addPlantilla(newPlantilla)
-      }
-    }
-  }
-
   async function loadEspecialista() {
     let response = await axios.get(urlEspecialistas + idEspecialista)
     especialista.value = response.data
-    loadPlantillas()
+    plantillaStore.loadPlantillas()
   }
 
   loadEspecialista()

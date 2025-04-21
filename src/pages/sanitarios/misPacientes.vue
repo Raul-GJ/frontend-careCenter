@@ -3,7 +3,7 @@
   import axios from 'axios'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
-  import { usePacienteStore } from '../../stores/pacienteStore'
+  import { usePacienteStore } from '@/stores/pacienteStore'
   
   const usuarioStore = useUsuarioStore()
   
@@ -11,28 +11,15 @@
 
   const urlApi = usuarioStore.getUrlApi()
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const urlPacientes = urlApi + "usuarios/pacientes/"
   const idEspecialista = usuarioStore.getId()
 
   const pacienteStore = usePacienteStore()
   const { pacientes } = storeToRefs(pacienteStore)
 
-  async function loadPacientes() {
-    let lista = especialista.value.pacientes
-    for (let id of lista) {
-      if (!pacienteStore.getPaciente(id)) {
-        let response2 = await axios.get(urlPacientes + id)
-        let newPaciente = response2.data
-        newPaciente.id = id
-        pacienteStore.addPaciente(newPaciente)
-      }
-    }
-  }
-
   async function loadEspecialista() {
     let response = await axios.get(urlEspecialistas + idEspecialista)
     especialista.value = response.data
-    loadPacientes()
+    pacienteStore.loadPacientes()
   }
 
   loadEspecialista()
@@ -62,6 +49,7 @@
           <td>
             <v-btn icon="mdi-folder-plus" title="Añadir a estudio" />
             <v-btn icon="mdi-bell-plus" title="Añadir alerta" />
+            <v-btn icon="mdi-text-box-plus" title="Añadir seguimiento" />
             <router-link :to="`./verPaciente/${paciente.id}`">
               <v-btn 
                 icon="mdi-list-box-outline" 

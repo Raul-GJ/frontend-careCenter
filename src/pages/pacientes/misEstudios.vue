@@ -3,7 +3,7 @@
   import axios from 'axios'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
-  import { useEstudioStore } from '../../stores/estudioStore'
+  import { useEstudioStore } from '@/stores/estudioStore'
 
   const usuarioStore = useUsuarioStore()
   

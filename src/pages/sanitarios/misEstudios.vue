@@ -3,12 +3,11 @@
   import axios from 'axios'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
-  import { useEstudioStore } from '../../stores/estudioStore'
+  import { useEstudioStore } from '@/stores/estudioStore'
 
   const usuarioStore = useUsuarioStore()
   
   const urlApi = usuarioStore.getUrlApi()
-  const urlEstudios = urlApi + "estudios/"
   const urlEspecialistas = urlApi + "usuarios/especialistas/"
   const idEspecialista = usuarioStore.getId()
 
@@ -17,21 +16,6 @@
   const estudioStore = useEstudioStore()
   const { estudios } = storeToRefs(estudioStore)
 
-  async function loadEstudios() {
-    let lista = especialista.value.infoEstudios
-    
-    for (let infoEstudio of lista) {
-      let id = infoEstudio.estudio
-      if (!estudioStore.getEstudio(id)) {
-        let response = await axios.get(urlEstudios + id)
-        let newEstudio = response.data
-        newEstudio.id = id
-        newEstudio.rol = infoEstudio.rol
-        estudioStore.addEstudio(newEstudio)
-      }
-    }
-  }
-
   function verEstudio(estudio) {
     alert(estudio.descripcion)
   }
@@ -39,7 +23,7 @@
   async function loadEspecialista() {
     let response = await axios.get(urlEspecialistas + idEspecialista)
     especialista.value = response.data
-    loadEstudios()
+    estudioStore.loadEstudios()
   }
 
   loadEspecialista()
