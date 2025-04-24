@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 
 export const useMedicoStore = defineStore('medicos', {
   state: () => ({
-    /** @type {{ id: String, nombre: String, apellido1: String, apellido2: String, email: String, telefono: String, nCol: String, pacientes: Array, atributoTemporal: String}[]} */
+    /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, nCol: String, pacientes: Array, atributoTemporal: String}[]} */
     medicos: []
   }),
   actions: {
@@ -15,8 +15,7 @@ export const useMedicoStore = defineStore('medicos', {
     setMedico(id, medico) {
       let m = this.getMedico(id)
       m.nombre = medico.nombre
-      m.apellido1 = medico.apellido1
-      m.apellido2 = medico.apellido2
+      m.apellidos = medico.apellidos
       m.email = medico.email
       m.telefono = medico.telefono
       m.nCol = medico.nCol

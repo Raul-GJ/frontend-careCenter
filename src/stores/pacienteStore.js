@@ -4,7 +4,7 @@ import { useUsuarioStore } from './usuarioStore'
 
 export const usePacienteStore = defineStore('pacientes', {
   state: () => ({
-    /** @type {{ id: String, nombre: String, apellido1: String, apellido2: String, email: String, telefono: String, medico: String, alertas: Array, consultas: Array, especialistas: Array, seguimientos: Array}[]} */
+    /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, medico: String, alertas: Array, consultas: Array, especialistas: Array, seguimientos: Array}[]} */
     pacientes: [],
     isLoaded: false
   }),
@@ -18,8 +18,7 @@ export const usePacienteStore = defineStore('pacientes', {
     setPaciente(id, paciente) {
       let p = this.getPaciente(id)
       p.nombre = paciente.nombre
-      p.apellido1 = paciente.apellido1
-      p.apellido2 = paciente.apellido2
+      p.apellidos = paciente.apellidos
       p.email = paciente.email
       p.telefono = paciente.telefono
     },

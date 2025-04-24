@@ -48,6 +48,16 @@
           <v-btn prepend-icon="mdi-chat-question">Mis consultas</v-btn>
         </router-link>
       </v-list-item>
+      <v-list-item>
+        <router-link to="/sanitarios/agregarAlertas">
+          <v-btn prepend-icon="mdi-bell">Crear alertas</v-btn>
+        </router-link>
+      </v-list-item>
+      <v-list-item>
+        <router-link to="/sanitarios/agregarSeguimientos">
+          <v-btn prepend-icon="mdi-list-box-outline">Crear seguimientos</v-btn>
+        </router-link>
+      </v-list-item>
     </v-list>
 
     <v-divider />

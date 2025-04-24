@@ -4,7 +4,7 @@ import { useUsuarioStore } from './usuarioStore'
 
 export const uesEspecialistaStore = defineStore('especialistas', {
   state: () => ({
-    /** @type {{ id: String, nombre: String, apellido1: String, apellido2: String, email: String, telefono: String, nCol: String, pacientes: Array, espceialidad: String, infoEstudios: Array, plantillas: Array, consultas: Array}[]} */
+    /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, nCol: String, pacientes: Array, espceialidad: String, infoEstudios: Array, plantillas: Array, consultas: Array}[]} */
     especialistas: [],
     isLoaded: false
   }),
@@ -18,8 +18,7 @@ export const uesEspecialistaStore = defineStore('especialistas', {
     setEspecialista(id, especialista) {
       let e = this.getEspecialista(id)
       e.nombre = especialista.nombre
-      e.apellido1 = especialista.apellido1
-      e.apellido2 = especialista.apellido2
+      e.apellidos = especialista.apellidos
       e.email = especialista.email
       e.telefono = especialista.telefono
       e.nCol = especialista.nCol

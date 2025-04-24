@@ -18,12 +18,11 @@
   }
   
   const urlApi = usuarioStore.getUrlApi()
-  const urlEspecialistas = urlApi + "usuarios/especialistas/"
   const urlEstudios = urlApi + "estudios/"
   const urlSeguimientos = urlApi + "seguimientos/"
   const urlAlertas = urlApi + "alertas/"
-  const idEspecialista = usuarioStore.getId()
-  const especialista = ref(null)
+  const urlAsignaciones = urlApi + "asignaciones/"
+  const especialista = ref(usuarioStore.getUsuario())
 
   const nombre = ref("")
   const descripcion = ref("")
@@ -87,14 +86,6 @@
     mensajeAlerta.value = ""
     contAlertas.value++
     agregarAlertaValue.value = false
-  }
-
-  async function loadEspecialista() {
-    let response = await axios.get(urlEspecialistas + idEspecialista)
-    especialista.value = response.data
-
-    pacienteStore.loadPacientes()
-    plantillaStore.loadPlantillas()
   }
 
   async function crearEstudio() {
@@ -167,17 +158,28 @@
     }
   }
 
+  async function asignarEstudio(idEstudio) {
+    let body = { especialista: especialista.value.id, estudio: idEstudio, rol: 'CREADOR'}
+    let response = await axios.post(urlAsignaciones, body, headers)
+    if (response.status != 201) {
+      alert("Error al asignar el estudio al especialista")
+      return
+    }
+  }
+
   async function publicarEstudio() {
 
     let idEstudio = await crearEstudio()
     await agregarPacientesEstudio(idEstudio)
     await agregarSeguimientosEstudio(idEstudio)
     await agregarAlertasEstudio(idEstudio)
+    await asignarEstudio(idEstudio)
 
     alert("Estudio creado con éxito")
   }
 
-  loadEspecialista()
+  pacienteStore.loadPacientes()
+  plantillaStore.loadPlantillas()
 </script>
 
 <template>
