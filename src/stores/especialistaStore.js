@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import api from '@/services/api'
 import { useUsuarioStore } from './usuarioStore'
 
-export const uesEspecialistaStore = defineStore('especialistas', {
+export const useEspecialistaStore = defineStore('especialistas', {
   state: () => ({
     /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, nCol: String, pacientes: Array, espceialidad: String, infoEstudios: Array, plantillas: Array, consultas: Array}[]} */
     especialistas: [],
@@ -37,7 +37,7 @@ export const uesEspecialistaStore = defineStore('especialistas', {
       let usuario = usuarioStore.getUsuario()
       try {
         for (let idEspecialista of usuario.especialistas) {
-          let response = await api.get("usuarios/especialistas/" + idEspecialista)
+          let response = await api.get("usuarios/" + idEspecialista)
           console.log(JSON.stringify(response.data))
           this.addEspecialista(response.data)
         }

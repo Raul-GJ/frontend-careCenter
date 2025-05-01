@@ -23,6 +23,11 @@
 
 <template>
   <v-container>
+    <router-link to="./escribirConsulta">
+      <v-btn prepend-icon="mdi-plus-circle">
+        Nueva consulta
+      </v-btn>
+    </router-link>
     <p>Consultas sin responder</p>
     <v-table height="200" fixed-header>
       <thead>

@@ -1,7 +1,13 @@
 <script setup>
-  import { ref } from 'vue'
+import { ref } from 'vue'
+import { useUsuarioStore } from '@/stores/usuarioStore';
 
-  const drawer = ref(false)
+const usuarioStore = useUsuarioStore()
+
+const usuario = usuarioStore.getUsuario()
+const tipoUsuario = usuario.tipo
+
+const drawer = ref(false)
 </script>
 
 <template>
@@ -9,25 +15,22 @@
     <h1>Nombre app</h1>
     <v-spacer />
     <v-btn icon="mdi-magnify" />
-    <v-app-bar-nav-icon
-      variant="text"
-      @click.stop="drawer = !drawer"
-    />
+    <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" />
   </v-app-bar>
-  <v-navigation-drawer 
-    v-model="drawer" 
-    temporary 
-    location="right"
-  >
+  <v-navigation-drawer v-model="drawer" temporary location="right">
     <v-list-item>
       <router-link to="/perfil">
         <v-btn prepend-icon="mdi-account">Mi cuenta</v-btn>
       </router-link>
     </v-list-item>
-    
+
     <v-divider />
 
-    <v-list density="compact" nav>
+    <v-list 
+      v-if="tipoUsuario == 'ESPECIALISTA' || tipoUsuario == 'MEDICO'" 
+      density="compact" 
+      nav
+    >
       <v-list-item>
         <router-link to="/sanitarios/misPacientes">
           <v-btn prepend-icon="mdi-account-group-outline">Mis pacientes</v-btn>
@@ -62,7 +65,11 @@
 
     <v-divider />
 
-    <v-list density="compact" nav>
+    <v-list 
+      v-if="tipoUsuario == 'PACIENTE'" 
+      density="compact" 
+      nav
+    >
       <v-list-item>
         <router-link to="/pacientes/misAlertas">
           <v-btn prepend-icon="mdi-bell">Mis alertas</v-btn>
