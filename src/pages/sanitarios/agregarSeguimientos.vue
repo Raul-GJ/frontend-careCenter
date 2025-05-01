@@ -1,18 +1,10 @@
 <script setup>
   import { ref, computed } from 'vue';
-  import axios from 'axios';
-  import { useUsuarioStore } from '@/stores/usuarioStore';
+  import api from '@/services/api';
   import { usePacienteStore } from '@/stores/pacienteStore';
   import { usePlantillaStore } from '@/stores/plantillaStore';
   import { storeToRefs } from 'pinia';
 
-  const headers = {
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }
-
-  const usuarioStore = useUsuarioStore()
   const pacienteStore = usePacienteStore()
   const plantillaStore = usePlantillaStore()
 
@@ -27,9 +19,8 @@
     return pacientes.pacientes.value.filter((p) => !pacientesAgregados.value.includes(p))
   })
 
-  const urlApi = usuarioStore.getUrlApi()
-  const urlSeguimientos = urlApi + "seguimientos/"
-  const urlPacientes = urlApi + "usuarios/pacientes/"
+  const urlSeguimientos = "seguimientos/"
+  const urlPacientes = "usuarios/pacientes/"
 
   const agregarSeguimientoValue = ref(false)
   const agregarPacienteValue = ref(false)
@@ -74,7 +65,7 @@
         plazo: seguimiento.plazo, 
         plantilla: seguimiento.plantilla.id
       }
-      let response = await axios.post(urlSeguimientos, body, headers)
+      let response = await api.post(urlSeguimientos, body)
       if (!response.status == 201) {
         console.log("No se ha podido crear el seguimiento " + JSON.stringify(seguimiento))
         return
@@ -88,10 +79,9 @@
     // Agregar los seguimientos a los pacientes
     for (let paciente of pacientesAgregados.value) {
       console.log(JSON.stringify(idSeguimientos.value))
-      let response = await axios.patch(
+      let response = await api.patch(
         urlPacientes + paciente.id + "/seguimientos/agregar/", 
-        JSON.stringify(idSeguimientos.value), 
-        headers)
+        JSON.stringify(idSeguimientos.value))
       if (!response.status == 204) {
         console.log("No se ha podido agregar el seguimiento al usuario con id" + paciente.id)
         return

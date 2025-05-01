@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import api from '@/services/api'
 import { useUsuarioStore } from './usuarioStore'
 
 export const useAlertaStore = defineStore('alertas', {
@@ -31,10 +31,9 @@ export const useAlertaStore = defineStore('alertas', {
         return
       const usuarioStore = useUsuarioStore()
       let usuario = usuarioStore.getUsuario()
-      let urlApi = usuarioStore.getUrlApi()
       try {
         for (let idAlerta of usuario.alertas) {
-          let response = await axios.get(urlApi + "alertas/" + idAlerta)
+          let response = await api.get("alertas/" + idAlerta)
           console.log(JSON.stringify(response.data))
           this.addAlerta(response.data)
         }

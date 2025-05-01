@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import api from '@/services/api'
 import { useUsuarioStore } from './usuarioStore'
 
 export const usePlantillaStore = defineStore('plantillas', {
@@ -30,10 +30,9 @@ export const usePlantillaStore = defineStore('plantillas', {
         return
       const usuarioStore = useUsuarioStore()
       let usuario = usuarioStore.getUsuario()
-      let urlApi = usuarioStore.getUrlApi()
       try {
         for (let idPlantilla of usuario.plantillas) {
-          let response = await axios.get(urlApi + "plantillas/" + idPlantilla)
+          let response = await api.get("plantillas/" + idPlantilla)
           console.log(JSON.stringify(response.data))
           this.addPlantilla(response.data)
         }

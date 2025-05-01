@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import api from '@/services/api'
 import { useUsuarioStore } from './usuarioStore'
 
 export const useConsultaStore = defineStore('consultas', {
@@ -27,9 +27,9 @@ export const useConsultaStore = defineStore('consultas', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let idUsuario = usuarioStore.getId()
-      let tipoUsuario = usuarioStore.getTipo()
-      let urlApi = usuarioStore.getUrlApi()
+      let usuario = usuarioStore.getUsuario()
+      let idUsuario = usuario.id
+      let tipoUsuario = usuario.tipo
       try {
         let url
         switch (tipoUsuario) {
@@ -44,7 +44,7 @@ export const useConsultaStore = defineStore('consultas', {
             console.log('Tipo de usuario erroneo: ' + tipoUsuario)
             return
         }
-        let response = await axios.get(urlApi + url + idUsuario)
+        let response = await api.get(url + idUsuario)
         console.log(JSON.stringify(response.data))
         for (let consulta of response.data) {
           this.addConsulta(consulta)

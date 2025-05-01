@@ -1,18 +1,24 @@
 <script setup>
   import { ref } from 'vue'
+  import api from '@/services/api'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
+  import { useRouter } from 'vue-router'
 
-  const nombre = ref('')
-  const apellidos = ref('')
-  const rol = ref('')
+  const usuarioStore = useUsuarioStore()
+  const router = useRouter()
+
+  const nombre = ref('Nombre de prueba')
+  const apellidos = ref('Apellidos de prueba')
+  const rol = ref('Especialista')
   const roles = ref(['Paciente', 'Médico de familia', 'Especialista'])
-  const especialidad = ref('')
-  const correo = ref('')
-  const telefono = ref()
-  const contrasenya = ref('')
+  const nCol = ref('123456')
+  const especialidad = ref('Cardiología')
+  const correo = ref('prueba@gmail.com')
+  const telefono = ref(123123123)
+  const contrasenya = ref('prueba')
   const mostrarContrasenya = ref(false)
   const reglas = ref({
           necesario: value => !!value || 'Campo necesario.',
-          caracteresMinimos: v => v.length >= 8 || 'Minimo 8 caracteres',
           email: value => {
             const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             return pattern.test(value) || 'Correo electrónico incorrecto.'
@@ -24,11 +30,54 @@
           },
         })
 
-  function registrar() {
-    if (reglas.value.email(correo.value) === true && reglas.value.caracteresMinimos(contrasenya.value) === true)
-      alert('Registrado correctamente')
-    else
-      alert('Campos incorrectos')
+  async function registrar() {
+    if (!reglas.value.email(correo.value) === true) {
+      console.log('Campos incorrectos')
+      return
+    }
+    let body = { 
+      nombre: nombre.value,
+      apellidos: apellidos.value,
+      email: correo.value,
+      telefono: telefono.value,
+      contrasenya: contrasenya.value
+    }
+    let url
+    switch (rol.value) {
+      case ('Paciente'):
+        url = 'auth/registro/paciente/'
+        break
+      case ('Medico de familia'):
+        url = 'auth/registro/medico/'
+        body.nCol = nCol.value
+        break
+      case ('Especialista'):
+        url = 'auth/registro/especialista/'
+        body.nCol = nCol.value
+        body.especialidad = especialidad.value
+        break
+      default:
+        console.log('Rol incorrecto')
+        return
+    }
+    let response = await api.post(url, body);
+    if (response.status != 201) {
+      console.log('Ha ocurrido un error creando el usuario')
+      return
+    }
+
+    let location = response.headers.get("location")
+    let idUsuario = location.split("/")[8]
+
+    usuarioStore.setId(idUsuario)
+    await usuarioStore.loadUsuario()
+    if (usuarioStore.getUsuario() == null) {
+      console.log('Error al cargar el usuario')
+      return
+    }
+
+    localStorage.setItem('token', response.data.token);
+    router.push('/home')
   }
 
 </script>
@@ -55,6 +104,12 @@
         label="Rol *"
       />
       <v-text-field 
+        v-if="rol == 'Medico' || rol == 'Especialista'" 
+        v-model="nCol" 
+        label="nCol *"
+        :rules="[reglas.necesario]"
+      />
+      <v-text-field 
         v-if="rol == 'Especialista'" 
         v-model="especialidad" 
         label="Especialidad *"
@@ -73,7 +128,7 @@
       <v-text-field
         v-model="contrasenya"
         :append-icon="mostrarContrasenya ? 'mdi-eye' : 'mdi-eye-off'"
-        :rules="[reglas.necesario, reglas.caracteresMinimos]"
+        :rules="[reglas.necesario]"
         :type="mostrarContrasenya ? 'text' : 'password'"
         label="Contraseña *"
         counter

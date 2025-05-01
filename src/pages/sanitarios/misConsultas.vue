@@ -1,28 +1,10 @@
 <script setup>
-  import { computed, ref } from 'vue'
-  import axios from 'axios'
-  import { useUsuarioStore } from '@/stores/usuarioStore'
+  import { computed } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useConsultaStore } from '@/stores/consultaStore'
-
-  const usuarioStore = useUsuarioStore()
-
-  const urlApi = usuarioStore.getUrlApi()
-  const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const idEspecialista = usuarioStore.getId()
-
-  const especialista = ref(null)
   
   const consultaStore = useConsultaStore()
   const { consultas } = storeToRefs(consultaStore)
-
-  async function loadEspecialista() {
-    let response = await axios.get(urlEspecialistas + idEspecialista)
-    especialista.value = response.data
-    consultaStore.loadConsultas()
-  }
-
-  loadEspecialista()
 
   const consultasSinResponder = computed(() => {
     return consultas.value.filter((c) => c.respuesta == null)
@@ -32,11 +14,7 @@
     return consultas.value.filter((c) => c.respuesta != null)
   })
 
-  function leerConsulta(consulta) {
-    alert(consulta.mensaje)
-    if (consulta.respuesta != null)
-      alert(consulta.respuesta.mensaje)
-  }
+  consultaStore.loadConsultas()
 </script>
 
 <template>
@@ -65,7 +43,12 @@
           <td>{{ consulta.asunto }}</td>
           <td>{{ consulta.fecha }}</td>
           <td>
-            <v-btn icon="mdi-folder-open" title="Ver consulta" @click="leerConsulta(consulta)"/>
+            <router-link :to="`./verConsulta/${consulta.id}`">
+              <v-btn 
+                icon="mdi-folder-open" 
+                title="Abrir consulta"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>
@@ -94,7 +77,12 @@
           <td>{{ consulta.asunto }}</td>
           <td>{{ consulta.fecha }}</td>
           <td>
-            <v-btn icon="mdi-folder-open" title="Ver consulta" @click="leerConsulta(consulta)"/>
+            <router-link :to="`./verConsulta/${consulta.id}`">
+              <v-btn 
+                icon="mdi-folder-open" 
+                title="Abrir consulta"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>

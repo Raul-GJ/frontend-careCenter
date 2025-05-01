@@ -1,35 +1,20 @@
 <script setup>
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
-  import axios from 'axios'
-  import { useUsuarioStore } from '@/stores/usuarioStore'
+  import { usePacienteStore } from '@/stores/pacienteStore'
 
-  const usuarioStore = useUsuarioStore()
+  const pacienteStore = usePacienteStore()
 
   const route = useRoute()
   const idPaciente = route.params.id
-
-  const headers = {
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }
-
-  const urlApi = usuarioStore.getUrlApi()
-  const urlPacientes = urlApi + "usuarios/pacientes/"
   const paciente = ref(null)
 
   const nombrePaciente = ref('')
   const emailPaciente = ref('')
   const telefonoPaciente = ref('')
 
-  async function loadPaciente() {
-    let response = await axios.get(urlPacientes + idPaciente)
-    console.log(JSON.stringify(response.data))
-    paciente.value = response.data
-    nombrePaciente.value = paciente.value.nombre
-    emailPaciente.value = paciente.value.email
-    telefonoPaciente.value = paciente.value.telefono
+  function loadPaciente() {
+    paciente.value = pacienteStore.getPaciente(idPaciente)
   }
 
   loadPaciente()

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import api from '@/services/api'
 import { useUsuarioStore } from './usuarioStore'
 
 export const useAsignacionEstudioStore = defineStore('asignacionEstudios', {
@@ -29,9 +29,8 @@ export const useAsignacionEstudioStore = defineStore('asignacionEstudios', {
         return
       const usuarioStore = useUsuarioStore()
       let idUsuario = usuarioStore.getId()
-      let urlApi = usuarioStore.getUrlApi()
       try {
-        let response = await axios.get(urlApi + "asignaciones/especialista/" + idUsuario)
+        let response = await api.get("asignaciones/especialista/" + idUsuario)
         console.log(JSON.stringify(response.data))
         for (let asignacion of response.data) {
           this.addAsignacionEstudio(asignacion)

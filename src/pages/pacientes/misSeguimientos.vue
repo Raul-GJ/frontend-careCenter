@@ -1,48 +1,11 @@
 <script setup>
-  import { ref } from 'vue'
-  import axios from 'axios'
-  import { useUsuarioStore } from '@/stores/usuarioStore'
   import { useSeguimientoStore } from '@/stores/seguimientoStore'
   import { storeToRefs } from 'pinia'
-
-  const usuarioStore = useUsuarioStore()
-  
-  const headers = {
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }
 
   const seguimientoStore = useSeguimientoStore()
   const { seguimientos } = storeToRefs(seguimientoStore)
 
-  const urlApi = usuarioStore.getUrlApi()
-  const urlSeguimientos = urlApi + "seguimientos/"
-  const urlPacientes = urlApi + "usuarios/pacientes/"
-  const idPaciente = usuarioStore.getId()
-
-  const paciente = ref(null)
-
-  async function loadSeguimientos() {
-    let lista = paciente.value.seguimientos
-    
-    for (let id of lista) {
-      if (!seguimientoStore.getSeguimiento(id)) {
-        let response = await axios.get(urlSeguimientos + id)
-        let newSeguimiento = response.data
-        newSeguimiento.id = id
-        seguimientoStore.addSeguimiento(newSeguimiento)
-      }
-    }
-  }
-  
-  async function loadPaciente() {
-    let response = await axios.get(urlPacientes + idPaciente)
-    paciente.value = response.data
-    loadSeguimientos()
-  }
-
-  loadPaciente()
+  seguimientoStore.loadSeguimientos()
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 <script setup>
   import { ref } from 'vue'
-  import axios from 'axios'
+  import api from '@/services/api'
   import { useUsuarioStore } from '@/stores/usuarioStore'
 
   const usuarioStore = useUsuarioStore()
@@ -13,15 +13,8 @@
           },
         })
 
-  const headers = {
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }
-
-  const urlApi = usuarioStore.getUrlApi()
-  const urlPlantillas = urlApi + "plantillas/"
-  const urlEspecialistas = urlApi + "usuarios/especialistas/"
+  const urlPlantillas = "plantillas/"
+  const urlEspecialistas = "usuarios/especialistas/"
   const idEspecialista = usuarioStore.getId()
 
   const especialista = ref(null)
@@ -98,7 +91,7 @@
   }
 
   async function loadEspecialista() {
-    let response = await axios.get(urlEspecialistas + idEspecialista)
+    let response = await api.get(urlEspecialistas + idEspecialista)
     especialista.value = response.data
   }
 
@@ -108,10 +101,10 @@
     
     alert("Creando plantilla")
     
-    let response = await axios.post(urlPlantillas, {
+    let response = await api.post(urlPlantillas, {
       "nombre": nombre.value,
       "descripcion": descripcion.value
-    }, headers)
+    })
     if (response.status != 201) {
       alert("Ha habido un error al crear esta plantilla")
       return
@@ -138,7 +131,7 @@
     alert("Agregando plantilla a especialista")
 
     let ids = [idPlantilla]
-    let response2 = await axios.patch(urlEspecialistas + idEspecialista + "/plantillas/agregar", ids, headers)
+    let response2 = await api.patch(urlEspecialistas + idEspecialista + "/plantillas/agregar", ids)
     if (response2.status != 204) {
       alert("Ha habido un error al crear esta plantilla")
       return
@@ -164,19 +157,19 @@
     let response
     switch(pregunta.regla.tipoDato) {
       case "CADENA": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/cadena", body, headers)
+        response = await api.post(urlPlantillas + idPlantilla + "/datos/cadena", body)
         break
       case "NUMERAL": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/numeral", body, headers)
+        response = await api.post(urlPlantillas + idPlantilla + "/datos/numeral", body)
         break
       case "BOOLEANO": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/booleano", body, headers)
+        response = await api.post(urlPlantillas + idPlantilla + "/datos/booleano", body)
         break
       case "RANGO": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/rango", body, headers)
+        response = await api.post(urlPlantillas + idPlantilla + "/datos/rango", body)
         break
       case "ENUMERADO": 
-        response = await axios.post(urlPlantillas + idPlantilla + "/datos/enumerado", body, headers)
+        response = await api.post(urlPlantillas + idPlantilla + "/datos/enumerado", body)
         break
       default:
         return false

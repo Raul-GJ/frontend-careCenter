@@ -1,6 +1,5 @@
 <script setup>
   import { ref } from 'vue'
-  import axios from 'axios'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
   import { usePacienteStore } from '@/stores/pacienteStore'
@@ -9,21 +8,16 @@
   
   const especialista = ref(null)
 
-  const urlApi = usuarioStore.getUrlApi()
-  const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const idEspecialista = usuarioStore.getId()
-
   const pacienteStore = usePacienteStore()
   const { pacientes } = storeToRefs(pacienteStore)
 
-  async function loadEspecialista() {
-    let response = await axios.get(urlEspecialistas + idEspecialista)
-    especialista.value = response.data
-    pacienteStore.loadPacientes()
+  async function load() {
+    await usuarioStore.loadUsuario()
+    especialista.value = usuarioStore.getUsuario()
+    await pacienteStore.loadPacientes()
   }
 
-  loadEspecialista()
-
+  load()
 </script>
 
 <template>

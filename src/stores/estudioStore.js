@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import api from '@/services/api'
 import { useUsuarioStore } from './usuarioStore'
 
 export const useEstudioStore = defineStore('estudios', {
   state: () => ({
-    /** @type {{ id: String, nombre: String, descripcion: String, fechaAlta: Date, fechaFin: Date, pacientes: Array, seguimientos: Array, alertas: Array, rol: String}[]} */
+    /** @type {{ id: String, nombre: String, descripcion: String, fechaAlta: Date, fechaFin: Date, pacientes: Array, seguimientos: Array, alertas: Array, rol: String, especialistas: Array}[]} */
     estudios: [],
     isLoaded: false
   }),
@@ -29,17 +29,34 @@ export const useEstudioStore = defineStore('estudios', {
         return
       const usuarioStore = useUsuarioStore()
       let idUsuario = usuarioStore.getId()
-      let urlApi = usuarioStore.getUrlApi()
       try {
-        let response = await axios.get(urlApi + "asignaciones/estudios/" + idUsuario)
+        // Cargar tus estudios
+        console.log('Cargando estudios')
+        let response = await api.get("asignaciones/estudios/" + idUsuario)
         console.log(JSON.stringify(response.data))
         for (let asignacion of response.data) {
           console.log(JSON.stringify(asignacion))
-          let response2 = await axios.get(urlApi + "estudios/" + asignacion.estudio)
+          let response2 = await api.get("estudios/" + asignacion.estudio)
           let newEstudio = response2.data
           newEstudio.rol = asignacion.rol
           this.addEstudio(newEstudio)
         }
+
+        // Cargar los especialistas de tus estudios
+        console.log('Cargando especialistas de los estudios')
+        for (let estudio of this.estudios) {
+          let responseEspecialistas = await api.get("asignaciones/especialistas/" + estudio.id)
+          console.log(JSON.stringify(responseEspecialistas.data))
+          for (let asignacion of responseEspecialistas.data) {
+            console.log(JSON.stringify(asignacion))
+            let response2 = await api.get("usuarios/especialistas/" + asignacion.especialista)
+            let newEspecialista = response2.data
+            newEspecialista.rol = asignacion.rol
+            estudio.especialistas = []
+            estudio.especialistas.push(newEspecialista)
+          }
+        }
+
         this.isLoaded = true
       } catch (error) {
         console.error('Error cargando estudios: ', error)

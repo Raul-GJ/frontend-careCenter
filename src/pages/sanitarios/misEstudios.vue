@@ -1,32 +1,15 @@
 <script setup>
-  import { ref } from 'vue'
-  import axios from 'axios'
-  import { useUsuarioStore } from '@/stores/usuarioStore'
   import { storeToRefs } from 'pinia'
   import { useEstudioStore } from '@/stores/estudioStore'
-
-  const usuarioStore = useUsuarioStore()
-  
-  const urlApi = usuarioStore.getUrlApi()
-  const urlEspecialistas = urlApi + "usuarios/especialistas/"
-  const idEspecialista = usuarioStore.getId()
-
-  const especialista = ref(null)
   
   const estudioStore = useEstudioStore()
   const { estudios } = storeToRefs(estudioStore)
 
-  function verEstudio(estudio) {
-    alert(estudio.descripcion)
-  }
-
-  async function loadEspecialista() {
-    let response = await axios.get(urlEspecialistas + idEspecialista)
-    especialista.value = response.data
+  async function load() {
     estudioStore.loadEstudios()
   }
 
-  loadEspecialista()
+  load()
 
 </script>
 
@@ -64,8 +47,12 @@
           <td>{{ estudio.nombre }}</td>
           <td>{{ estudio.descripcion }}</td>
           <td>
-            <v-btn icon="mdi-folder-open" title="Ver estudio" @click="verEstudio(estudio)"/>
-            <v-btn icon="mdi-text-box-edit" title="Editar estudio" />
+            <router-link :to="`./verEstudio/${estudio.id}`">
+              <v-btn 
+                icon="mdi-list-box-outline" 
+                title="Ver datos"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>
