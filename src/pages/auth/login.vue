@@ -1,8 +1,8 @@
 <script setup>
   import { ref } from 'vue'
-  import api from '@/services/api'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { useRouter } from 'vue-router'
+  import { login } from '@/services/apiAuth'
 
   const router = useRouter()
 
@@ -19,33 +19,16 @@
   const correo = ref('')
   const contrasenya = ref('')
 
-  async function login() {
-    let token = localStorage.getItem('token')
-    if (token)
-      localStorage.removeItem('token')
-    let body = { correo: correo.value, contrasenya: contrasenya.value }
-    let response = await api.post("auth/login", body)
-    if (response.status != 200) {
-      alert("Credenciales incorrectas")
-      return
-    }
-    let id = response.data.id
+  async function doLogin() {
+    console.log('Intentando iniciar sesión con:', correo.value, contrasenya.value)
+    let {token, id} = await login(correo.value, contrasenya.value)
+    localStorage.setItem('token', token);
     usuarioStore.setId(id)
-    /*
-    let response2 = await api.get("usuarios/" + id)
-    if (response2.status != 200) {
-      console.log("Error al cargar el usuario")
-      return
-    }
-    usuarioStore.setUsuario(response2.data)
-    */
     usuarioStore.loadUsuario()
     if (usuarioStore.getUsuario() == null) {
       console.log('Error al cargar el usuario')
       return
     }
-    
-    localStorage.setItem('token', response.data.token);
     router.push('/home')
   }
 
@@ -73,14 +56,9 @@
         @click:append="mostrarContrasenya = !mostrarContrasenya"
       />
 
-      <v-btn @click="login()">
+      <v-btn @click="doLogin()">
         Login
       </v-btn>
-      <!--
-      <router-link to="/home">
-        <v-btn>Login</v-btn>
-      </router-link>
-      -->
     </v-form>
   </v-container>
 </template>
