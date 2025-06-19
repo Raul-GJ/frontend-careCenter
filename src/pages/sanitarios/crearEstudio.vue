@@ -1,20 +1,19 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import api from '@/services/api'
   import { useDate } from 'vuetify'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { usePacienteStore } from '@/stores/pacienteStore'
   import { usePlantillaStore } from '@/stores/plantillaStore'
   import { storeToRefs } from 'pinia'
+  import { crearEstudio, agregarPacientesEstudio, agregarAlertasEstudio, agregarSeguimientosEstudio } from '@/services/apiEstudios'
+  import { crearAsignacion } from '@/services/apiAsignaciones'
+  import { crearSeguimiento } from '@/services/apiSeguimientos'
+  import { crearAlerta } from '@/services/apiAlertas'
 
   const usuarioStore = useUsuarioStore();
   
   const adapter = useDate()
-  
-  const urlEstudios = "estudios/"
-  const urlSeguimientos = "seguimientos/"
-  const urlAlertas = "alertas/"
-  const urlAsignaciones = "asignaciones/"
+
   const especialista = ref(usuarioStore.getUsuario())
 
   const nombre = ref("")
@@ -81,12 +80,12 @@
     agregarAlertaValue.value = false
   }
 
-  async function crearEstudio() {
+  async function doCrearEstudio() {
     let estudio = { nombre: nombre.value, 
       descripcion: descripcion.value, 
       fechaAlta: adapter.toISO(fechaAltaLocal.value) + "T09:00:00",
       fechaFin: adapter.toISO(fechaFinLocal.value) + "T09:00:00" }
-    let response = await api.post(urlEstudios, estudio)
+    let response = await crearEstudio(estudio)
 
     if (response.status != 201) {
       alert("Error al crear el estudio")
@@ -94,24 +93,24 @@
     }
 
     let location = response.headers.get("location")
-    let idEstudio = location.split("/")[6]
+    let idEstudio = location.split("/").at(-1)
     return idEstudio
   }
 
-  async function agregarPacientesEstudio(idEstudio) {
+  async function doAgregarPacientesEstudio(idEstudio) {
     let pacientesIds = pacientesEstudio.value.map((p) => p.id)
-    let pacientesResponse = await api.patch(urlEstudios + idEstudio + "/pacientes/agregar", pacientesIds)
+    let pacientesResponse = await agregarPacientesEstudio(idEstudio, pacientesIds)
     if (pacientesResponse.status != 204) {
       alert("Error al agregar pacientes")
       return
     }
   }
 
-  async function agregarSeguimientosEstudio(idEstudio) {
+  async function doAgregarSeguimientosEstudio(idEstudio) {
     let seguimientosIds = []
     for (let seguimiento of seguimientosEstudio.value) {
       let body = { fecha: seguimiento.fecha, plazo: seguimiento.plazo, plantilla: seguimiento.formulario.id }
-      let seguimientoResponse = await api.post(urlSeguimientos, body)
+      let seguimientoResponse = await crearSeguimiento(idEstudio, body)
       if (seguimientoResponse.status != 201) {
         alert("Error al crear el seguimiento " + seguimiento.id)
         return
@@ -121,7 +120,7 @@
       seguimientosIds.push(idSeguimiento)
     }
 
-    let seguimientosResponse = await api.patch(urlEstudios + idEstudio + "/seguimientos/agregar", seguimientosIds)
+    let seguimientosResponse = await agregarSeguimientosEstudio(idEstudio, seguimientosIds)
 
     if (seguimientosResponse.status != 204) {
       alert("Error al agregar seguimientos al estudio")
@@ -129,11 +128,11 @@
     }
   }
 
-  async function agregarAlertasEstudio(idEstudio) {
+  async function doAgregarAlertasEstudio(idEstudio) {
     let alertasIds = []
     for (let alerta of alertasEstudio.value) {
       let body = { fecha: alerta.fecha, asunto: alerta.asunto, mensaje: alerta.mensaje }
-      let alertaResponse = await api.post(urlAlertas, body)
+      let alertaResponse = await crearAlerta(idEstudio, body)
       if (alertaResponse.status != 201) {
         alert("Error al crear la alerta " + alerta.id)
         return
@@ -143,7 +142,7 @@
       alertasIds.push(idAlerta)
     }
 
-    let alertasResponse = await api.patch(urlEstudios + idEstudio + "/alertas/agregar", alertasIds)
+    let alertasResponse = await agregarAlertasEstudio(idEstudio, alertasIds)
 
     if (alertasResponse.status != 204) {
       alert("Error al agregar alertas al estudio")
@@ -153,7 +152,7 @@
 
   async function asignarEstudio(idEstudio) {
     let body = { especialista: especialista.value.id, estudio: idEstudio, rol: 'CREADOR'}
-    let response = await api.post(urlAsignaciones, body)
+    let response = await crearAsignacion(body)
     if (response.status != 201) {
       alert("Error al asignar el estudio al especialista")
       return
@@ -162,10 +161,10 @@
 
   async function publicarEstudio() {
 
-    let idEstudio = await crearEstudio()
-    await agregarPacientesEstudio(idEstudio)
-    await agregarSeguimientosEstudio(idEstudio)
-    await agregarAlertasEstudio(idEstudio)
+    let idEstudio = await doCrearEstudio()
+    await doAgregarPacientesEstudio(idEstudio)
+    await doAgregarSeguimientosEstudio(idEstudio)
+    await doAgregarAlertasEstudio(idEstudio)
     await asignarEstudio(idEstudio)
 
     alert("Estudio creado con éxito")

@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { obtenerAsignacionesPorEspecialista, obtenerAsignacionesPorEstudio } from '@/services/apiAsignaciones'
+import { obtenerEstudio } from '@/services/apiEstudios'
+import { obtenerUsuario } from '@/services/apiUsuarios'
 import { useUsuarioStore } from './usuarioStore'
 
 export const useEstudioStore = defineStore('estudios', {
@@ -32,11 +34,11 @@ export const useEstudioStore = defineStore('estudios', {
       try {
         // Cargar tus estudios
         console.log('Cargando estudios')
-        let response = await api.get("asignaciones/estudios/" + idUsuario)
+        let response = await obtenerAsignacionesPorEspecialista(idUsuario)
         console.log(JSON.stringify(response.data))
         for (let asignacion of response.data) {
           console.log(JSON.stringify(asignacion))
-          let response2 = await api.get("estudios/" + asignacion.estudio)
+          let response2 = await obtenerEstudio("estudios/" + asignacion.estudio)
           let newEstudio = response2.data
           newEstudio.rol = asignacion.rol
           this.addEstudio(newEstudio)
@@ -45,11 +47,11 @@ export const useEstudioStore = defineStore('estudios', {
         // Cargar los especialistas de tus estudios
         console.log('Cargando especialistas de los estudios')
         for (let estudio of this.estudios) {
-          let responseEspecialistas = await api.get("asignaciones/especialistas/" + estudio.id)
+          let responseEspecialistas = await obtenerAsignacionesPorEstudio(estudio.id)
           console.log(JSON.stringify(responseEspecialistas.data))
           for (let asignacion of responseEspecialistas.data) {
             console.log(JSON.stringify(asignacion))
-            let response2 = await api.get("usuarios/especialistas/" + asignacion.especialista)
+            let response2 = await obtenerUsuario(asignacion.especialista)
             let newEspecialista = response2.data
             newEspecialista.rol = asignacion.rol
             estudio.especialistas = []

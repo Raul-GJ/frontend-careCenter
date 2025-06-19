@@ -22,7 +22,10 @@ export async function login(correo, contrasenya) {
       console.log('Error al iniciar sesión: token no recibido')
       return
     }
-    return response.data
+    // Guardar token y expiración (1 hora)
+    localStorage.setItem('token', token)
+    localStorage.setItem('token_expiry', (Date.now() + 3600 * 1000).toString())
+    return response
   } catch (error) {
     console.error("Error during API authentication:", error);
     throw error;
@@ -34,7 +37,6 @@ export async function logout() {
     let token = localStorage.getItem('token')
     if (token) {
       await api.post(ENDPOINTS.AUTH.LOGOUT, {});
-      localStorage.removeItem('token');
     }
   } catch (error) {
     console.error("Error during API logout:", error);
@@ -42,15 +44,15 @@ export async function logout() {
   }
 }
 
-export async function registro(correo, contrasenya) {
+export async function registro(rol, body) {
   try {
-    let body = { correo, contrasenya }
-    let response = await api.post(ENDPOINTS.AUTH.LOGOUT, body)
+    let response = await api.post(ENDPOINTS.AUTH.REGISTRO(rol), body)
     if (response.status != 201) {
       alert("Error al registrar el usuario")
-      return
+      return null;
     }
     alert("Usuario registrado correctamente")
+    return response;
   } catch (error) {
     console.error("Error during API registration:", error);
     throw error;

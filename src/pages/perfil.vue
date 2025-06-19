@@ -1,24 +1,12 @@
 <script setup>
   import { ref } from 'vue'
-  import axios from 'axios'
+  import { modificarUsuario } from '@/services/apiUsuarios'
   import { useUsuarioStore } from '@/stores/usuarioStore'
-
-  const headers = {
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }
   
   const usuarioStore = useUsuarioStore()
 
   const idUsuario = usuarioStore.getId()
-  const tipoUsuario = usuarioStore.getTipo()
-  const urlApi = usuarioStore.getUrlApi()
   const usuario = usuarioStore.getUsuario()
-
-  const urlPacientes = urlApi + "usuarios/pacientes/"
-  const urlMedicos = urlApi + "usuarios/medicos/"
-  const urlEspecialistas = urlApi + "usuarios/especialistas/"
   
   const nombre = ref(usuario.nombre)
   const email = ref(usuario.email)
@@ -48,26 +36,12 @@
   }
 
   async function editarUsuario() {
-    let url
-    switch(tipoUsuario) {
-      case ("PACIENTE"):
-        url = urlPacientes
-        break
-      case ("MEDICO"):
-        url = urlMedicos
-        break
-      case ("ESPECIALISTA"):
-        url = urlEspecialistas
-        break
-      default:
-        return
-    }
     let body = { 
       nombre: nombre.value,
       email: email.value,
       telefono: telefono.value
     }
-    let response = await axios.patch(url + idUsuario, body, headers)
+    let response = await modificarUsuario(idUsuario, body)
     if (response.status != 204) {
       console.log("Error al modificar el usuario ")
     }

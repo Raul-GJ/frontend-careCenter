@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { obtenerAlerta } from '@/services/apiAlertas'
 import { useUsuarioStore } from './usuarioStore'
 
 export const useAlertaStore = defineStore('alertas', {
   state: () => ({
-    /** @type {{ id: String, asunto: String, mensaje: String, fecha: Date}[]} */
+    /** @type {{ id: String, asunto: String, mensaje: String, fecha: Date, leida: boolean}[]} */
     alertas: [],
     isLoaded: false
   }),
@@ -17,11 +17,14 @@ export const useAlertaStore = defineStore('alertas', {
     },
     setAlerta(id, alerta) {
       let a = this.getAlerta(id)
-      a.nombre = alerta.nombre
-      a.apellido1 = alerta.apellido1
-      a.apellido2 = alerta.apellido2
-      a.email = alerta.email
-      a.telefono = alerta.telefono
+      a.leida = alerta.leida
+      a.asunto = alerta.asunto
+      a.mensaje = alerta.mensaje
+      a.fecha = alerta.fecha
+    },
+    leerAlerta(id) {
+      let a = this.getAlerta(id)
+      a.leida = true
     },
     deleteAlerta(id) {
       this.alertas = this.alertas.filter(a => a.id != id)
@@ -33,7 +36,7 @@ export const useAlertaStore = defineStore('alertas', {
       let usuario = usuarioStore.getUsuario()
       try {
         for (let idAlerta of usuario.alertas) {
-          let response = await api.get("alertas/" + idAlerta)
+          let response = await obtenerAlerta(idAlerta)
           console.log(JSON.stringify(response.data))
           this.addAlerta(response.data)
         }

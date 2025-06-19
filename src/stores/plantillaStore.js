@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { obtenerPlantilla } from '@/services/apiPlantillas'
 import { useUsuarioStore } from './usuarioStore'
 
 export const usePlantillaStore = defineStore('plantillas', {
@@ -32,7 +32,7 @@ export const usePlantillaStore = defineStore('plantillas', {
       let usuario = usuarioStore.getUsuario()
       try {
         for (let idPlantilla of usuario.plantillas) {
-          let response = await api.get("plantillas/" + idPlantilla)
+          let response = await obtenerPlantilla(idPlantilla)
           console.log(JSON.stringify(response.data))
           this.addPlantilla(response.data)
         }

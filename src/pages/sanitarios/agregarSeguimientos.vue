@@ -1,9 +1,10 @@
 <script setup>
   import { ref, computed } from 'vue';
-  import api from '@/services/api';
   import { usePacienteStore } from '@/stores/pacienteStore';
   import { usePlantillaStore } from '@/stores/plantillaStore';
   import { storeToRefs } from 'pinia';
+  import { crearSeguimiento } from '@/services/apiSeguimientos';
+  import { agregarSeguimientosPaciente } from '@/services/apiUsuarios';
 
   const pacienteStore = usePacienteStore()
   const plantillaStore = usePlantillaStore()
@@ -18,9 +19,6 @@
     pacientes.pacientes.value
     return pacientes.pacientes.value.filter((p) => !pacientesAgregados.value.includes(p))
   })
-
-  const urlSeguimientos = "seguimientos/"
-  const urlPacientes = "usuarios/pacientes/"
 
   const agregarSeguimientoValue = ref(false)
   const agregarPacienteValue = ref(false)
@@ -65,7 +63,7 @@
         plazo: seguimiento.plazo, 
         plantilla: seguimiento.plantilla.id
       }
-      let response = await api.post(urlSeguimientos, body)
+      let response = await crearSeguimiento(body)
       if (!response.status == 201) {
         console.log("No se ha podido crear el seguimiento " + JSON.stringify(seguimiento))
         return
@@ -79,9 +77,7 @@
     // Agregar los seguimientos a los pacientes
     for (let paciente of pacientesAgregados.value) {
       console.log(JSON.stringify(idSeguimientos.value))
-      let response = await api.patch(
-        urlPacientes + paciente.id + "/seguimientos/agregar/", 
-        JSON.stringify(idSeguimientos.value))
+      let response = await agregarSeguimientosPaciente(paciente.id, idSeguimientos.value)
       if (!response.status == 204) {
         console.log("No se ha podido agregar el seguimiento al usuario con id" + paciente.id)
         return

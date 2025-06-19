@@ -9,7 +9,7 @@ export async function crearSeguimiento(seguimiento) {
       alert("Error al crear el seguimiento");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al crear el seguimiento:", error);
     throw error;
@@ -24,7 +24,7 @@ export async function obtenerSeguimiento(id) {
       alert("Error al obtener el seguimiento");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener el seguimiento:", error);
     throw error;
@@ -39,7 +39,7 @@ export async function modificarSeguimiento(id, seguimiento) {
       alert("Error al modificar el seguimiento");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al modificar el seguimiento:", error);
     throw error;
@@ -54,7 +54,7 @@ export async function eliminarSeguimiento(id) {
       alert("Error al eliminar el seguimiento");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar el seguimiento:", error);
     throw error;
@@ -69,7 +69,7 @@ export async function rellenarFormulario(id, datos) {
       alert("Error al rellenar el formulario del seguimiento");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al rellenar el formulario del seguimiento:", error);
     throw error;

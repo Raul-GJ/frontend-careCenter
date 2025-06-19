@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { obtenerUsuario } from '@/services/apiUsuarios'
 import { useUsuarioStore } from './usuarioStore'
 
 export const useMedicoStore = defineStore('medicos', {
@@ -32,7 +32,7 @@ export const useMedicoStore = defineStore('medicos', {
       const usuarioStore = useUsuarioStore()
       let usuario = usuarioStore.getUsuario()
       try {
-        let response = await api.get("usuarios/" + usuario.medicoCabecera)
+        let response = await obtenerUsuario(usuario.medicoCabecera)
         console.log(JSON.stringify(response.data))
         this.addMedico(response.data)
         

@@ -1,7 +1,8 @@
 <script setup>
   import { ref } from 'vue'
-  import api from '@/services/api'
   import { useUsuarioStore } from '@/stores/usuarioStore'
+  import { crearPlantilla, agregarPregunta } from '@/services/apiPlantillas'
+  import { agregarPlantillasEspecialista } from '@/services/apiUsuarios'
 
   const usuarioStore = useUsuarioStore()
 
@@ -13,18 +14,15 @@
           },
         })
 
-  const urlPlantillas = "plantillas/"
-  const urlEspecialistas = "usuarios/especialistas/"
   const idEspecialista = usuarioStore.getId()
 
-  const especialista = ref(null)
   const nombre = ref("")
   const descripcion = ref("")
   const preguntas = ref([])
   const strPregunta = ref("")
 
   const tiposPregunta = ref(["Texto", "Número", "verdadero/falso", "rango numérico", "selección"])
-  const tiposPreguntaFormal = ref(["CADENA", "NUMERAL", "BOOLEANO", "RANGO", "ENUMERADO"])
+  const tiposPreguntaFormal = ref(["TEXTO", "NUMERICO", "BOOLEANO", "RANGO", "ENUMERADO"])
   const tipoPregunta = ref("Texto")
 
   const rangoMinValue = ref(1)
@@ -34,7 +32,7 @@
   const newEnumValue = ref("")
 
   const cont = ref(0)
-  const agregarPregunta = ref(false)
+  const agregarPreguntaBoolean = ref(false)
 
   const limpiarPlantillaValue = ref(false)
 
@@ -62,7 +60,7 @@
   }
 
   function changeAgregarState() {
-    agregarPregunta.value = !agregarPregunta.value
+    agregarPreguntaBoolean.value = !agregarPreguntaBoolean.value
   }
 
   function addPregunta() {
@@ -90,21 +88,13 @@
     preguntas.value = preguntas.value.filter((p) => p.id != id)
   }
 
-  async function loadEspecialista() {
-    let response = await api.get(urlEspecialistas + idEspecialista)
-    especialista.value = response.data
-  }
-
   async function publicarPlantilla() {
     
     // Publicar plantilla
     
     alert("Creando plantilla")
     
-    let response = await api.post(urlPlantillas, {
-      "nombre": nombre.value,
-      "descripcion": descripcion.value
-    })
+    let response = await crearPlantilla( { nombre: nombre.value, descripcion: descripcion.value })
     if (response.status != 201) {
       alert("Ha habido un error al crear esta plantilla")
       return
@@ -115,7 +105,7 @@
     alert("Agregando preguntas")
 
     let location = response.headers.get("location")
-    let idPlantilla = location.split("/")[6]
+    let idPlantilla = location.split("/").at(-1)
 
     for (let pregunta of preguntas.value) {
       if (!publicarPregunta(idPlantilla, pregunta)) {
@@ -131,7 +121,7 @@
     alert("Agregando plantilla a especialista")
 
     let ids = [idPlantilla]
-    let response2 = await api.patch(urlEspecialistas + idEspecialista + "/plantillas/agregar", ids)
+    let response2 = await agregarPlantillasEspecialista(idEspecialista, ids)
     if (response2.status != 204) {
       alert("Ha habido un error al crear esta plantilla")
       return
@@ -154,32 +144,11 @@
 
   async function publicarPregunta(idPlantilla, pregunta) {
     let body = JSON.stringify(pregunta, replacerPreguntas)
-    let response
-    switch(pregunta.regla.tipoDato) {
-      case "CADENA": 
-        response = await api.post(urlPlantillas + idPlantilla + "/datos/cadena", body)
-        break
-      case "NUMERAL": 
-        response = await api.post(urlPlantillas + idPlantilla + "/datos/numeral", body)
-        break
-      case "BOOLEANO": 
-        response = await api.post(urlPlantillas + idPlantilla + "/datos/booleano", body)
-        break
-      case "RANGO": 
-        response = await api.post(urlPlantillas + idPlantilla + "/datos/rango", body)
-        break
-      case "ENUMERADO": 
-        response = await api.post(urlPlantillas + idPlantilla + "/datos/enumerado", body)
-        break
-      default:
-        return false
-    }
+    let response = await agregarPregunta(idPlantilla, pregunta.regla.tipoDato, body)
     if (response.status != 201)
       return false
     return true
   }
-
-  loadEspecialista()
 </script>
 
 <template>
@@ -227,7 +196,7 @@
       >
         Agregar pregunta
       </v-btn>
-      <v-container v-if="agregarPregunta">
+      <v-container v-if="agregarPreguntaBoolean">
         <v-text-field 
           v-model="strPregunta"
           display 

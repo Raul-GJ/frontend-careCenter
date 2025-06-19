@@ -7,15 +7,21 @@
   const { consultas } = storeToRefs(consultaStore)
 
   const consultasSinRespuesta = computed(() => {
-    return consultas.value.filter((c) => c.respuesta == '')
+    return consultas.value.filter((c) => c.respuesta == null)
   })
 
   const consultasRespondidas = computed(() => {
-    return consultas.value.filter((c) => !c.respuesta == '')
+    return consultas.value.filter((c) => c.respuesta != null)
   })
 
-  function leerConsulta(consulta) {
-    alert(consulta.mensaje)
+  function formatoFecha(fecha) {
+    return new Date(fecha).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
   consultaStore.loadConsultas()
@@ -33,9 +39,6 @@
       <thead>
         <tr>
           <th>
-            Id
-          </th>
-          <th>
             Asunto
           </th>
           <th>
@@ -51,12 +54,16 @@
       </thead>
       <tbody>
         <tr v-for="consulta in consultasSinRespuesta" :key="consulta.id" >
-          <td>{{ consulta.id }}</td>
           <td>{{ consulta.asunto }}</td>
-          <td>{{ consulta.fechaEnvio }}</td>
-          <td>{{ consulta.sanitario }}</td>
+          <td>{{ formatoFecha(consulta.fecha) }}</td>
+          <td>{{ consulta.receptor.nombre }}</td>
           <td>
-            <v-btn icon="mdi-folder-open" title="Ver consulta" @click="leerConsulta(consulta)"/>
+            <router-link :to="`./verConsulta/${consulta.id}`">
+              <v-btn 
+                icon="mdi-folder-open" 
+                title="Ver consulta"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>
@@ -65,9 +72,6 @@
     <v-table height="200" fixed-header>
       <thead>
         <tr>
-          <th>
-            Id
-          </th>
           <th>
             Asunto
           </th>
@@ -87,13 +91,17 @@
       </thead>
       <tbody>
         <tr v-for="consulta in consultasRespondidas" :key="consulta.id" >
-          <td>{{ consulta.id }}</td>
           <td>{{ consulta.asunto }}</td>
-          <td>{{ consulta.fechaEnvio }}</td>
-          <td>{{ consulta.fechaRespuesta }}</td>
-          <td>{{ consulta.sanitario }}</td>
+          <td>{{ formatoFecha(consulta.fecha) }}</td>
+          <td>{{ formatoFecha(consulta.respuesta.fecha) }}</td>
+          <td>{{ consulta.receptor.nombre }}</td>
           <td>
-            <v-btn icon="mdi-folder-open" title="Ver consulta" @click="leerConsulta(consulta)"/>
+            <router-link :to="`./verConsulta/${consulta.id}`">
+              <v-btn 
+                icon="mdi-folder-open" 
+                title="Ver consulta"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>

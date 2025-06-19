@@ -8,7 +8,7 @@ export async function crearAlerta(alerta) {
       alert("Error al crear la alerta");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al crear la alerta:", error);
     throw error;
@@ -22,7 +22,7 @@ export async function obtenerAlerta(id) {
       alert("Error al obtener la alerta");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener la alerta:", error);
     throw error;
@@ -36,7 +36,7 @@ export async function modificarAlerta(id, alerta) {
       alert("Error al modificar la alerta");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al modificar la alerta:", error);
     throw error;
@@ -50,9 +50,23 @@ export async function eliminarAlerta(id) {
       alert("Error al eliminar la alerta");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar la alerta:", error);
+    throw error;
+  }
+}
+
+export async function leerAlerta(id) {
+  try {
+    let response = await api.patch(ENDPOINTS.ALERTAS.LEER_ALERTA(id));
+    if (response.status !== 204) {
+      alert("Error al leer la alerta");
+      return null;
+    }
+    return response;
+  } catch (error) {
+    console.error("Error al leer la alerta:", error);
     throw error;
   }
 }

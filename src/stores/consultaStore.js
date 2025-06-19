@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { obtenerConsultasUsuario } from '@/services/apiConsultas'
 import { useUsuarioStore } from './usuarioStore'
+import { obtenerUsuario } from '@/services/apiUsuarios'
 
 export const useConsultaStore = defineStore('consultas', {
   state: () => ({
-    /** @type {{ id: String, emisor: String, receptor: String, asunto: String, mensaje: String, fecha: Date, respuesta: String, fechaRespuesta: Date}[]} */
+    /** @type {{ id: String, emisor: Object, receptor: Object, asunto: String, mensaje: String, fecha: Date, respuesta: Object}[]} */
     consultas: [],
     isLoaded: false
   }),
@@ -29,25 +30,17 @@ export const useConsultaStore = defineStore('consultas', {
       const usuarioStore = useUsuarioStore()
       let usuario = usuarioStore.getUsuario()
       let idUsuario = usuario.id
-      let tipoUsuario = usuario.tipo
       try {
-        let url
-        switch (tipoUsuario) {
-          case 'PACIENTE':
-            url = "consultas/paciente/"
-            break
-          case 'MEDICO':
-          case 'ESPECIALISTA':
-            url = "consultas/sanitario/"
-            break
-          default:
-            console.log('Tipo de usuario erroneo: ' + tipoUsuario)
-            return
-        }
-        let response = await api.get(url + idUsuario)
+        let response = await obtenerConsultasUsuario(idUsuario)
         console.log(JSON.stringify(response.data))
         for (let consulta of response.data) {
-          this.addConsulta(consulta)
+          let consulta2 = consulta
+          consulta2.emisor = usuario
+          if (consulta.receptor) {
+            let response2 = await obtenerUsuario(consulta.receptor)
+            consulta2.receptor = response2.data
+          }
+          this.addConsulta(consulta2)
         }
         this.isLoaded = true
       } catch (error) {

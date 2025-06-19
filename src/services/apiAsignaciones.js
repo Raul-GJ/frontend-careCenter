@@ -7,7 +7,7 @@ export async function crearAsignacion(asignacion) {
       alert("Error al crear la asignación");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al crear la asignación:", error);
     throw error;
@@ -20,33 +20,33 @@ export async function obtenerAsignacion(id) {
       alert("Error al obtener la asignación");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener la asignación:", error);
     throw error;
   }
 }
-export async function obtenerEspecialistasAsignacion(id) {
+export async function obtenerAsignacionesPorEspecialista(id) {
   try {
-    let response = await api.get(ENDPOINTS.ASIGNACIONES.OBTENER_ESPECIALISTAS(id));
+    let response = await api.get(ENDPOINTS.ASIGNACIONES.OBTENER_ASIGNACIONES_POR_ESPECIALISTA(id));
     if (response.status !== 200) {
       alert("Error al obtener los especialistas de la asignación");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener los especialistas de la asignación:", error);
     throw error;
   }
 }
-export async function obtenerEstudiosAsignacion(id) {
+export async function obtenerAsignacionesPorEstudio(id) {
   try {
-    let response = await api.get(ENDPOINTS.ASIGNACIONES.OBTENER_ESTUDIOS(id));
+    let response = await api.get(ENDPOINTS.ASIGNACIONES.OBTENER_ASIGNACIONES_POR_ESTUDIO(id));
     if (response.status !== 200) {
       alert("Error al obtener los estudios de la asignación");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener los estudios de la asignación:", error);
     throw error;
@@ -59,7 +59,7 @@ export async function modificarAsignacion(id, asignacion) {
       alert("Error al modificar la asignación");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al modificar la asignación:", error);
     throw error;
@@ -72,7 +72,7 @@ export async function eliminarAsignacion(id) {
       alert("Error al eliminar la asignación");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar la asignación:", error);
     throw error;

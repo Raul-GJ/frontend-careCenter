@@ -8,7 +8,7 @@ export async function crearEstudio(estudio) {
       alert("Error al crear el estudio");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al crear el estudio:", error);
     throw error;
@@ -21,7 +21,7 @@ export async function obtenerEstudio(id) {
       alert("Error al obtener el estudio");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener el estudio:", error);
     throw error;
@@ -34,7 +34,7 @@ export async function modificarEstudio(id, estudio) {
       alert("Error al modificar el estudio");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al modificar el estudio:", error);
     throw error;
@@ -47,7 +47,7 @@ export async function eliminarEstudio(id) {
       alert("Error al eliminar el estudio");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar el estudio:", error);
     throw error;
@@ -60,7 +60,7 @@ export async function agregarPacientesEstudio(id, pacientes) {
       alert("Error al agregar pacientes al estudio");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar pacientes al estudio:", error);
     throw error;
@@ -73,7 +73,7 @@ export async function eliminarPacienteEstudio(idEstudio, idPaciente) {
       alert("Error al eliminar el paciente del estudio");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar el paciente del estudio:", error);
     throw error;
@@ -86,7 +86,7 @@ export async function agregarEspecialistasEstudio(id, especialistas) {
       alert("Error al agregar especialistas al estudio");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar especialistas al estudio:", error);
     throw error;
@@ -99,7 +99,7 @@ export async function eliminarEspecialistaEstudio(idEstudio, idEspecialista) {
       alert("Error al eliminar el especialista del estudio");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar el especialista del estudio:", error);
     throw error;
@@ -112,7 +112,7 @@ export async function agregarAlertasEstudio(id, alertas) {
       alert("Error al agregar alertas al estudio");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar alertas al estudio:", error);
     throw error;
@@ -125,20 +125,20 @@ export async function eliminarAlertaEstudio(idEstudio, idAlerta) {
       alert("Error al eliminar la alerta del estudio");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar la alerta del estudio:", error);
     throw error;
   }
 }
-export async function agregarSeguiminetosEstudio(id, seguimientos) {
+export async function agregarSeguimientosEstudio(id, seguimientos) {
   try {
     let response = await api.post(ENDPOINTS.ESTUDIOS.AGREGAR_SEGUIMIENTOS(id), seguimientos);
     if (response.status !== 200) {
       alert("Error al agregar seguimientos al estudio");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar seguimientos al estudio:", error);
     throw error;
@@ -151,7 +151,7 @@ export async function eliminarSeguimientoEstudio(idEstudio, idSeguimiento) {
       alert("Error al eliminar el seguimiento del estudio");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar el seguimiento del estudio:", error);
     throw error;

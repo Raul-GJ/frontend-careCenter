@@ -7,7 +7,7 @@ export async function crearConsulta(consulta) {
       alert("Error al crear la consulta");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al crear la consulta:", error);
     throw error;
@@ -20,20 +20,20 @@ export async function obtenerConsulta(id) {
       alert("Error al obtener la consulta");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener la consulta:", error);
     throw error;
   }
 }
-export async function OBTENER_CONSULTAS_USUARIO(id) {
+export async function obtenerConsultasUsuario(id) {
   try {
     let response = await api.get(ENDPOINTS.CONSULTAS.OBTENER_CONSULTAS_USUARIO(id));
     if (response.status !== 200) {
       alert("Error al obtener las consultas del paciente");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener las consultas del paciente:", error);
     throw error;
@@ -46,7 +46,7 @@ export async function responderConsulta(id, respuesta) {
       alert("Error al responder la consulta");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al responder la consulta:", error);
     throw error;

@@ -1,8 +1,8 @@
 <script setup>
   import { ref } from 'vue'
-  import api from '@/services/api'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { useRouter } from 'vue-router'
+  import { registro } from '@/services/apiAuth'
 
   const usuarioStore = useUsuarioStore()
   const router = useRouter()
@@ -42,17 +42,17 @@
       telefono: telefono.value,
       contrasenya: contrasenya.value
     }
-    let url
+    let rolFormateado
     switch (rol.value) {
       case ('Paciente'):
-        url = 'auth/registro/paciente/'
+        rolFormateado = 'PACIENTE'
         break
       case ('Medico de familia'):
-        url = 'auth/registro/medico/'
+        rolFormateado = 'MEDICO'
         body.nCol = nCol.value
         break
       case ('Especialista'):
-        url = 'auth/registro/especialista/'
+        rolFormateado = 'ESPECIALISTA'
         body.nCol = nCol.value
         body.especialidad = especialidad.value
         break
@@ -60,14 +60,13 @@
         console.log('Rol incorrecto')
         return
     }
-    let response = await api.post(url, body);
-    if (response.status != 201) {
-      console.log('Ha ocurrido un error creando el usuario')
+    let response = await registro(rolFormateado, body)
+    if (response == null) {
+      console.log('Error al registrar el usuario')
       return
     }
-
     let location = response.headers.get("location")
-    let idUsuario = location.split("/")[8]
+    let idUsuario = location.split("/").at(-1)
 
     usuarioStore.setId(idUsuario)
     await usuarioStore.loadUsuario()

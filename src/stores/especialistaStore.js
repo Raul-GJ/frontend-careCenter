@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { obtenerUsuario } from '@/services/apiUsuarios'
 import { useUsuarioStore } from './usuarioStore'
 
 export const useEspecialistaStore = defineStore('especialistas', {
@@ -37,7 +37,7 @@ export const useEspecialistaStore = defineStore('especialistas', {
       let usuario = usuarioStore.getUsuario()
       try {
         for (let idEspecialista of usuario.especialistas) {
-          let response = await api.get("usuarios/" + idEspecialista)
+          let response = await obtenerUsuario(idEspecialista)
           console.log(JSON.stringify(response.data))
           this.addEspecialista(response.data)
         }

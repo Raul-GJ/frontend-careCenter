@@ -4,7 +4,7 @@
   import { useEspecialistaStore } from '@/stores/especialistaStore';
   import { useMedicoStore } from '@/stores/medicoStore';
   import { ref } from 'vue';
-  import api from '@/services/api';
+  import { crearConsulta, obtenerConsulta } from '@/services/apiConsultas';
 
   const reglas = ref({
           necesario: value => !!value || 'Campo necesario.',
@@ -41,12 +41,7 @@
       return
     }
     let body = { emisor: usuario.id, receptor: receptor.value.id, asunto: asunto.value, mensaje: mensaje.value }
-    
-    let response
-    if (receptor.value.id == usuario.medicoCabecera)
-      response = await api.post("consultas/medicos/", body)
-    else
-      response = await api.post("consultas/especialistas/", body)
+    let response = await crearConsulta(body)
 
     if (response.status != 201) {
       console.log("Error al crear la consulta")
@@ -54,9 +49,10 @@
     }
 
     let location = response.headers.get("location")
-    let idConsulta = location.split("/")[7]
+    let idConsulta = location.split("/").at(-1)
+    console.log("Consulta creada con ID:", idConsulta)
 
-    let responseConsulta = await api.get("consultas/" + idConsulta)
+    let responseConsulta = await obtenerConsulta(idConsulta)
 
     if (responseConsulta.status != 200) {
       console.log("Error al recuperar la consulta")

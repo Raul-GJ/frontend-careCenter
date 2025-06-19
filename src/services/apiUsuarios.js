@@ -4,12 +4,13 @@ import { ENDPOINTS } from "@/constants";
 // Obtener usuario
 export async function obtenerUsuario(id) {
   try {
+    console.log(ENDPOINTS.USUARIOS.OBTENER_USUARIO(id));
     const response = await api.get(ENDPOINTS.USUARIOS.OBTENER_USUARIO(id));
     if (response.status !== 200) {
       alert("Error al obtener el usuario");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener el usuario:", error);
     throw error;
@@ -24,7 +25,7 @@ export async function modificarUsuario(id, usuario) {
       alert("Error al modificar el usuario");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al modificar el usuario:", error);
     throw error;
@@ -39,7 +40,7 @@ export async function eliminarUsuario(id) {
       alert("Error al eliminar el usuario");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar el usuario:", error);
     throw error;
@@ -54,7 +55,7 @@ export async function agregarAlertas(id, alertas) {
       alert("Error al agregar alertas al usuario");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar alertas al usuario:", error);
     throw error;
@@ -69,7 +70,7 @@ export async function eliminarAlerta(id, alertaId) {
       alert("Error al eliminar la alerta del usuario");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar la alerta del usuario:", error);
     throw error;
@@ -84,7 +85,7 @@ export async function agregarSeguimientosPaciente(id, seguimientos) {
       alert("Error al agregar seguimientos al paciente");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar seguimientos al paciente:", error);
     throw error;
@@ -99,7 +100,7 @@ export async function eliminarSeguimientoPaciente(id, seguimientoId) {
       alert("Error al eliminar el seguimiento del paciente");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar el seguimiento del paciente:", error);
     throw error;
@@ -114,7 +115,7 @@ export async function agregarPacientesMedico(id, pacientes) {
       alert("Error al agregar pacientes al médico");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar pacientes al médico:", error);
     throw error;
@@ -129,7 +130,7 @@ export async function eliminarPacienteMedico(id, pacienteId) {
       alert("Error al eliminar el paciente del médico");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar el paciente del médico:", error);
     throw error;
@@ -144,7 +145,7 @@ export async function agregarPacientesEspecialista(id, pacientes) {
       alert("Error al agregar pacientes al especialista");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar pacientes al especialista:", error);
     throw error;
@@ -159,7 +160,7 @@ export async function eliminarPacienteEspecialista(id, pacienteId) {
       alert("Error al eliminar el paciente del especialista");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar el paciente del especialista:", error);
     throw error;
@@ -174,7 +175,7 @@ export async function agregarPlantillasEspecialista(id, plantillas) {
       alert("Error al agregar plantillas al especialista");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar plantillas al especialista:", error);
     throw error;
@@ -189,7 +190,7 @@ export async function eliminarPlantillaEspecialista(id, plantillaId) {
       alert("Error al eliminar la plantilla del especialista");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar la plantilla del especialista:", error);
     throw error;

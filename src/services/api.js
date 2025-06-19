@@ -9,11 +9,17 @@ const api = axios.create({
 
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const expiry = localStorage.getItem('token_expiry');
+  if (token && expiry) {
+    if (Date.now() > Number(expiry)) {
+      // Token expirado: eliminarlo
+      localStorage.removeItem('token');
+      localStorage.removeItem('token_expiry');
+    } else {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });
-
 
 export default api;

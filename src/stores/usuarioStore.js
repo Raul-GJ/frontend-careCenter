@@ -1,10 +1,11 @@
 // stores/userStore.js
 import { defineStore } from 'pinia'
-import api from '@/services/api'
+import { obtenerUsuario } from '@/services/apiUsuarios'
+import { logout } from '@/services/apiAuth'
 
 export const useUsuarioStore = defineStore('usuario', {
   state: () => ({
-    id: "6806775acd30891a73f1e1c6",
+    id: null,
     usuario: null,
   }),
   actions: {
@@ -21,12 +22,23 @@ export const useUsuarioStore = defineStore('usuario', {
       this.usuario = usuario
     },
     async loadUsuario() {
-      let response = await api.get('usuarios/' + this.id)
+      let response = await obtenerUsuario(this.id)
       if (response.status != 200) {
         console.log("Error al cargar el usuario")
         return
       }
       this.usuario = response.data
+    },
+    logout() {
+      try {
+        logout()
+        this.usuario = null
+        this.id = null
+        localStorage.removeItem('token')
+        localStorage.removeItem('token_expiry')
+      } catch (error) {
+        console.error('Error during logout:', error)
+      }
     }
   },
   persist: true

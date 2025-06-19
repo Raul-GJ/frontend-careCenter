@@ -8,7 +8,7 @@ export async function crearPlantilla(plantilla) {
       alert("Error al crear la plantilla");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al crear la plantilla:", error);
     throw error;
@@ -21,7 +21,7 @@ export async function obtenerPlantilla(id) {
       alert("Error al obtener la plantilla");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al obtener la plantilla:", error);
     throw error;
@@ -34,7 +34,7 @@ export async function modificarPlantilla(id, plantilla) {
       alert("Error al modificar la plantilla");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al modificar la plantilla:", error);
     throw error;
@@ -47,20 +47,20 @@ export async function eliminarPlantilla(id) {
       alert("Error al eliminar la plantilla");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar la plantilla:", error);
     throw error;
   }
 }
-export async function agregarPregunta(id, pregunta) {
+export async function agregarPregunta(id, tipo, pregunta) {
   try {
-    let response = await api.post(ENDPOINTS.PLANTILLAS.AGREGAR_PREGUNTA(id), pregunta);
+    let response = await api.post(ENDPOINTS.PLANTILLAS.AGREGAR_PREGUNTA(id, tipo), pregunta);
     if (response.status !== 200) {
       alert("Error al agregar la pregunta a la plantilla");
       return null;
     }
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error al agregar la pregunta a la plantilla:", error);
     throw error;
@@ -73,7 +73,7 @@ export async function eliminarPregunta(idPlantilla, idPregunta) {
       alert("Error al eliminar la pregunta de la plantilla");
       return null;
     }
-    return true;
+    return response;
   } catch (error) {
     console.error("Error al eliminar la pregunta de la plantilla:", error);
     throw error;

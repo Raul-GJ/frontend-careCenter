@@ -1,8 +1,9 @@
 <script setup>
   import { ref, computed } from 'vue';
-  import api from '@/services/api';
   import { usePacienteStore } from '@/stores/pacienteStore';
   import { storeToRefs } from 'pinia';
+  import { crearAlerta } from '@/services/apiAlertas';
+  import { agregarAlertas } from '@/services/apiUsuarios';
 
   const pacienteStore = usePacienteStore()
 
@@ -15,9 +16,6 @@
     pacientes.pacientes.value
     return pacientes.pacientes.value.filter((p) => !pacientesAgregados.value.includes(p))
   })
-
-  const urlAlertas = "alertas/"
-  const urlPacientes = "usuarios/pacientes/"
 
   const agregarAlertaValue = ref(false)
   const agregarPacienteValue = ref(false)
@@ -49,7 +47,7 @@
     // Crear las alertas
     for (let alerta of alertas.value) {
       let body = { asunto: alerta.asunto, mensaje: alerta.mensaje, fecha: alerta.fecha}
-      let response = await api.post(urlAlertas, body)
+      let response = await crearAlerta(body)
       if (!response.status == 201) {
         console.log("No se ha podido crear la alerta " + JSON.stringify(alerta))
         return
@@ -63,7 +61,7 @@
     // Agregar las alertas a los pacientes
     for (let paciente of pacientesAgregados.value) {
       console.log(JSON.stringify(idAlertas.value))
-      let response = await api.patch(urlPacientes + paciente.id + "/alertas/agregar/", JSON.stringify(idAlertas.value))
+      let response = await agregarAlertas(paciente.id, idAlertas.value)
       if (!response.status == 204) {
         console.log("No se ha podido agregar la alerta al usuario con id" + paciente.id)
         return

@@ -18,10 +18,13 @@
 
   const correo = ref('')
   const contrasenya = ref('')
+  const mostrarContrasenya = ref(false)
 
   async function doLogin() {
     console.log('Intentando iniciar sesión con:', correo.value, contrasenya.value)
-    let {token, id} = await login(correo.value, contrasenya.value)
+    let response = await login(correo.value, contrasenya.value)
+    let token = response.data.token
+    let id = response.data.id
     localStorage.setItem('token', token);
     usuarioStore.setId(id)
     usuarioStore.loadUsuario()

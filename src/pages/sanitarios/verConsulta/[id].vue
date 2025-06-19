@@ -1,8 +1,8 @@
 <script setup>
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
-  import api from '@/services/api'
   import { useConsultaStore } from '@/stores/consultaStore'
+  import { responderConsulta } from '@/services/apiConsultas'
 
   const consultaStore = useConsultaStore()
 
@@ -24,14 +24,14 @@
       respondida.value = true
   }
 
-  async function responderConsulta() {
+  async function doResponderConsulta() {
     if (!reglas.value.limite(respuesta.value) === true) {
       alert("La respuesta no debe superar los 10.000 caracteres")
       return
     }
 
     let body = { mensaje: respuesta.value }
-    let response = await api.patch("consultas/" + idConsulta, body)
+    let response = await responderConsulta(idConsulta, body)
 
     if (response.status != 204) {
       console.log("Ha habido un error al intentar responder la consulta")
@@ -70,7 +70,7 @@
         />
         <v-btn 
           prepend-icon="mdi-send-variant"
-          @click="responderConsulta()"  
+          @click="doResponderConsulta()"  
         >
           Enviar
         </v-btn>

@@ -30,7 +30,12 @@
           <td>{{ seguimiento.fecha }}</td>
           <td>
             <v-btn icon="mdi-folder-open" title="Ver seguimiento" @click="verSeguimiento(seguimiento)"/>
-            <v-btn icon="mdi-text-box-edit" title="Rellenar seguimiento" />
+            <router-link :to="`./rellenarSeguimiento/${seguimiento.formulario.plantilla}`">
+              <v-btn 
+                icon="mdi-text-box-edit" 
+                title="Rellenar seguimiento"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>
