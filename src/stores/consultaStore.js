@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { obtenerConsultasUsuario } from '@/services/apiConsultas'
 import { useUsuarioStore } from './usuarioStore'
 import { obtenerUsuario } from '@/services/apiUsuarios'
+import { obtenerConsulta } from '@/services/apiConsultas'
 
 export const useConsultaStore = defineStore('consultas', {
   state: () => ({
@@ -17,8 +18,9 @@ export const useConsultaStore = defineStore('consultas', {
       const consulta = this.consultas.find(c => c.id == id)
       if (!consulta) {
         try {
-          // No hay un endpoint individual para una consulta, así que devuelve undefined
-          return undefined
+          let response = await obtenerConsulta(id)
+          this.addConsulta(response.data)
+          return response.data
         } catch (error) {
           console.error('Error obteniendo consulta:', error)
           throw error

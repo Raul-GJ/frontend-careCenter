@@ -1,8 +1,10 @@
 <script setup>
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { ref } from 'vue'
   import { useConsultaStore } from '@/stores/consultaStore'
   import { responderConsulta } from '@/services/apiConsultas'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
 
   const consultaStore = useConsultaStore()
 
@@ -12,19 +14,24 @@
         })
 
   const route = useRoute()
+  const router = useRouter()
   const idConsulta = route.params.id
   const consulta = ref(null)
 
   const respuesta = ref('')
   const respondida = ref(false)
 
-  function loadConsulta() {
-    consulta.value = consultaStore.getConsulta(idConsulta)
+  async function loadConsulta() {
+    loadingStore.start()
+    consulta.value = await consultaStore.getConsulta(idConsulta)
+    console.log(consulta.value)
     if (consulta.value.respuesta != null)
       respondida.value = true
+    loadingStore.stop()
   }
 
   async function doResponderConsulta() {
+    loadingStore.start()
     if (!reglas.value.limite(respuesta.value) === true) {
       alert("La respuesta no debe superar los 10.000 caracteres")
       return
@@ -38,6 +45,8 @@
     }
     consultaStore.responderConsulta(consulta.value.id, respuesta.value)
     respondida.value = true
+    loadingStore.stop()
+    router.push('/sanitarios/misConsultas')
   }
 
   loadConsulta()
@@ -45,7 +54,7 @@
 
 <template>
   <v-container>
-    <v-container>
+    <v-container v-if="!loadingStore.loading">
       <v-text-field 
         v-model="consulta.asunto"
         label="Asunto"

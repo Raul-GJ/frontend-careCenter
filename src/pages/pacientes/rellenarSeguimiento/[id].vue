@@ -1,25 +1,28 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useSeguimientoStore } from '@/stores/seguimientoStore'
 import { obtenerPlantilla } from '@/services/apiPlantillas'
 import { useLoadingStore } from '@/stores/loadingStore'
+import { rellenarFormulario } from '@/services/apiSeguimientos'
+
+const seguimientoStore = useSeguimientoStore()
+const loadingStore = useLoadingStore()
 
 const route = useRoute()
 const router = useRouter()
 
-const idPlantilla = route.params.id
+const idSeguimiento = route.params.id
+const seguimiento = ref(null)
+
 const plantilla = ref(null)
 const respuestas = ref({})
 const cargando = ref(true)
 const error = ref(null)
 
 async function fetchPlantilla() {
-  const loadingStore = useLoadingStore()
-  cargando.value = true
-  loadingStore.start()
-  error.value = null
   try {
-    let response = await obtenerPlantilla(idPlantilla)
+    let response = await obtenerPlantilla(seguimiento.value.formulario.plantilla)
     if (!response || response.status !== 200 || !response.data) {
       error.value = 'No se encontró la plantilla'
       plantilla.value = null
@@ -38,7 +41,6 @@ async function fetchPlantilla() {
     plantilla.value = null
   } finally {
     cargando.value = false
-    loadingStore.stop()
   }
 }
 
@@ -47,7 +49,11 @@ watch(plantilla, (nuevaPlantilla) => {
   if (nuevaPlantilla && nuevaPlantilla.preguntas) {
     const obj = {}
     for (const pregunta of nuevaPlantilla.preguntas) {
-      obj[pregunta.id] = pregunta.regla.tipoDato === 'BOOLEANO' ? false : ''
+      if (pregunta.regla.tipoDato === 'BOOLEANO') {
+        obj[pregunta.id] = false // Siempre inicializa como false
+      } else {
+        obj[pregunta.id] = ''
+      }
     }
     respuestas.value = obj
   }
@@ -55,26 +61,43 @@ watch(plantilla, (nuevaPlantilla) => {
 
 onMounted(fetchPlantilla)
 
-function enviarFormulario() {
-  alert('Respuestas enviadas:\n' + JSON.stringify(respuestas.value, null, 2))
+async function enviarFormulario() {
+  try {
+    let body = { respuestas: [] }
+    if (plantilla.value && plantilla.value.preguntas) {
+      for (const pregunta of plantilla.value.preguntas) {
+        let valor = respuestas.value[pregunta.id]
+        if (pregunta.regla.tipoDato === 'NUMERICO' || pregunta.regla.tipoDato === 'RANGO') {
+          valor = valor === '' ? null : Number(valor)
+        } else if (pregunta.regla.tipoDato === 'BOOLEANO') {
+          valor = typeof valor === 'boolean' ? valor : false // fuerza booleano
+        }
+        body.respuestas.push(valor)
+      }
+    }
+    console.log('Enviando respuestas:', body)
+    await rellenarFormulario(idSeguimiento, body)
+    alert('Formulario enviado correctamente')
+    router.back()
+  } catch (err) {
+    console.error('Error al enviar el formulario:', err)
+    error.value = 'Error al enviar el formulario'
+    return
+  }
 }
+
+async function loadSeguimiento() {
+  loadingStore.start()
+  seguimiento.value = await seguimientoStore.getSeguimiento(idSeguimiento)
+  await fetchPlantilla()
+  loadingStore.stop()
+}
+
+loadSeguimiento()
 </script>
 
 <template>
-  <v-container v-if="cargando">
-    <v-progress-circular
-      indeterminate
-      color="primary"
-    />
-    <span>Cargando plantilla...</span>
-  </v-container>
-  <v-container v-else-if="error">
-    <h2>{{ error }}</h2>
-    <v-btn @click="router.back()">
-      Volver
-    </v-btn>
-  </v-container>
-  <v-container v-else-if="plantilla">
+  <v-container v-if="!loadingStore.loading && plantilla">
     <h1>{{ plantilla.nombre }}</h1>
     <p>{{ plantilla.descripcion }}</p>
     <v-form @submit.prevent="enviarFormulario">
@@ -99,11 +122,14 @@ function enviarFormulario() {
           />
         </template>
         <template v-else-if="pregunta.regla.tipoDato === 'BOOLEANO'">
-          <v-checkbox
+          <v-btn
             :id="'pregunta-' + pregunta.id"
-            v-model="respuestas[pregunta.id]"
-            :label="pregunta.pregunta"
-          />
+            :color="respuestas[pregunta.id] ? 'green' : 'red'"
+            class="mb-2"
+            @click="respuestas[pregunta.id] = !respuestas[pregunta.id]"
+          >
+            {{ respuestas[pregunta.id] ? 'Sí' : 'No' }}
+          </v-btn>
         </template>
         <template v-else-if="pregunta.regla.tipoDato === 'RANGO'">
           <v-text-field
@@ -133,7 +159,7 @@ function enviarFormulario() {
     </v-form>
   </v-container>
   <v-container v-else>
-    <h2>No se encontró la plantilla</h2>
+    <h2>No se encontró el seguimiento</h2>
     <v-btn @click="router.back()">
       Volver
     </v-btn>

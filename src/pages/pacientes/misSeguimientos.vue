@@ -45,7 +45,7 @@
               title="Ver seguimiento"
               @click="verSeguimiento(seguimiento)"
             />
-            <router-link :to="`./rellenarSeguimiento/${seguimiento.formulario.plantilla}`">
+            <router-link :to="`./rellenarSeguimiento/${seguimiento.id}`">
               <v-btn 
                 icon="mdi-text-box-edit" 
                 title="Rellenar seguimiento"

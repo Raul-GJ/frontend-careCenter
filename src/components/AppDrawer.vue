@@ -46,21 +46,28 @@ function cerrarSesion() {
       nav
     >
       <v-list-item>
+        <router-link to="/misAlertas">
+          <v-btn prepend-icon="mdi-bell">
+            Mis alertas
+          </v-btn>
+        </router-link>
+      </v-list-item>  
+      <v-list-item>
         <router-link to="/sanitarios/misPacientes" :replace="false">
           <v-btn prepend-icon="mdi-account-group-outline">
             Mis pacientes
           </v-btn>
         </router-link>
       </v-list-item>
-      <v-list-item>
-        <router-link to="/sanitarios/misEstudios" :replace="false">
+      <v-list-item v-if="tipoUsuario == 'ESPECIALISTA'">
+        <router-link to="/sanitarios/especialistas/misEstudios" :replace="false">
           <v-btn prepend-icon="mdi-folder">
             Mis estudios
           </v-btn>
         </router-link>
       </v-list-item>
-      <v-list-item>
-        <router-link to="/sanitarios/misPlantillas">
+      <v-list-item v-if="tipoUsuario == 'ESPECIALISTA'">
+        <router-link to="/sanitarios/especialistas/misPlantillas">
           <v-btn prepend-icon="mdi-list-box-outline">
             Mis plantillas
           </v-btn>
@@ -80,8 +87,8 @@ function cerrarSesion() {
           </v-btn>
         </router-link>
       </v-list-item>
-      <v-list-item>
-        <router-link to="/sanitarios/agregarSeguimientos">
+      <v-list-item v-if="tipoUsuario == 'ESPECIALISTA'">
+        <router-link to="/sanitarios/especialistas/agregarSeguimientos">
           <v-btn prepend-icon="mdi-list-box-outline">
             Crear seguimientos
           </v-btn>
@@ -97,7 +104,7 @@ function cerrarSesion() {
       nav
     >
       <v-list-item>
-        <router-link to="/pacientes/misAlertas">
+        <router-link to="/misAlertas">
           <v-btn prepend-icon="mdi-bell">
             Mis alertas
           </v-btn>

@@ -53,11 +53,12 @@
           <td>{{ plantilla.nombre }}</td>
           <td>{{ plantilla.descripcion }}</td>
           <td>
-            <v-btn
-              icon="mdi-folder-open"
-              title="Ver consulta"
-              @click="leerConsulta(consulta)"
-            />
+            <router-link :to="`./verPlantilla/${plantilla.id}`">
+              <v-btn 
+                icon="mdi-list-box-outline" 
+                title="Ver plantilla"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>

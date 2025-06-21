@@ -23,7 +23,7 @@
   const preguntas = ref([])
   const strPregunta = ref("")
 
-  const tiposPregunta = ref(["Texto", "Número", "verdadero/falso", "rango numérico", "selección"])
+  const tiposPregunta = ref(["Texto", "Número", "si/no", "rango numérico", "selección"])
   const tiposPreguntaFormal = ref(["TEXTO", "NUMERICO", "BOOLEANO", "RANGO", "ENUMERADO"])
   const tipoPregunta = ref("Texto")
 
@@ -61,10 +61,6 @@
     enumValues.value = enumValues.value.filter((v) => v != value)
   }
 
-  function changeAgregarState() {
-    agregarPreguntaBoolean.value = !agregarPreguntaBoolean.value
-  }
-
   function addPregunta() {
     if (strPregunta.value != "" && tiposPregunta.value.includes(tipoPregunta.value)) {
       let regla = { tipoDato: tipoPregunta.value }
@@ -82,7 +78,7 @@
       preguntas.value.push(pregunta)
       strPregunta.value = ""
       tipoPregunta.value = "Texto"
-      changeAgregarState()
+      agregarPreguntaBoolean.value = false
     }
   }
 
@@ -207,7 +203,7 @@
       </v-list>
       <v-btn 
         prepend-icon="mdi-plus-circle" 
-        @click="changeAgregarState()"
+        @click="agregarPreguntaBoolean = !agregarPreguntaBoolean"
       >
         Agregar pregunta
       </v-btn>

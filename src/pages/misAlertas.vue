@@ -1,10 +1,12 @@
 <script setup>
   import { computed } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useAlertaStore } from '@/stores/alertaStore'
   import { storeToRefs } from 'pinia'
   import { leerAlerta } from '@/services/apiAlertas'
   import { useLoadingStore } from '@/stores/loadingStore'
   const loadingStore = useLoadingStore()
+  const router = useRouter()
 
   const alertaStore = useAlertaStore()
   const { alertas } = storeToRefs(alertaStore)
@@ -21,7 +23,7 @@
     loadingStore.start()
     await leerAlerta(alerta.id)
     alertaStore.leerAlerta(alerta.id)
-    window.location.href = `/pacientes/leerAlerta/${alerta.id}`
+    router.push(`/leerAlerta/${alerta.id}`)
     loadingStore.stop()
   }
 

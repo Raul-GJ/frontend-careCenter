@@ -35,9 +35,6 @@
       <thead>
         <tr>
           <th>
-            Id
-          </th>
-          <th>
             Asunto
           </th>
           <th>
@@ -53,7 +50,6 @@
           v-for="consulta in consultasSinResponder"
           :key="consulta.id"
         >
-          <td>{{ consulta.id }}</td>
           <td>{{ consulta.asunto }}</td>
           <td>{{ consulta.fecha }}</td>
           <td>
@@ -67,16 +63,13 @@
         </tr>
       </tbody>
     </v-table>
-    <p>Consultas leídas</p>
+    <p>Consultas respondidas</p>
     <v-table
       height="200"
       fixed-header
     >
       <thead>
         <tr>
-          <th>
-            Id
-          </th>
           <th>
             Asunto
           </th>
@@ -93,7 +86,6 @@
           v-for="consulta in consultasRespondidas"
           :key="consulta.id"
         >
-          <td>{{ consulta.id }}</td>
           <td>{{ consulta.asunto }}</td>
           <td>{{ consulta.fecha }}</td>
           <td>

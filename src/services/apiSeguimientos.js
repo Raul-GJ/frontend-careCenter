@@ -65,8 +65,8 @@ export async function eliminarSeguimiento(id) {
 export async function rellenarFormulario(id, datos) {
   try {
     const response = await api.post(ENDPOINTS.SEGUIMIENTOS.RELLENAR_FORMULARIO(id), datos);
-    if (response.status !== 200) {
-      alert("Error al rellenar el formulario del seguimiento");
+    if (response.status !== 204) {
+      console.error("Error al rellenar el formulario del seguimiento");
       return null;
     }
     return response;
