@@ -36,7 +36,12 @@ onMounted(fetchAlerta)
 
 <template>
   <v-container>
-    <v-btn @click="router.back()" class="mb-4">Volver</v-btn>
+    <v-btn
+      class="mb-4"
+      @click="router.back()"
+    >
+      Volver
+    </v-btn>
     <div v-if="error">
       <h2>{{ error }}</h2>
     </div>

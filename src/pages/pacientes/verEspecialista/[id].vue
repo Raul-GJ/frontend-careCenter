@@ -24,7 +24,10 @@
   <v-container>
     <v-row>
       <v-col>
-        <v-avatar image="@/assets/avatar-perfil-por-defecto.png" size="250"/>
+        <v-avatar
+          image="@/assets/avatar-perfil-por-defecto.png"
+          size="250"
+        />
         <v-container>
           <v-text-field
             v-model="nombrePaciente"

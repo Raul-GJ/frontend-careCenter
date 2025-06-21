@@ -12,8 +12,18 @@ export const useAsignacionEstudioStore = defineStore('asignacionEstudios', {
     addAsignacionEstudio(e) {
       this.asignacionEstudios.push(e)
     },
-    getAsignacionEstudio(id) {
-      return this.asignacionEstudios.find(e => e.id == id)
+    async getAsignacionEstudio(id) {
+      const asignacion = this.asignacionEstudios.find(e => e.id == id)
+      if (!asignacion) {
+        try {
+          // No hay un endpoint individual, así que devolvemos undefined o podrías lanzar un error
+          return undefined
+        } catch (error) {
+          console.error('Error obteniendo asignación:', error)
+          throw error
+        }
+      }
+      return asignacion
     },
     setAsignacionEstudio(id, asignacion) {
       let e = this.getAsignacionEstudio(id)

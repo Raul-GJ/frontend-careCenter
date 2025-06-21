@@ -12,8 +12,19 @@ export const useEspecialistaStore = defineStore('especialistas', {
     addEspecialista(e) {
       this.especialistas.push(e)
     },
-    getEspecialista(id) {
-      return this.especialistas.find(e => e.id == id)
+    async getEspecialista(id) {
+      const especialista = this.especialistas.find(e => e.id == id)
+      if (!especialista) {
+        try {
+          let response = await obtenerUsuario(id)
+          this.addEspecialista(response.data)
+          return response.data
+        } catch (error) {
+          console.error('Error obteniendo especialista:', error)
+          throw error
+        }
+      }
+      return especialista
     },
     setEspecialista(id, especialista) {
       let e = this.getEspecialista(id)

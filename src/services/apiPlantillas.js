@@ -29,8 +29,8 @@ export async function obtenerPlantilla(id) {
 }
 export async function modificarPlantilla(id, plantilla) {
   try {
-    let response = await api.put(ENDPOINTS.PLANTILLAS.MODIFICAR_PLANTILLA(id), plantilla);
-    if (response.status !== 200) {
+    let response = await api.patch(ENDPOINTS.PLANTILLAS.MODIFICAR_PLANTILLA(id), plantilla);
+    if (response.status !== 204) {
       alert("Error al modificar la plantilla");
       return null;
     }

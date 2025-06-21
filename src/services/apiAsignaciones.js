@@ -54,8 +54,8 @@ export async function obtenerAsignacionesPorEstudio(id) {
 }
 export async function modificarAsignacion(id, asignacion) {
   try {
-    let response = await api.put(ENDPOINTS.ASIGNACIONES.MODIFICAR_ASIGNACION(id), asignacion);
-    if (response.status !== 200) {
+    let response = await api.patch(ENDPOINTS.ASIGNACIONES.MODIFICAR_ASIGNACION(id), asignacion);
+    if (response.status !== 204) {
       alert("Error al modificar la asignación");
       return null;
     }

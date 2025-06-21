@@ -35,8 +35,8 @@ export const ENDPOINTS = {
   ASIGNACIONES: {
     CREAR_ASIGNACION: '/asignaciones/',
     OBTENER_ASIGNACION: (id) => `/asignaciones/${id}/`,
-    OBTENER_ASIGNACIONES_POR_ESPECIALISTA: (id) => `/asignaciones/especialistas/${id}/`,
-    OBTENER_ASIGNACIONES_POR_ESTUDIO: (id) => `/asignaciones/estudios/${id}/`,
+    OBTENER_ASIGNACIONES_POR_ESPECIALISTA: (id) => `/asignaciones/estudios/${id}/`,
+    OBTENER_ASIGNACIONES_POR_ESTUDIO: (id) => `/asignaciones/especialistas/${id}/`,
     MODIFICAR_ASIGNACION: (id) => `/asignaciones/${id}/`,
     ELIMINAR_ASIGNACION: (id) => `/asignaciones/${id}/`,
   },

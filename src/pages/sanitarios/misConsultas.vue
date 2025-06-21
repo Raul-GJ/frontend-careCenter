@@ -2,6 +2,8 @@
   import { computed } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useConsultaStore } from '@/stores/consultaStore'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
   
   const consultaStore = useConsultaStore()
   const { consultas } = storeToRefs(consultaStore)
@@ -14,13 +16,22 @@
     return consultas.value.filter((c) => c.respuesta != null)
   })
 
-  consultaStore.loadConsultas()
+  async function loadConsultas() {
+    loadingStore.start()
+    await consultaStore.loadConsultas()
+    loadingStore.stop()
+  }
+
+  loadConsultas()
 </script>
 
 <template>
   <v-container>
     <p>Consultas sin responder</p>
-    <v-table height="200" fixed-header>
+    <v-table
+      height="200"
+      fixed-header
+    >
       <thead>
         <tr>
           <th>
@@ -38,7 +49,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="consulta in consultasSinResponder" :key="consulta.id" >
+        <tr
+          v-for="consulta in consultasSinResponder"
+          :key="consulta.id"
+        >
           <td>{{ consulta.id }}</td>
           <td>{{ consulta.asunto }}</td>
           <td>{{ consulta.fecha }}</td>
@@ -54,7 +68,10 @@
       </tbody>
     </v-table>
     <p>Consultas leídas</p>
-    <v-table height="200" fixed-header>
+    <v-table
+      height="200"
+      fixed-header
+    >
       <thead>
         <tr>
           <th>
@@ -72,7 +89,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="consulta in consultasRespondidas" :key="consulta.id" >
+        <tr
+          v-for="consulta in consultasRespondidas"
+          :key="consulta.id"
+        >
           <td>{{ consulta.id }}</td>
           <td>{{ consulta.asunto }}</td>
           <td>{{ consulta.fecha }}</td>

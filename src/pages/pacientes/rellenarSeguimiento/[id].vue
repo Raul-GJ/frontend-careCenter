@@ -62,18 +62,26 @@ function enviarFormulario() {
 
 <template>
   <v-container v-if="cargando">
-    <v-progress-circular indeterminate color="primary" />
+    <v-progress-circular
+      indeterminate
+      color="primary"
+    />
     <span>Cargando plantilla...</span>
   </v-container>
   <v-container v-else-if="error">
     <h2>{{ error }}</h2>
-    <v-btn @click="router.back()">Volver</v-btn>
+    <v-btn @click="router.back()">
+      Volver
+    </v-btn>
   </v-container>
   <v-container v-else-if="plantilla">
     <h1>{{ plantilla.nombre }}</h1>
     <p>{{ plantilla.descripcion }}</p>
     <v-form @submit.prevent="enviarFormulario">
-      <div v-for="(pregunta) in plantilla.preguntas" :key="pregunta.id">
+      <div
+        v-for="(pregunta) in plantilla.preguntas"
+        :key="pregunta.id"
+      >
         <label :for="'pregunta-' + pregunta.id">{{ pregunta.pregunta }}</label>
         <template v-if="pregunta.regla.tipoDato === 'TEXTO'">
           <v-text-field
@@ -116,11 +124,18 @@ function enviarFormulario() {
           />
         </template>
       </div>
-      <v-btn type="submit" prepend-icon="mdi-content-save">Enviar</v-btn>
+      <v-btn
+        type="submit"
+        prepend-icon="mdi-content-save"
+      >
+        Enviar
+      </v-btn>
     </v-form>
   </v-container>
   <v-container v-else>
     <h2>No se encontró la plantilla</h2>
-    <v-btn @click="router.back()">Volver</v-btn>
+    <v-btn @click="router.back()">
+      Volver
+    </v-btn>
   </v-container>
 </template>

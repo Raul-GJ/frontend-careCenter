@@ -31,8 +31,8 @@ export async function obtenerAlerta(id) {
 
 export async function modificarAlerta(id, alerta) {
   try {
-    let response = await api.put(ENDPOINTS.ALERTAS.MODIFICAR_ALERTA(id), alerta);
-    if (response.status !== 200) {
+    let response = await api.patch(ENDPOINTS.ALERTAS.MODIFICAR_ALERTA(id), alerta);
+    if (response.status !== 204) {
       alert("Error al modificar la alerta");
       return null;
     }

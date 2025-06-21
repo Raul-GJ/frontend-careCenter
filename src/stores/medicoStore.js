@@ -11,8 +11,19 @@ export const useMedicoStore = defineStore('medicos', {
     addMedico(m) {
       this.medicos.push(m)
     },
-    getMedico(id) {
-      return this.medicos.find(m => m.id == id)
+    async getMedico(id) {
+      const medico = this.medicos.find(m => m.id == id)
+      if (!medico) {
+        try {
+          let response = await obtenerUsuario(id)
+          this.addMedico(response.data)
+          return response.data
+        } catch (error) {
+          console.error('Error obteniendo médico:', error)
+          throw error
+        }
+      }
+      return medico
     },
     setMedico(id, medico) {
       let m = this.getMedico(id)

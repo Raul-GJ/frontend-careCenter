@@ -5,6 +5,8 @@
   import { storeToRefs } from 'pinia';
   import { crearSeguimiento } from '@/services/apiSeguimientos';
   import { agregarSeguimientosPaciente } from '@/services/apiUsuarios';
+  import { useLoadingStore } from '@/stores/loadingStore';
+  const loadingStore = useLoadingStore()
 
   const pacienteStore = usePacienteStore()
   const plantillaStore = usePlantillaStore()
@@ -54,7 +56,7 @@
   }
 
   async function publicarSeguimientos() {
-    
+    loadingStore.start()
     // Crear los seguimientos
     for (let seguimiento of seguimientos.value) {
       let body = {  
@@ -66,6 +68,7 @@
       let response = await crearSeguimiento(body)
       if (!response.status == 201) {
         console.log("No se ha podido crear el seguimiento " + JSON.stringify(seguimiento))
+        loadingStore.stop()
         return
       }
 
@@ -80,13 +83,21 @@
       let response = await agregarSeguimientosPaciente(paciente.id, idSeguimientos.value)
       if (!response.status == 204) {
         console.log("No se ha podido agregar el seguimiento al usuario con id" + paciente.id)
+        loadingStore.stop()
         return
       }
     }
+    loadingStore.stop()
   }
 
-  pacienteStore.loadPacientes()
-  plantillaStore.loadPlantillas()
+  async function load() {
+    loadingStore.start()
+    await pacienteStore.loadPacientes()
+    await plantillaStore.loadPlantillas()
+    loadingStore.stop()
+  }
+
+  load()
 </script>
 
 <template>

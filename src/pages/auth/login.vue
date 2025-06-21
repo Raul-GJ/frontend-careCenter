@@ -3,10 +3,12 @@
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { useRouter } from 'vue-router'
   import { login } from '@/services/apiAuth'
+  import { useLoadingStore } from '@/stores/loadingStore'
 
   const router = useRouter()
 
   const usuarioStore = useUsuarioStore()
+  const loadingStore = useLoadingStore()
   
   const reglas = ref({
           necesario: value => !!value || 'Campo necesario.',
@@ -19,19 +21,31 @@
   const correo = ref('')
   const contrasenya = ref('')
   const mostrarContrasenya = ref(false)
+  const errorValue = ref(false)
 
   async function doLogin() {
+    loadingStore.start()
     console.log('Intentando iniciar sesión con:', correo.value, contrasenya.value)
-    let response = await login(correo.value, contrasenya.value)
+    let response
+    try {
+      response = await login(correo.value, contrasenya.value)
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error)
+      errorValue.value = true
+      loadingStore.stop()
+      return
+    }
     let token = response.data.token
     let id = response.data.id
     localStorage.setItem('token', token);
     usuarioStore.setId(id)
-    usuarioStore.loadUsuario()
+    await usuarioStore.loadUsuario() // <-- Esperar a que termine la carga
     if (usuarioStore.getUsuario() == null) {
       console.log('Error al cargar el usuario')
+      loadingStore.stop()
       return
     }
+    loadingStore.stop()
     router.push('/home')
   }
 
@@ -58,6 +72,14 @@
         counter
         @click:append="mostrarContrasenya = !mostrarContrasenya"
       />
+      <v-alert 
+        v-if="errorValue" 
+        type="error"
+        dismissible
+        @click:close="error = false"
+      >
+        Error al iniciar sesión. Por favor, verifica tus credenciales.
+      </v-alert>
 
       <v-btn @click="doLogin()">
         Login

@@ -2,6 +2,8 @@
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
   import { useConsultaStore } from '@/stores/consultaStore'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
 
   const consultaStore = useConsultaStore()
 
@@ -12,9 +14,11 @@
   const respondida = ref(false)
 
   function loadConsulta() {
+    loadingStore.start()
     consulta.value = consultaStore.getConsulta(idConsulta)
     if (consulta.value.respuesta != null)
       respondida.value = true
+    loadingStore.stop()
   }
 
   loadConsulta()

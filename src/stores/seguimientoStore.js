@@ -12,8 +12,18 @@ export const useSeguimientoStore = defineStore('seguimientos', {
     addSeguimiento(s) {
       this.seguimientos.push(s)
     },
-    getSeguimiento(id) {
-      return this.seguimientos.find(s => s.id == id)
+    async getSeguimiento(id) {
+      let seguimiento = this.seguimientos.find(s => s.id == id)
+      if (!seguimiento) {
+        try {
+          let response = await obtenerSeguimiento(id)
+          this.addSeguimiento(response.data)
+          return response.data
+        } catch (error) {
+          console.error('Error obteniendo seguimiento:', error)
+          throw error
+        }
+      }
     },
     setSeguimiento(id, seguimiento) {
       let s = this.getSeguimiento(id)

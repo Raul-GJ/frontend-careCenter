@@ -12,8 +12,19 @@ export const usePlantillaStore = defineStore('plantillas', {
     addPlantilla(p) {
       this.plantillas.push(p)
     },
-    getPlantilla(id) {
-      return this.plantillas.find(p => p.id == id)
+    async getPlantilla(id) {
+      const plantilla = this.plantillas.find(p => p.id == id)
+      if (!plantilla) {
+        try {
+          let response = await obtenerPlantilla(id)
+          this.addPlantilla(response.data)
+          return response.data
+        } catch (error) {
+          console.error('Error obteniendo plantilla:', error)
+          throw error
+        }
+      }
+      return plantilla
     },
     setPlantilla(id, plantilla) {
       let p = this.getPlantilla(id)

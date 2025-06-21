@@ -16,6 +16,10 @@ export const useUsuarioStore = defineStore('usuario', {
       this.id = id
     },
     getUsuario() {
+      if (!this.usuario) {
+        console.warn("Usuario no cargado, llamando a loadUsuario")
+        this.loadUsuario()
+      }
       return this.usuario
     },
     setUsuario(usuario) {

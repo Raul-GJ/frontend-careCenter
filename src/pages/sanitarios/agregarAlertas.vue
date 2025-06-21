@@ -4,6 +4,8 @@
   import { storeToRefs } from 'pinia';
   import { crearAlerta } from '@/services/apiAlertas';
   import { agregarAlertas } from '@/services/apiUsuarios';
+  import { useLoadingStore } from '@/stores/loadingStore';
+  const loadingStore = useLoadingStore()
 
   const pacienteStore = usePacienteStore()
 
@@ -43,13 +45,14 @@
   }
 
   async function publicarAlertas() {
-    
+    loadingStore.start()
     // Crear las alertas
     for (let alerta of alertas.value) {
       let body = { asunto: alerta.asunto, mensaje: alerta.mensaje, fecha: alerta.fecha}
       let response = await crearAlerta(body)
       if (!response.status == 201) {
         console.log("No se ha podido crear la alerta " + JSON.stringify(alerta))
+        loadingStore.stop()
         return
       }
 
@@ -64,12 +67,20 @@
       let response = await agregarAlertas(paciente.id, idAlertas.value)
       if (!response.status == 204) {
         console.log("No se ha podido agregar la alerta al usuario con id" + paciente.id)
+        loadingStore.stop()
         return
       }
     }
+    loadingStore.stop()
   }
 
-  pacienteStore.loadPacientes()
+  async function loadPacientes() {
+    loadingStore.start()
+    await pacienteStore.loadPacientes()
+    loadingStore.stop()
+  }
+
+  loadPacientes()
 </script>
 
 <template>
@@ -98,9 +109,6 @@
           <thead>
             <tr>
               <th>
-                Id
-              </th>
-              <th>
                 Nombre
               </th>
               <th>
@@ -113,8 +121,7 @@
               v-for="paciente in pacientesRestantes"
               :key="paciente.id"
             >
-              <td>Id: {{ paciente.id }}</td>
-              <td>Id: {{ paciente.nombre }}</td>
+              <td>Nombre: {{ paciente.nombre }}</td>
               <td>
                 <v-btn 
                   icon="mdi-plus" 
@@ -132,7 +139,6 @@
           v-for="alerta in alertas"
           :key="alerta.id"
         >
-          <p>Id: {{ alerta.id }}</p>
           <p>Asunto: {{ alerta.asunto }}</p>
           <p>Mensaje: {{ alerta.mensaje }}</p>
           <p>Fecha: {{ alerta.fecha }}</p>

@@ -34,8 +34,8 @@ export async function obtenerSeguimiento(id) {
 // Modificar un seguimiento
 export async function modificarSeguimiento(id, seguimiento) {
   try {
-    const response = await api.put(ENDPOINTS.SEGUIMIENTOS.MODIFICAR_SEGUIMIENTO(id), seguimiento);
-    if (response.status !== 200) {
+    const response = await api.patch(ENDPOINTS.SEGUIMIENTOS.MODIFICAR_SEGUIMIENTO(id), seguimiento);
+    if (response.status !== 204) {
       alert("Error al modificar el seguimiento");
       return null;
     }

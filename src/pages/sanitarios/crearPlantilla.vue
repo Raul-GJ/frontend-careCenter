@@ -3,6 +3,8 @@
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { crearPlantilla, agregarPregunta } from '@/services/apiPlantillas'
   import { agregarPlantillasEspecialista } from '@/services/apiUsuarios'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
 
   const usuarioStore = useUsuarioStore()
 
@@ -89,47 +91,51 @@
   }
 
   async function publicarPlantilla() {
-    
+    loadingStore.start()
     // Publicar plantilla
     
-    alert("Creando plantilla")
+    console.log("Creando plantilla")
     
     let response = await crearPlantilla( { nombre: nombre.value, descripcion: descripcion.value })
     if (response.status != 201) {
-      alert("Ha habido un error al crear esta plantilla")
+      console.log("Ha habido un error al crear esta plantilla")
+      loadingStore.stop()
       return
     }
 
     // Agregar preguntas a la plantilla
 
-    alert("Agregando preguntas")
+    console.log("Agregando preguntas")
 
     let location = response.headers.get("location")
     let idPlantilla = location.split("/").at(-1)
 
     for (let pregunta of preguntas.value) {
       if (!publicarPregunta(idPlantilla, pregunta)) {
-        alert("Error en la regunta \"" + pregunta.pregunta + "\"")
+        console.log("Error en la regunta \"" + pregunta.pregunta + "\"")
+        loadingStore.stop()
         return
       }
-      alert("Pregunta \"" + pregunta.pregunta + "\" agregada correctamente")
+      console.log("Pregunta \"" + pregunta.pregunta + "\" agregada correctamente")
     }
     preguntas.value = []
 
     // Agregar plantilla a especialista
 
-    alert("Agregando plantilla a especialista")
+    console.log("Agregando plantilla a especialista")
 
     let ids = [idPlantilla]
     let response2 = await agregarPlantillasEspecialista(idEspecialista, ids)
     if (response2.status != 204) {
-      alert("Ha habido un error al crear esta plantilla")
+      console.log("Ha habido un error al crear esta plantilla")
+      loadingStore.stop()
       return
     }
 
     nombre.value = ""
     descripcion.value = ""
-    alert("Plantilla creada correctamente")
+    console.log("Plantilla creada correctamente")
+    loadingStore.stop()
   }
 
   function replacerPreguntas(key, value) {
@@ -143,11 +149,14 @@
   }
 
   async function publicarPregunta(idPlantilla, pregunta) {
+    loadingStore.start()
     let body = JSON.stringify(pregunta, replacerPreguntas)
     let response = await agregarPregunta(idPlantilla, pregunta.regla.tipoDato, body)
+    loadingStore.stop()
     if (response.status != 201)
       return false
     return true
+
   }
 </script>
 
@@ -164,7 +173,10 @@
         label="Descripción"
       />
       <v-list>
-        <v-list-item v-for="pregunta of preguntas" :key="pregunta.id">
+        <v-list-item
+          v-for="pregunta of preguntas"
+          :key="pregunta.id"
+        >
           <p>Id: {{ pregunta.id }}</p>
           <p>Pregunta: {{ pregunta.pregunta }}</p>
           <p>Tipo: {{ pregunta.regla.tipoDato }}</p>
@@ -177,7 +189,10 @@
           <v-container v-if="pregunta.regla.tipoDato == 'selección'">
             <p>Posibles valores:</p>
             <v-list>
-              <v-list-item v-for="value of pregunta.regla.values" :key="value">
+              <v-list-item
+                v-for="value of pregunta.regla.values"
+                :key="value"
+              >
                 <p>{{ value }}</p>
               </v-list-item>
             </v-list>
@@ -228,7 +243,10 @@
         <v-container v-if="tipoPregunta == 'selección'">
           <p>Opciones: </p>
           <v-list>
-            <v-list-item v-for="value of enumValues" :key="value">
+            <v-list-item
+              v-for="value of enumValues"
+              :key="value"
+            >
               <p>{{ value }}</p>
               <template #append>
                 <v-btn 

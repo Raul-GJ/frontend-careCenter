@@ -13,8 +13,18 @@ export const useConsultaStore = defineStore('consultas', {
     addConsulta(c) {
       this.consultas.push(c)
     },
-    getConsulta(id) {
-      return this.consultas.find(c => c.id == id)
+    async getConsulta(id) {
+      const consulta = this.consultas.find(c => c.id == id)
+      if (!consulta) {
+        try {
+          // No hay un endpoint individual para una consulta, así que devuelve undefined
+          return undefined
+        } catch (error) {
+          console.error('Error obteniendo consulta:', error)
+          throw error
+        }
+      }
+      return consulta
     },
     responderConsulta(id, consulta) {
       let c = this.getConsulta(id)

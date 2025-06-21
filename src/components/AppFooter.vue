@@ -1,5 +1,8 @@
 <template>
-  <v-footer height="40" app>
+  <v-footer
+    height="40"
+    app
+  >
     <div class="text-caption text-disabled">
       <p>Página hecha por Raúl González Jiménez</p>
     </div>

@@ -3,6 +3,8 @@
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { useRouter } from 'vue-router'
   import { registro } from '@/services/apiAuth'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
 
   const usuarioStore = useUsuarioStore()
   const router = useRouter()
@@ -31,8 +33,10 @@
         })
 
   async function registrar() {
+    loadingStore.start()
     if (!reglas.value.email(correo.value) === true) {
       console.log('Campos incorrectos')
+      loadingStore.stop()
       return
     }
     let body = { 
@@ -58,11 +62,13 @@
         break
       default:
         console.log('Rol incorrecto')
+        loadingStore.stop()
         return
     }
     let response = await registro(rolFormateado, body)
     if (response == null) {
       console.log('Error al registrar el usuario')
+      loadingStore.stop()
       return
     }
     let location = response.headers.get("location")
@@ -72,10 +78,12 @@
     await usuarioStore.loadUsuario()
     if (usuarioStore.getUsuario() == null) {
       console.log('Error al cargar el usuario')
+      loadingStore.stop()
       return
     }
 
     localStorage.setItem('token', response.data.token);
+    loadingStore.stop()
     router.push('/home')
   }
 
@@ -85,7 +93,10 @@
   <v-container>
     <h1>Página de registro</h1>
     <p>* Indica que un campo es obligatorio</p>
-    <v-form @submit.prevent @submit="registrar">
+    <v-form
+      @submit.prevent
+      @submit="registrar"
+    >
       <v-text-field 
         v-model="nombre"
         :rules="[reglas.necesario]" 

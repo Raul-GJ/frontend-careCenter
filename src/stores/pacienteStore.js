@@ -12,8 +12,19 @@ export const usePacienteStore = defineStore('pacientes', {
     addPaciente(p) {
       this.pacientes.push(p)
     },
-    getPaciente(id) {
-      return this.pacientes.find(p => p.id == id)
+    async getPaciente(id) {
+      const paciente = this.pacientes.find(p => p.id == id)
+      if (!paciente) {
+        try {
+          let response = await obtenerUsuario(id)
+          this.addPaciente(response.data)
+          return response.data
+        } catch (error) {
+          console.error('Error obteniendo paciente:', error)
+          throw error
+        }
+      }
+      return paciente
     },
     setPaciente(id, paciente) {
       let p = this.getPaciente(id)

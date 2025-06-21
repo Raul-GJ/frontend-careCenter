@@ -3,6 +3,8 @@
   import { useAlertaStore } from '@/stores/alertaStore'
   import { storeToRefs } from 'pinia'
   import { leerAlerta } from '@/services/apiAlertas'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
 
   const alertaStore = useAlertaStore()
   const { alertas } = storeToRefs(alertaStore)
@@ -16,12 +18,20 @@
   })
 
   async function goToLeerAlerta(alerta) {
+    loadingStore.start()
     await leerAlerta(alerta.id)
     alertaStore.leerAlerta(alerta.id)
     window.location.href = `/pacientes/leerAlerta/${alerta.id}`
+    loadingStore.stop()
   }
 
-  alertaStore.loadAlertas()
+  async function loadAlertas() {
+    loadingStore.start()
+    await alertaStore.loadAlertas()
+    loadingStore.stop()
+  }
+  
+  loadAlertas()
 </script>
 
 <template>
@@ -48,18 +58,28 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="alerta in alertasSinLeer" :key="alerta.id" >
+        <tr
+          v-for="alerta in alertasSinLeer"
+          :key="alerta.id"
+        >
           <td>{{ alerta.id }}</td>
           <td>{{ alerta.asunto }}</td>
           <td>{{ alerta.fecha }}</td>
           <td>
-            <v-btn icon="mdi-folder-open" title="Ver alerta" @click="goToLeerAlerta(alerta)"/>
+            <v-btn
+              icon="mdi-folder-open"
+              title="Ver alerta"
+              @click="goToLeerAlerta(alerta)"
+            />
           </td>
         </tr>
       </tbody>
     </v-table>
     <p>Alertas leidas</p>
-    <v-table height="200" fixed-header>
+    <v-table
+      height="200"
+      fixed-header
+    >
       <thead>
         <tr>
           <th>
@@ -77,12 +97,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="alerta in alertasLeidas" :key="alerta.id" >
+        <tr
+          v-for="alerta in alertasLeidas"
+          :key="alerta.id"
+        >
           <td>{{ alerta.id }}</td>
           <td>{{ alerta.asunto }}</td>
           <td>{{ alerta.fecha }}</td>
           <td>
-            <v-btn icon="mdi-folder-open" title="Ver alerta" @click="goToLeerAlerta(alerta)"/>
+            <v-btn
+              icon="mdi-folder-open"
+              title="Ver alerta"
+              @click="goToLeerAlerta(alerta)"
+            />
           </td>
         </tr>
       </tbody>

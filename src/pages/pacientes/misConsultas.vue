@@ -2,6 +2,8 @@
   import { computed } from 'vue'
   import { useConsultaStore } from '@/stores/consultaStore'
   import { storeToRefs } from 'pinia'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
 
   const consultaStore = useConsultaStore()
   const { consultas } = storeToRefs(consultaStore)
@@ -24,7 +26,13 @@
     })
   }
 
-  consultaStore.loadConsultas()
+  async function loadConsultas() {
+    loadingStore.start()
+    await consultaStore.loadConsultas()
+    loadingStore.stop()
+  }
+
+  loadConsultas()
 </script>
 
 <template>
@@ -35,7 +43,10 @@
       </v-btn>
     </router-link>
     <p>Consultas sin responder</p>
-    <v-table height="200" fixed-header>
+    <v-table
+      height="200"
+      fixed-header
+    >
       <thead>
         <tr>
           <th>
@@ -53,7 +64,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="consulta in consultasSinRespuesta" :key="consulta.id" >
+        <tr
+          v-for="consulta in consultasSinRespuesta"
+          :key="consulta.id"
+        >
           <td>{{ consulta.asunto }}</td>
           <td>{{ formatoFecha(consulta.fecha) }}</td>
           <td>{{ consulta.receptor.nombre }}</td>
@@ -69,7 +83,10 @@
       </tbody>
     </v-table>
     <p>Consultas respondidas</p>
-    <v-table height="200" fixed-header>
+    <v-table
+      height="200"
+      fixed-header
+    >
       <thead>
         <tr>
           <th>
@@ -90,7 +107,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="consulta in consultasRespondidas" :key="consulta.id" >
+        <tr
+          v-for="consulta in consultasRespondidas"
+          :key="consulta.id"
+        >
           <td>{{ consulta.asunto }}</td>
           <td>{{ formatoFecha(consulta.fecha) }}</td>
           <td>{{ formatoFecha(consulta.respuesta.fecha) }}</td>

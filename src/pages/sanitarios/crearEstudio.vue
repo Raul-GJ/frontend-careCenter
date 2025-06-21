@@ -9,6 +9,8 @@
   import { crearAsignacion } from '@/services/apiAsignaciones'
   import { crearSeguimiento } from '@/services/apiSeguimientos'
   import { crearAlerta } from '@/services/apiAlertas'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
 
   const usuarioStore = useUsuarioStore();
   
@@ -88,7 +90,8 @@
     let response = await crearEstudio(estudio)
 
     if (response.status != 201) {
-      alert("Error al crear el estudio")
+      console.log("Error al crear el estudio")
+      loadingStore.stop()
       return
     }
 
@@ -101,7 +104,8 @@
     let pacientesIds = pacientesEstudio.value.map((p) => p.id)
     let pacientesResponse = await agregarPacientesEstudio(idEstudio, pacientesIds)
     if (pacientesResponse.status != 204) {
-      alert("Error al agregar pacientes")
+      console.log("Error al agregar pacientes")
+      loadingStore.stop()
       return
     }
   }
@@ -112,7 +116,8 @@
       let body = { fecha: seguimiento.fecha, plazo: seguimiento.plazo, plantilla: seguimiento.formulario.id }
       let seguimientoResponse = await crearSeguimiento(idEstudio, body)
       if (seguimientoResponse.status != 201) {
-        alert("Error al crear el seguimiento " + seguimiento.id)
+        console.log("Error al crear el seguimiento " + seguimiento.id)
+        loadingStore.stop()
         return
       }
       let locationSeguimiento = seguimientoResponse.headers.get("location")
@@ -123,7 +128,8 @@
     let seguimientosResponse = await agregarSeguimientosEstudio(idEstudio, seguimientosIds)
 
     if (seguimientosResponse.status != 204) {
-      alert("Error al agregar seguimientos al estudio")
+      console.log("Error al agregar seguimientos al estudio")
+      loadingStore.stop()
       return
     }
   }
@@ -134,7 +140,8 @@
       let body = { fecha: alerta.fecha, asunto: alerta.asunto, mensaje: alerta.mensaje }
       let alertaResponse = await crearAlerta(idEstudio, body)
       if (alertaResponse.status != 201) {
-        alert("Error al crear la alerta " + alerta.id)
+        console.log("Error al crear la alerta " + alerta.id)
+        loadingStore.stop()
         return
       }
       let locationAlerta = alertaResponse.headers.get("location")
@@ -145,7 +152,8 @@
     let alertasResponse = await agregarAlertasEstudio(idEstudio, alertasIds)
 
     if (alertasResponse.status != 204) {
-      alert("Error al agregar alertas al estudio")
+      console.log("Error al agregar alertas al estudio")
+      loadingStore.stop()
       return
     }
   }
@@ -154,24 +162,31 @@
     let body = { especialista: especialista.value.id, estudio: idEstudio, rol: 'CREADOR'}
     let response = await crearAsignacion(body)
     if (response.status != 201) {
-      alert("Error al asignar el estudio al especialista")
+      console.log("Error al asignar el estudio al especialista")
+      loadingStore.stop()
       return
     }
   }
 
   async function publicarEstudio() {
-
+    loadingStore.start()
     let idEstudio = await doCrearEstudio()
     await doAgregarPacientesEstudio(idEstudio)
     await doAgregarSeguimientosEstudio(idEstudio)
     await doAgregarAlertasEstudio(idEstudio)
     await asignarEstudio(idEstudio)
-
-    alert("Estudio creado con éxito")
+    loadingStore.stop()
+    console.log("Estudio creado con éxito")
   }
 
-  pacienteStore.loadPacientes()
-  plantillaStore.loadPlantillas()
+  async function load() {
+    loadingStore.start()
+    await pacienteStore.loadPacientes()
+    await plantillaStore.loadPlantillas()
+    loadingStore.stop()
+  }
+
+  load()
 </script>
 
 <template>

@@ -12,10 +12,15 @@
 <template>
   <v-container>
     <router-link to="./misPlantillas">
-      <v-btn prepend-icon="mdi-list-box-outline">Mis plantillas</v-btn>
+      <v-btn prepend-icon="mdi-list-box-outline">
+        Mis plantillas
+      </v-btn>
     </router-link>
     <h1>Mis seguimientos</h1>
-    <v-table height="200" fixed-header>
+    <v-table
+      height="200"
+      fixed-header
+    >
       <thead>
         <tr>
           <th>
@@ -33,12 +38,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="seguimiento in seguimientos" :key="seguimiento.id">
+        <tr
+          v-for="seguimiento in seguimientos"
+          :key="seguimiento.id"
+        >
           <td>{{ seguimiento.id }}</td>
           <td>{{ seguimiento.titulo }}</td>
           <td>{{ seguimiento.descripcion }}</td>
           <td>
-            <v-btn icon="mdi-text-box-edit" title="Editar seguimiento" />
+            <v-btn
+              icon="mdi-text-box-edit"
+              title="Editar seguimiento"
+            />
           </td>
         </tr>
       </tbody>

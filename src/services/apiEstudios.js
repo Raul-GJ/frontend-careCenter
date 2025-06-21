@@ -29,8 +29,8 @@ export async function obtenerEstudio(id) {
 }
 export async function modificarEstudio(id, estudio) {
   try {
-    let response = await api.put(ENDPOINTS.ESTUDIOS.MODIFICAR_ESTUDIO(id), estudio);
-    if (response.status !== 200) {
+    let response = await api.patch(ENDPOINTS.ESTUDIOS.MODIFICAR_ESTUDIO(id), estudio);
+    if (response.status !== 204) {
       alert("Error al modificar el estudio");
       return null;
     }

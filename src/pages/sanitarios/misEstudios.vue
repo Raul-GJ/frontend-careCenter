@@ -1,12 +1,16 @@
 <script setup>
   import { storeToRefs } from 'pinia'
   import { useEstudioStore } from '@/stores/estudioStore'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
   
   const estudioStore = useEstudioStore()
   const { estudios } = storeToRefs(estudioStore)
 
   async function load() {
-    estudioStore.loadEstudios()
+    loadingStore.start()
+    await estudioStore.loadEstudios()
+    loadingStore.stop()
   }
 
   load()
@@ -42,7 +46,10 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="estudio in estudios" :key="estudio.id">
+        <tr
+          v-for="estudio in estudios"
+          :key="estudio.id"
+        >
           <td>{{ estudio.id }}</td>
           <td>{{ estudio.nombre }}</td>
           <td>{{ estudio.descripcion }}</td>

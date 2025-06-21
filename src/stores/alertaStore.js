@@ -12,8 +12,19 @@ export const useAlertaStore = defineStore('alertas', {
     addAlerta(a) {
       this.alertas.push(a)
     },
-    getAlerta(id) {
-      return this.alertas.find(a => a.id == id)
+    async getAlerta(id) {
+      const alerta = this.alertas.find(a => a.id == id)
+      if (!alerta) {
+        try {
+          let response = await obtenerAlerta(id)
+          this.addAlerta(response.data)
+          return response.data
+        } catch (error) {
+          console.error('Error obteniendo alerta:', error)
+          throw error
+        }
+      }
+      return alerta
     },
     setAlerta(id, alerta) {
       let a = this.getAlerta(id)
@@ -37,7 +48,6 @@ export const useAlertaStore = defineStore('alertas', {
       try {
         for (let idAlerta of usuario.alertas) {
           let response = await obtenerAlerta(idAlerta)
-          console.log(JSON.stringify(response.data))
           this.addAlerta(response.data)
         }
         this.isLoaded = true

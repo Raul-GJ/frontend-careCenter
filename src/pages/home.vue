@@ -1,21 +1,26 @@
 <script setup>
-import { ref } from 'vue'
-import AppDrawer from '@/components/AppDrawer.vue'
+  import { ref } from 'vue'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  const loadingStore = useLoadingStore()
 
-const drawer = ref(false)
+  const usuarioStore = useUsuarioStore()
+  const usuario = ref(null)
+
+  async function loadUsuario() {
+    loadingStore.start()
+    await usuarioStore.loadUsuario()
+    usuario.value = usuarioStore.getUsuario()
+    loadingStore.stop()
+  }
+
+  loadUsuario()
 </script>
 
 <template>
-  <v-app-bar>
-    <h1>Nombre app</h1>
-    <v-spacer />
-    <v-btn icon="mdi-magnify" />
-    <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" />
-  </v-app-bar>
-  <AppDrawer v-model="drawer" />
   <v-container>
-    <main>
-      <h2>Hola usuario</h2>
+    <main v-if="usuario">
+      <h2>Hola {{ usuario.nombre }}</h2>
       <section>
         <article>
           <p>Esta es la página principal de la aplicación</p>

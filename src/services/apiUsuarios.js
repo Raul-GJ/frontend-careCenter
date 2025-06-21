@@ -20,8 +20,8 @@ export async function obtenerUsuario(id) {
 // Modificar usuario
 export async function modificarUsuario(id, usuario) {
   try {
-    const response = await api.put(ENDPOINTS.USUARIOS.MODIFICAR_USUARIO(id), usuario);
-    if (response.status !== 200) {
+    const response = await api.patch(ENDPOINTS.USUARIOS.MODIFICAR_USUARIO(id), usuario);
+    if (response.status !== 204) {
       alert("Error al modificar el usuario");
       return null;
     }

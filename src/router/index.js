@@ -9,32 +9,44 @@ import { createRouter, createWebHistory } from 'vue-router/auto'
 import { routes } from 'vue-router/auto-routes'
 import { useLoadingStore } from '@/stores/loadingStore'
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
-})
+const navigationHistory = []
 
 // PROTECCIÓN DE RUTAS
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    ...routes,
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('@/pages/NotFound.vue')
+    }
+  ],
+})
+
 router.beforeEach((to, from, next) => {
-  const loadingStore = useLoadingStore()
-  loadingStore.start()
 
   const token = localStorage.getItem('token')
   const isLoginOrRegisterOrRoot = ['/auth/login', '/auth/registro', '/'].includes(to.path)
 
   if (!token && !isLoginOrRegisterOrRoot) {
-    // Si no hay token y no es una ruta de login, registro o root, redirige al login
+    // Si no hay token y no es una ruta pública, redirige al login
     next({ path: '/auth/login' })
+  } else if (token && isLoginOrRegisterOrRoot && from.path === '/auth/login') {
+    // Solo usa replace tras login exitoso
+    next({ path: '/home', replace: true })
   } else if (token && isLoginOrRegisterOrRoot) {
-    // Si hay token y se intenta acceder a login, registro o root, redirige a home
+    // Si ya está autenticado y navega manualmente a login/registro/root, redirige a home (sin replace)
     next({ path: '/home' })
   } else {
-    // Si hay token o es una ruta pública, permite el acceso
+    // Permite el acceso normal
     next()
   }
 })
 
-router.afterEach(() => {
+router.afterEach((to) => {
+  navigationHistory.push(to.fullPath)
+  console.log('Historial de navegación:', navigationHistory)
   const loadingStore = useLoadingStore()
   loadingStore.stop()
 })
