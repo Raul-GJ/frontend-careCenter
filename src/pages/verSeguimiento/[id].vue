@@ -30,6 +30,7 @@
   async function loadSeguimiento() {
     loadingStore.start()
     let seguimientoResponse = await seguimientoStore.getSeguimiento(idSeguimiento)
+    console.log(seguimientoResponse)
     let plantilla = await plantillaStore.getPlantilla(seguimientoResponse.formulario.plantilla)
     seguimientoResponse.formulario.plantilla = plantilla
     seguimiento.value = seguimientoResponse
@@ -79,7 +80,35 @@
         </v-list>
       </div>
       <div v-else>
-        <p>El usuario todavía no ha rellenado el formulario.</p>
+        <v-chip color="red" text-color="white">
+          El formulario no ha sido rellenado.
+        </v-chip>
+        <v-list>
+          <v-list-item
+            v-for="pregunta of preguntas"
+            :key="pregunta.id"
+          >
+            <p>Pregunta: {{ pregunta.pregunta }}</p>
+            <p>Tipo: {{ pregunta.regla.tipoDato }}</p>
+
+            <v-container v-if="pregunta.regla.tipoDato == 'rango numérico'">
+              <p>Valor mínimo: {{ pregunta.regla.minValue }}</p>
+              <p>Valor máximo: {{ pregunta.regla.maxValue }}</p>
+            </v-container>
+
+            <v-container v-if="pregunta.regla.tipoDato == 'selección'">
+              <p>Posibles valores:</p>
+              <v-list>
+                <v-list-item
+                  v-for="value of pregunta.regla.values"
+                  :key="value"
+                >
+                  <p>{{ value }}</p>
+                </v-list-item>
+              </v-list>
+            </v-container>
+          </v-list-item>
+        </v-list>
       </div>
     </div>
   </v-container>

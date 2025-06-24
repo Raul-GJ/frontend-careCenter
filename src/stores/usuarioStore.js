@@ -6,6 +6,7 @@ import { logout } from '@/services/apiAuth'
 export const useUsuarioStore = defineStore('usuario', {
   state: () => ({
     id: null,
+    tipo: null, // 'paciente', 'sanitario', 'especialista', 'administrador'
     usuario: null,
   }),
   actions: {
@@ -15,10 +16,16 @@ export const useUsuarioStore = defineStore('usuario', {
     setId(id) {
       this.id = id
     },
-    getUsuario() {
+    getTipo() {
+      return this.tipo
+    },
+    setTipo(tipo) {
+      this.tipo = tipo
+    },
+    async getUsuario() {
+      console.log(`Cargando usuario con ID: ${this.id} y tipo: ${this.tipo}`)
       if (!this.usuario) {
-        console.warn("Usuario no cargado, llamando a loadUsuario")
-        this.loadUsuario()
+        await this.loadUsuario()
       }
       return this.usuario
     },
@@ -26,7 +33,11 @@ export const useUsuarioStore = defineStore('usuario', {
       this.usuario = usuario
     },
     async loadUsuario() {
-      let response = await obtenerUsuario(this.id)
+      if (!this.id || !this.tipo) {
+        console.warn("ID o tipo de usuario no definidos, no se puede cargar el usuario")
+        return
+      }
+      let response = await obtenerUsuario(this.id, this.tipo)
       if (response.status != 200) {
         console.log("Error al cargar el usuario")
         return

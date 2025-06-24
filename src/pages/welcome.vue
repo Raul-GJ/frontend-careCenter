@@ -6,12 +6,25 @@
   <v-container>
     <header>
       <v-app-bar>
-        <h1>Mi app</h1>
+        <div 
+          class="text-decoration-none d-flex align-center"
+          style="gap: 12px;"
+        >
+          <v-img
+            src="@/assets/logo.png"
+            height="40"
+            width="40"
+            contain
+            class="ms-4"
+          />
+          <span class="text-h5 font-weight-bold">CareCenter</span>
+        </div>
+        
         <v-spacer />
         <router-link to="/auth/login">
           <v-btn>Login</v-btn>
         </router-link>
-        <router-link to="/auth/register">
+        <router-link to="/auth/registro">
           <v-btn>Registro</v-btn>
         </router-link>
       </v-app-bar>

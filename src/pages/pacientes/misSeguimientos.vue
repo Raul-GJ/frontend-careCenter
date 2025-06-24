@@ -13,6 +13,13 @@
     loadingStore.stop()
   }
 
+  function isRellenable(seguimiento) {
+    return seguimiento.formulario 
+      && seguimiento.formulario.respuestas.length === 0
+      && new Date(seguimiento.formulario.fecha) < new Date()
+      && new Date(seguimiento.formulario.plazo) > new Date()
+  }
+
   loadSeguimientos()
 </script>
 
@@ -40,12 +47,18 @@
           <td>{{ seguimiento.formulario.plantilla }}</td>
           <td>{{ seguimiento.fecha }}</td>
           <td>
-            <v-btn
-              icon="mdi-folder-open"
-              title="Ver seguimiento"
-              @click="verSeguimiento(seguimiento)"
-            />
-            <router-link :to="`./rellenarSeguimiento/${seguimiento.id}`">
+            <router-link :to="`/verSeguimiento/${seguimiento.id}`">
+              <v-btn
+                icon="mdi-folder-open"
+                title="Ver seguimiento"
+              />
+            </router-link>
+
+            
+            <router-link 
+              v-if="isRellenable(seguimiento)"
+              :to="`./rellenarSeguimiento/${seguimiento.id}`"
+            >
               <v-btn 
                 icon="mdi-text-box-edit" 
                 title="Rellenar seguimiento"

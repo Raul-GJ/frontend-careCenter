@@ -4,7 +4,7 @@ import { useUsuarioStore } from './usuarioStore'
 
 export const useEspecialistaStore = defineStore('especialistas', {
   state: () => ({
-    /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, nCol: String, pacientes: Array, espceialidad: String, infoEstudios: Array, plantillas: Array, consultas: Array}[]} */
+    /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, fechaNacimiento: Date, sexo: String, direccion: String, dni: String, nCol: String, centroDeSalud: String, pacientes: Array, especialidad: String, infoEstudios: Array, plantillas: Array, consultas: Array}[]} */
     especialistas: [],
     isLoaded: false
   }),
@@ -16,7 +16,8 @@ export const useEspecialistaStore = defineStore('especialistas', {
       const especialista = this.especialistas.find(e => e.id == id)
       if (!especialista) {
         try {
-          let response = await obtenerUsuario(id)
+          // Cambia aquí: pasa el tipo correcto
+          let response = await obtenerUsuario(id, 'especialistas')
           this.addEspecialista(response.data)
           return response.data
         } catch (error) {
@@ -45,10 +46,10 @@ export const useEspecialistaStore = defineStore('especialistas', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let usuario = usuarioStore.getUsuario()
+      let usuario = await usuarioStore.getUsuario()
       try {
         for (let idEspecialista of usuario.especialistas) {
-          let response = await obtenerUsuario(idEspecialista)
+          let response = await obtenerUsuario(idEspecialista, 'especialista')
           console.log(JSON.stringify(response.data))
           this.addEspecialista(response.data)
         }

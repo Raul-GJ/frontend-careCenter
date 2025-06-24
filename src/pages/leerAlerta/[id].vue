@@ -1,11 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useLoadingStore } from '@/stores/loadingStore'
 import { obtenerAlerta } from '@/services/apiAlertas'
 
 const route = useRoute()
-const router = useRouter()
 const loadingStore = useLoadingStore()
 
 const alerta = ref(null)
@@ -36,12 +35,6 @@ onMounted(fetchAlerta)
 
 <template>
   <v-container>
-    <v-btn
-      class="mb-4"
-      @click="router.back()"
-    >
-      Volver
-    </v-btn>
     <div v-if="error">
       <h2>{{ error }}</h2>
     </div>

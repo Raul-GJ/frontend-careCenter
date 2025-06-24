@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="global-background">
     <v-main>
       <!-- Loader global centrado -->
       <v-overlay
@@ -41,7 +41,16 @@
           @click.stop="drawer = !drawer"
         />
       </v-app-bar>
-      <AppDrawer v-model="drawer" />
+      <AppDrawer v-if="showAppBar" v-model="drawer" />
+      <v-btn
+        v-if="showBackButton"
+        variant="text"
+        prepend-icon="mdi-arrow-left"
+        class="ml-2 mt-4 back-btn-spacing"
+        @click="volverAtras"
+      >
+        Volver
+      </v-btn>
       <!-- Aquí se renderizan las páginas -->
       <router-view />
       <AppFooter />
@@ -50,27 +59,46 @@
 </template>
 
 <script setup>
-import AppFooter from './components/AppFooter.vue';
-import AppDrawer from './components/AppDrawer.vue';
-import { ref, computed, onMounted } from 'vue'
-import { useLoadingStore } from '@/stores/loadingStore'
-import { useRoute, useRouter } from 'vue-router'
-const loadingStore = useLoadingStore()
-const drawer = ref(false)
-const route = useRoute()
-const router = useRouter()
-const hideDrawerRoutes = ['/', '/auth/login', '/auth/registro']
-const showAppBar = computed(() => !hideDrawerRoutes.includes(route.path))
+  import AppFooter from './components/AppFooter.vue';
+  import AppDrawer from './components/AppDrawer.vue';
+  import { ref, computed, onMounted } from 'vue'
+  import { useLoadingStore } from '@/stores/loadingStore'
+  import { useRoute, useRouter } from 'vue-router'
+  const loadingStore = useLoadingStore()
+  const drawer = ref(false)
+  const route = useRoute()
+  const router = useRouter()
+  const hideDrawerRoutes = ['/', '/auth/login', '/auth/registro']
+  const showAppBar = computed(() => !hideDrawerRoutes.includes(route.path))
 
-onMounted(() => {
-  const token = localStorage.getItem('token')
-  const expiry = localStorage.getItem('token_expiry')
-  if (!token || !expiry || Date.now() > Number(expiry)) {
-    localStorage.removeItem('token')
-    localStorage.removeItem('token_expiry')
-    if (route.path !== '/auth/login' && route.path !== '/auth/registro') {
-      router.replace('/auth/login')
+  onMounted(() => {
+    const token = localStorage.getItem('token')
+    const expiry = localStorage.getItem('token_expiry')
+    if (!token || !expiry || Date.now() > Number(expiry)) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('token_expiry')
+      if (route.path !== '/auth/login' && route.path !== '/auth/registro' && route.path !== '/') {
+        router.replace('/auth/login')
+      }
     }
+  })
+
+  const showBackButton = computed(() => 
+    window.history.length > 1 && route.path !== '/' && route.path !== '/home')
+
+  function volverAtras() {
+    router.back()
   }
-})
 </script>
+
+<style>
+/* Fondo de pantalla global */
+.global-background {
+  min-height: 100vh;
+  min-width: 100vw;
+  background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+  /* Puedes cambiar el gradiente o usar una imagen: */
+  /* background: url('@/assets/background.jpg') no-repeat center center fixed; */
+  /* background-size: cover; */
+}
+</style>

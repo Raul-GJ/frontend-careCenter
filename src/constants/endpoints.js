@@ -5,14 +5,20 @@ export const ENDPOINTS = {
     REGISTRO: (rol) => `/auth/registro/${rol}/`,
   },
   USUARIOS: {
-    OBTENER_USUARIO: (id) => `/usuarios/${id}/`,
-    MODIFICAR_USUARIO: (id) => `/usuarios/${id}/`,
+    OBTENER_USUARIO: (id, tipo) => `/usuarios/${tipo}/${id}/`,
+    MODIFICAR_USUARIO: (id, tipo) => `/usuarios/${tipo}/${id}/`,
     ELIMINAR_USUARIO: (id) => `/usuarios/${id}/`,
     AGREGAR_ALERTAS: (id) => `/usuarios/${id}/alertas/`,
     ELIMINAR_ALERTA: (id, alertaId) => `/usuarios/${id}/alertas/${alertaId}/`,
     PACIENTES: {
       AGREGAR_SEGUIMIENTOS: (id) => `/usuarios/pacientes/${id}/seguimientos/`,
       ELIMINAR_SEGUIMIENTO: (id, seguimientoId) => `/usuarios/pacientes/${id}/seguimientos/${seguimientoId}/`,
+      NOTAS: {
+        AGREGAR_NOTAS: (id) => `/usuarios/pacientes/${id}/notas/`,
+        OBTENER_NOTA: (notaId) => `/usuarios/pacientes/notas/${notaId}/`,
+        MODIFICAR_NOTA: (notaId) => `/usuarios/pacientes/notas/${notaId}/`,
+        ELIMINAR_NOTA: (id, notaId) => `/usuarios/pacientes/${id}/notas/${notaId}/`,
+      }
     },
     MEDICOS: {
       AGREGAR_PACIENTES: (id) => `/usuarios/medicos/${id}/pacientes/`,

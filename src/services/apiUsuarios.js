@@ -2,10 +2,9 @@ import api from "./api";
 import { ENDPOINTS } from "@/constants";
 
 // Obtener usuario
-export async function obtenerUsuario(id) {
+export async function obtenerUsuario(id, tipo) {
   try {
-    console.log(ENDPOINTS.USUARIOS.OBTENER_USUARIO(id));
-    const response = await api.get(ENDPOINTS.USUARIOS.OBTENER_USUARIO(id));
+    const response = await api.get(ENDPOINTS.USUARIOS.OBTENER_USUARIO(id, tipo));
     if (response.status !== 200) {
       alert("Error al obtener el usuario");
       return null;
@@ -18,9 +17,9 @@ export async function obtenerUsuario(id) {
 }
 
 // Modificar usuario
-export async function modificarUsuario(id, usuario) {
+export async function modificarUsuario(id, tipo, usuario) {
   try {
-    const response = await api.patch(ENDPOINTS.USUARIOS.MODIFICAR_USUARIO(id), usuario);
+    const response = await api.patch(ENDPOINTS.USUARIOS.MODIFICAR_USUARIO(id, tipo), usuario);
     if (response.status !== 204) {
       alert("Error al modificar el usuario");
       return null;

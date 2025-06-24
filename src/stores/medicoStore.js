@@ -4,7 +4,7 @@ import { useUsuarioStore } from './usuarioStore'
 
 export const useMedicoStore = defineStore('medicos', {
   state: () => ({
-    /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, nCol: String, pacientes: Array, atributoTemporal: String}[]} */
+    /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, fechaNacimiento: Date, sexo: String, direccion: String, dni: String, nCol: String, centroDeSalud: String, pacientes: Array}[]} */
     medicos: []
   }),
   actions: {
@@ -15,7 +15,7 @@ export const useMedicoStore = defineStore('medicos', {
       const medico = this.medicos.find(m => m.id == id)
       if (!medico) {
         try {
-          let response = await obtenerUsuario(id)
+          let response = await obtenerUsuario(id, 'medicos')
           this.addMedico(response.data)
           return response.data
         } catch (error) {

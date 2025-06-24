@@ -24,6 +24,7 @@ export const useSeguimientoStore = defineStore('seguimientos', {
           throw error
         }
       }
+      return seguimiento
     },
     setSeguimiento(id, seguimiento) {
       let s = this.getSeguimiento(id)

@@ -4,7 +4,7 @@ import { useUsuarioStore } from './usuarioStore'
 
 export const usePacienteStore = defineStore('pacientes', {
   state: () => ({
-    /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, medico: String, alertas: Array, consultas: Array, especialistas: Array, seguimientos: Array}[]} */
+    /** @type {{ id: String, nombre: String, apellidos: String, email: String, telefono: String, fechaNacimiento: Date, sexo: String, direccion: String, dni: String, medico: String, especialistas: Array, seguimientos: Array, nss: String, alergias: Array, tratamientos: Array, notas: Array}[]} */
     pacientes: [],
     isLoaded: false
   }),
@@ -16,7 +16,7 @@ export const usePacienteStore = defineStore('pacientes', {
       const paciente = this.pacientes.find(p => p.id == id)
       if (!paciente) {
         try {
-          let response = await obtenerUsuario(id)
+          let response = await obtenerUsuario(id, 'pacientes')
           this.addPaciente(response.data)
           return response.data
         } catch (error) {

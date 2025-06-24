@@ -1,7 +1,10 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useUsuarioStore } from '@/stores/usuarioStore'
+import { useLoadingStore } from '@/stores/loadingStore'
 import { useRouter } from 'vue-router'
+
+const loadingStore = useLoadingStore()
 
 const props = defineProps({
   modelValue: Boolean
@@ -14,7 +17,7 @@ const drawer = computed({
 })
 
 const usuarioStore = useUsuarioStore()
-const usuario = computed(() => usuarioStore.getUsuario())
+const usuario = ref(null)
 const tipoUsuario = computed(() => usuario.value?.tipo)
 const router = useRouter()
 
@@ -22,6 +25,14 @@ function cerrarSesion() {
   usuarioStore.logout()
   router.push('/')
 }
+
+async function loadUsuario() {
+  loadingStore.start()
+  usuario.value = await usuarioStore.getUsuario()
+  loadingStore.stop()
+}
+
+loadUsuario()
 </script>
 
 <template>

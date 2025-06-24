@@ -35,16 +35,40 @@
       loadingStore.stop()
       return
     }
-    let token = response.data.token
-    let id = response.data.id
+    const token = response.data.token
+    const id = response.data.id
+    const roles = response.data.roles
+    if (!token || !id || !roles || roles.length === 0) {
+      console.error('Respuesta inesperada del servidor:', response)
+      errorValue.value = true
+      loadingStore.stop()
+      return
+    }
+
+    let tipo = ''
+    if (roles.includes('MEDICO')) {
+      tipo = 'medicos'
+    } else if (roles.includes('ESPECIALISTA')) {
+      tipo = 'especialistas'
+    } else if (roles.includes('PACIENTE')) {
+      tipo = 'pacientes'
+    } else {
+      console.error('Rol no reconocido:', roles)
+      errorValue.value = true
+      loadingStore.stop()
+      return
+    }
+
     localStorage.setItem('token', token);
     usuarioStore.setId(id)
-    await usuarioStore.loadUsuario() // <-- Esperar a que termine la carga
-    if (usuarioStore.getUsuario() == null) {
+    usuarioStore.setTipo(tipo)
+    const usuario = await usuarioStore.getUsuario()
+    if (usuario == null) {
       console.log('Error al cargar el usuario')
       loadingStore.stop()
       return
     }
+    console.log('Usuario cargado:', usuario)
     loadingStore.stop()
     router.push('/home')
   }
