@@ -80,7 +80,10 @@
         </v-list>
       </div>
       <div v-else>
-        <v-chip color="red" text-color="white">
+        <v-chip
+          color="red"
+          text-color="white"
+        >
           El formulario no ha sido rellenado.
         </v-chip>
         <v-list>

@@ -6,7 +6,7 @@ import { logout } from '@/services/apiAuth'
 export const useUsuarioStore = defineStore('usuario', {
   state: () => ({
     id: null,
-    tipo: null, // 'paciente', 'sanitario', 'especialista', 'administrador'
+    tipo: null, // 'pacientes', 'medicos', 'especialistas'
     usuario: null,
   }),
   actions: {

@@ -43,7 +43,7 @@
 
 <template>
   <v-container>
-    <div v-if="!loadingStore.loading">
+    <div v-if="!loadingStore.loading && paciente">
       <v-row>
         <v-col cols="4">
           <v-avatar
@@ -108,24 +108,39 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="seguimiento in seguimientos" :key="seguimiento.id">
+              <tr
+                v-for="seguimiento in seguimientos"
+                :key="seguimiento.id"
+              >
                 <td>{{ seguimiento.motivo }}</td>
                 <td>{{ seguimiento.fecha }}</td>
                 <td>{{ seguimiento.plazo }}</td>
                 <td>
                   <span v-if="new Date(seguimiento.formulario.fecha) > new Date()">
-                    <v-chip color="orange" text-color="white">Pendiente</v-chip>
+                    <v-chip
+                      color="orange"
+                      text-color="white"
+                    >Pendiente</v-chip>
                   </span>
                   <span v-else-if="seguimiento.formulario.respuestas.length > 0">
-                    <v-chip color="green" text-color="white">Completado</v-chip>
+                    <v-chip
+                      color="green"
+                      text-color="white"
+                    >Completado</v-chip>
                   </span>
                   <span v-else>
-                    <v-chip color="red" text-color="white">No rellenado</v-chip>
+                    <v-chip
+                      color="red"
+                      text-color="white"
+                    >No rellenado</v-chip>
                   </span>
                 </td>
                 <td>
                   <router-link :to="`/verSeguimiento/${seguimiento.id}`">
-                    <v-btn icon="mdi-eye" title="Ver seguimiento" />
+                    <v-btn
+                      icon="mdi-eye"
+                      title="Ver seguimiento"
+                    />
                   </router-link>
                 </td>
               </tr>
@@ -134,14 +149,20 @@
 
           <p>Alergias</p>
           <v-list>
-            <v-list-item v-for="alergia in paciente.alergias" :key="alergia">
+            <v-list-item
+              v-for="alergia in paciente.alergias"
+              :key="alergia"
+            >
               <v-list-item-content>{{ alergia }}</v-list-item-content>
             </v-list-item>
           </v-list>
 
           <p>Tratamientos</p>
           <v-list>
-            <v-list-item v-for="tratamiento in paciente.tratamientos" :key="tratamiento">
+            <v-list-item
+              v-for="tratamiento in paciente.tratamientos"
+              :key="tratamiento"
+            >
               <v-list-item-content>{{ tratamiento }}</v-list-item-content>
             </v-list-item>
           </v-list>
@@ -157,17 +178,26 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="nota in paciente.notas" :key="nota.id">
+              <tr
+                v-for="nota in paciente.notas"
+                :key="nota.id"
+              >
                 <td>{{ nota.asunto }}</td>
                 <td>{{ nota.sanitario }}</td>
                 <td>
-                  <v-chip :color="nota.privado ? 'green' : 'red'" text-color="white">
+                  <v-chip
+                    :color="nota.privado ? 'green' : 'red'"
+                    text-color="white"
+                  >
                     {{ nota.privado ? "Privada" : "Pública" }}
                   </v-chip>
                 </td>
                 <td>
                   <router-link :to="`./verNota/${nota.id}`">
-                    <v-btn icon="mdi-eye" title="Ver nota" />
+                    <v-btn
+                      icon="mdi-eye"
+                      title="Ver nota"
+                    />
                   </router-link>
                 </td>
               </tr>

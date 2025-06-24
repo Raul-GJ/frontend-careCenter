@@ -34,7 +34,7 @@ export const ENDPOINTS = {
   ALERTAS: {
     CREAR_ALERTA: '/alertas/',
     OBTENER_ALERTA: (id) => `/alertas/${id}/`,
-    MODIFICAR_ALERTA: (id) => `/alertas/${id}/`,
+    OBTENER_ALERTAS_USUARIO: (id) => `/alertas/usuario/${id}/`,
     ELIMINAR_ALERTA: (id) => `/alertas/${id}/`,
     LEER_ALERTA: (id) => `/alertas/${id}/leer/`,
   },

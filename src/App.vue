@@ -1,5 +1,5 @@
 <template>
-  <v-app class="global-background">
+  <v-app>
     <v-main>
       <!-- Loader global centrado -->
       <v-overlay
@@ -41,18 +41,23 @@
           @click.stop="drawer = !drawer"
         />
       </v-app-bar>
-      <AppDrawer v-if="showAppBar" v-model="drawer" />
-      <v-btn
-        v-if="showBackButton"
-        variant="text"
-        prepend-icon="mdi-arrow-left"
-        class="ml-2 mt-4 back-btn-spacing"
-        @click="volverAtras"
-      >
-        Volver
-      </v-btn>
-      <!-- Aquí se renderizan las páginas -->
-      <router-view />
+      <AppDrawer
+        v-if="showAppBar"
+        v-model="drawer"
+      />
+      <div class="global-background">
+        <v-btn
+          v-if="showBackButton"
+          variant="text"
+          prepend-icon="mdi-arrow-left"
+          class="ml-2 mt-4 back-btn-spacing volver-btn"
+          @click="volverAtras"
+        >
+          Volver
+        </v-btn>
+        <!-- Aquí se renderizan las páginas -->
+        <router-view />
+      </div>
       <AppFooter />
     </v-main>
   </v-app>
@@ -96,9 +101,16 @@
 .global-background {
   min-height: 100vh;
   min-width: 100vw;
-  background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-  /* Puedes cambiar el gradiente o usar una imagen: */
-  /* background: url('@/assets/background.jpg') no-repeat center center fixed; */
-  /* background-size: cover; */
+  background: linear-gradient(135deg, #23272f 0%, #1a1d23 100%);
+}
+
+.volver-btn {
+  background-color: #232f3e !important;
+  color: #fff !important;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.volver-btn:hover {
+  background-color: #1a2330 !important;
 }
 </style>

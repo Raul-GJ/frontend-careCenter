@@ -41,11 +41,11 @@ export const useEstudioStore = defineStore('estudios', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let idUsuario = usuarioStore.getId()
+      const usuario = await usuarioStore.getUsuario()
       try {
         // Cargar tus estudios
         console.log('Cargando estudios')
-        let response = await obtenerAsignacionesPorEspecialista(idUsuario)
+        let response = await obtenerAsignacionesPorEspecialista(usuario.id)
         console.log(JSON.stringify(response.data))
         for (let asignacion of response.data) {
           console.log(JSON.stringify(asignacion))
@@ -62,7 +62,7 @@ export const useEstudioStore = defineStore('estudios', {
           let responseEspecialistas = await obtenerAsignacionesPorEstudio(estudio.id)
           console.log(JSON.stringify(responseEspecialistas.data))
           for (let asignacion of responseEspecialistas.data) {
-            if (asignacion.especialista == idUsuario) {
+            if (asignacion.especialista == usuario.id) {
               let yo = usuarioStore.getUsuario()
               yo.rol = 'CREADOR'
               estudio.especialistas.push(yo)

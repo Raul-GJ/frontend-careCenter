@@ -40,7 +40,7 @@ export const useNotaStore = defineStore('notas', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let usuario = usuarioStore.getUsuario()
+      let usuario = await usuarioStore.getUsuario()
       console.log(JSON.stringify(usuario))
       try {
         for (let idNota of usuario.notas) {

@@ -16,7 +16,7 @@
   async function load() {
     loadingStore.start()
     await usuarioStore.loadUsuario()
-    especialista.value = usuarioStore.getUsuario()
+    especialista.value = await usuarioStore.getUsuario()
     await pacienteStore.loadPacientes()
     loadingStore.stop()
   }

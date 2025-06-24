@@ -42,7 +42,10 @@ loadUsuario()
     location="right"
   >
     <v-list-item>
-      <router-link to="/perfil" :replace="false">
+      <router-link
+        to="/perfil"
+        :replace="false"
+      >
         <v-btn prepend-icon="mdi-account">
           Mi cuenta
         </v-btn>
@@ -64,14 +67,20 @@ loadUsuario()
         </router-link>
       </v-list-item>  
       <v-list-item>
-        <router-link to="/sanitarios/misPacientes" :replace="false">
+        <router-link
+          to="/sanitarios/misPacientes"
+          :replace="false"
+        >
           <v-btn prepend-icon="mdi-account-group-outline">
             Mis pacientes
           </v-btn>
         </router-link>
       </v-list-item>
       <v-list-item v-if="tipoUsuario == 'ESPECIALISTA'">
-        <router-link to="/sanitarios/especialistas/misEstudios" :replace="false">
+        <router-link
+          to="/sanitarios/especialistas/misEstudios"
+          :replace="false"
+        >
           <v-btn prepend-icon="mdi-folder">
             Mis estudios
           </v-btn>

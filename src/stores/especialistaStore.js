@@ -49,7 +49,7 @@ export const useEspecialistaStore = defineStore('especialistas', {
       let usuario = await usuarioStore.getUsuario()
       try {
         for (let idEspecialista of usuario.especialistas) {
-          let response = await obtenerUsuario(idEspecialista, 'especialista')
+          let response = await obtenerUsuario(idEspecialista, 'especialistas')
           console.log(JSON.stringify(response.data))
           this.addEspecialista(response.data)
         }

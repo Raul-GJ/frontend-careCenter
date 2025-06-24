@@ -43,7 +43,7 @@ export const useMedicoStore = defineStore('medicos', {
       const usuarioStore = useUsuarioStore()
       let usuario = usuarioStore.getUsuario()
       try {
-        let response = await obtenerUsuario(usuario.medicoCabecera)
+        let response = await obtenerUsuario(usuario.medicoCabecera, 'medicos')
         console.log(JSON.stringify(response.data))
         this.addMedico(response.data)
         

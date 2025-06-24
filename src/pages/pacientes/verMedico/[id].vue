@@ -1,24 +1,24 @@
 <script setup>
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
-  import { useMedicoStore } from '@/stores/medicoStore';
-  import { useEspecialistaStore } from '@/stores/especialistaStore';
+  import { useMedicoStore } from '@/stores/medicoStore'
   import { useLoadingStore } from '@/stores/loadingStore'
 
   const route = useRoute()
   const loadingStore = useLoadingStore()
   const medicoStore = useMedicoStore()
-  const especialistaStore = useEspecialistaStore()
   const idSanitario = route.params.id
   const sanitario = ref(null)
 
   async function loadSanitario() {
     loadingStore.start()
-    sanitario.value = await medicoStore.getMedico(idSanitario)
-    if (!sanitario.value) {
-      sanitario.value = await especialistaStore.getEspecialista(idSanitario)
+    try {
+      sanitario.value = await medicoStore.getMedico(idSanitario)
+    } catch (error) {
+       console.error('Error cargando sanitario:', error)
+    } finally {
+      loadingStore.stop()
     }
-    loadingStore.stop()
   }
 
   loadSanitario()
@@ -41,12 +41,6 @@
             />
             <v-text-field
               v-model="sanitario.centroDeSalud"
-              variant="solo"
-              disabled
-            />
-            <v-text-field
-              v-if="sanitario.tipo === 'especialista'"  
-              v-model="sanitario.especialidad"
               variant="solo"
               disabled
             />

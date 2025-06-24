@@ -34,7 +34,10 @@
         <v-col cols="12">
           <h2>
             Nota
-            <v-chip :color="nota.privado ? 'green' : 'red'" text-color="white">
+            <v-chip
+              :color="nota.privado ? 'green' : 'red'"
+              text-color="white"
+            >
               {{ nota.privado ? "Privada" : "Pública" }}
             </v-chip>
           </h2>

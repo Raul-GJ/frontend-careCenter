@@ -38,7 +38,7 @@ export const useAsignacionEstudioStore = defineStore('asignacionEstudios', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let idUsuario = usuarioStore.getId()
+      let idUsuario = await usuarioStore.getId()
       try {
         let response = await obtenerAsignacionesPorEspecialista(idUsuario)
         console.log(JSON.stringify(response.data))

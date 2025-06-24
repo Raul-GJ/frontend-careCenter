@@ -1,56 +1,57 @@
 <script setup>
   import { useRoute } from 'vue-router'
   import { ref } from 'vue'
-  import { usePacienteStore } from '@/stores/pacienteStore'
-
-  const pacienteStore = usePacienteStore()
+  import { useEspecialistaStore } from '@/stores/especialistaStore'
+  import { useLoadingStore } from '@/stores/loadingStore'
 
   const route = useRoute()
-  const idPaciente = route.params.id
-  const paciente = ref(null)
+  const loadingStore = useLoadingStore()
+  const especialistaStore = useEspecialistaStore()
+  const idSanitario = route.params.id
+  const sanitario = ref(null)
 
-  const nombrePaciente = ref('')
-  const emailPaciente = ref('')
-  const telefonoPaciente = ref('')
-
-  function loadPaciente() {
-    paciente.value = pacienteStore.getPaciente(idPaciente)
+  async function loadSanitario() {
+    loadingStore.start()
+    try {
+      sanitario.value = await especialistaStore.getEspecialista(idSanitario)
+    } catch (error) {
+       console.error('Error cargando sanitario:', error)
+    } finally {
+      loadingStore.stop()
+    }
   }
 
-  loadPaciente()
+  loadSanitario()
 </script>
 
 <template>
   <v-container>
-    <v-row>
-      <v-col>
-        <v-avatar
-          image="@/assets/avatar-perfil-por-defecto.png"
-          size="250"
-        />
-        <v-container>
-          <v-text-field
-            v-model="nombrePaciente"
-            variant="solo"
-            disabled
+    <div v-if="!loadingStore.loading">
+      <v-row>
+        <v-col cols="12">
+          <v-avatar
+            image="@/assets/avatar-perfil-por-defecto.png"
+            size="250"
           />
-          <v-text-field
-            v-model="emailPaciente"
-            variant="solo"
-            disabled
-          />
-          <v-text-field
-            v-model="telefonoPaciente"
-            variant="solo"
-            disabled
-          />
-        </v-container>
-      </v-col>
-      <v-col>
-        <p>Otra Información de interés</p>
-      </v-col>
-    </v-row>
+          <v-container>
+            <v-text-field
+              v-model="sanitario.nombre"
+              variant="solo"
+              disabled
+            />
+            <v-text-field
+              v-model="sanitario.centroDeSalud"
+              variant="solo"
+              disabled
+            />
+            <v-text-field
+              v-model="sanitario.especialidad"
+              variant="solo"
+              disabled
+            />
+          </v-container>
+        </v-col>
+      </v-row>
+    </div>
   </v-container>
 </template>
-
-

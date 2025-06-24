@@ -40,11 +40,11 @@ export const usePacienteStore = defineStore('pacientes', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let usuario = usuarioStore.getUsuario()
+      let usuario = await usuarioStore.getUsuario()
       console.log(JSON.stringify(usuario))
       try {
         for (let idPaciente of usuario.pacientes) {
-          let response = await obtenerUsuario(idPaciente)
+          let response = await obtenerUsuario(idPaciente, 'pacientes')
           console.log(JSON.stringify(response.data))
           this.addPaciente(response.data)
         }

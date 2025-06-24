@@ -40,7 +40,7 @@ export const usePlantillaStore = defineStore('plantillas', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let usuario = usuarioStore.getUsuario()
+      let usuario = await usuarioStore.getUsuario()
       try {
         for (let idPlantilla of usuario.plantillas) {
           let response = await obtenerPlantilla(idPlantilla)

@@ -255,7 +255,10 @@
           </tbody>
         </v-table>
         <div v-if="agregarPacientesValue">
-          <v-table height="200" fixed-header>
+          <v-table
+            height="200"
+            fixed-header
+          >
             <thead>
               <tr>
                 <th>Nombre</th>
@@ -264,7 +267,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="paciente in pacientesRestantes" :key="paciente.id">
+              <tr
+                v-for="paciente in pacientesRestantes"
+                :key="paciente.id"
+              >
                 <td>{{ paciente.nombre }}</td>
                 <td>{{ paciente.apellidos }}</td>
                 <td>

@@ -29,16 +29,16 @@ export async function obtenerAlerta(id) {
   }
 }
 
-export async function modificarAlerta(id, alerta) {
+export async function obtenerAlertasUsuario(id) {
   try {
-    let response = await api.patch(ENDPOINTS.ALERTAS.MODIFICAR_ALERTA(id), alerta);
-    if (response.status !== 204) {
-      alert("Error al modificar la alerta");
+    let response = await api.get(ENDPOINTS.ALERTAS.OBTENER_ALERTAS_USUARIO(id));
+    if (response.status !== 200) {
+      alert("Error al obtener las alertas del usuario");
       return null;
     }
     return response;
   } catch (error) {
-    console.error("Error al modificar la alerta:", error);
+    console.error("Error al obtener las alertas del usuario:", error);
     throw error;
   }
 }

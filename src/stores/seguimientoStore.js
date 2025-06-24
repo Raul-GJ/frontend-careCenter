@@ -39,7 +39,7 @@ export const useSeguimientoStore = defineStore('seguimientos', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let usuario = usuarioStore.getUsuario()
+      let usuario = await usuarioStore.getUsuario()
       try {
         for (let idSeguimiento of usuario.seguimientos) {
           let response = await obtenerSeguimiento(idSeguimiento)

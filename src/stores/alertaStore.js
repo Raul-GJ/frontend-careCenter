@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { obtenerAlerta } from '@/services/apiAlertas'
+import { obtenerAlertasUsuario } from '@/services/apiAlertas'
 import { useUsuarioStore } from './usuarioStore'
 
 export const useAlertaStore = defineStore('alertas', {
@@ -44,11 +45,11 @@ export const useAlertaStore = defineStore('alertas', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let usuario = usuarioStore.getUsuario()
+      let usuario = await usuarioStore.getUsuario()
       try {
-        for (let idAlerta of usuario.alertas) {
-          let response = await obtenerAlerta(idAlerta)
-          this.addAlerta(response.data)
+        const response = await obtenerAlertasUsuario(usuario.id)
+        for (let alerta of response.data) {
+          this.addAlerta(alerta)
         }
         this.isLoaded = true
       } catch (error) {

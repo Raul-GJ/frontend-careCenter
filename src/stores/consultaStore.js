@@ -40,7 +40,7 @@ export const useConsultaStore = defineStore('consultas', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
-      let usuario = usuarioStore.getUsuario()
+      let usuario = await usuarioStore.getUsuario()
       let idUsuario = usuario.id
       try {
         let response = await obtenerConsultasUsuario(idUsuario)
