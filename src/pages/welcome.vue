@@ -39,7 +39,6 @@ const cards = [
         elevation="8"
         app
         class="welcome-app-bar"
-        style="position:fixed; top:0; left:0; right:0; z-index:1100; background: #000 !important; box-shadow: 0 4px 24px rgba(0,0,0,0.25);"
       >
         <div 
           class="text-decoration-none d-flex align-center"
@@ -76,23 +75,20 @@ const cards = [
         </router-link>
       </v-app-bar>
     </header>
-    <main style="padding-top: 80px;">
+    <main class="welcome-main">
       <v-row
         align="center"
         justify="center"
-        style="min-height: 80vh;"
-        class="ma-0 pa-0"
+        class="ma-0 pa-0 welcome-row"
       >
         <v-col
           cols="12"
           md="5"
-          class="d-flex"
-          style="margin-bottom: 24px;"
+          class="d-flex welcome-col"
         >
           <v-card
-            class="pa-8 flex-grow-1"
+            class="pa-8 flex-grow-1 welcome-card"
             elevation="8"
-            style="border-radius: 24px;"
           >
             <v-row
               justify="center"
@@ -105,8 +101,7 @@ const cards = [
               />
             </v-row>
             <h2
-              class="text-center mb-4 font-weight-bold"
-              style="color: #1976d2;"
+              class="text-center mb-4 font-weight-bold welcome-title"
             >
               ¡Bienvenido!
             </h2>
@@ -146,17 +141,14 @@ const cards = [
         <v-col
           cols="12"
           md="5"
-          class="d-flex"
-          style="margin-bottom: 24px;"
+          class="d-flex welcome-col"
         >
           <v-card
-            class="pa-6 flex-grow-1"
+            class="pa-6 flex-grow-1 welcome-card-features"
             elevation="4"
-            style="border-radius: 18px;"
           >
             <h3
-              class="text-center mb-6 font-weight-bold"
-              style="color: #1565c0;"
+              class="text-center mb-6 font-weight-bold welcome-features-title"
             >
               Características principales
             </h3>
@@ -180,6 +172,34 @@ const cards = [
 <style scoped>
 .welcome-app-bar {
   border-bottom: 1px solid #222;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  background: #000 !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+}
+.welcome-main {
+  padding-top: 80px;
+}
+.welcome-row {
+  min-height: 80vh;
+}
+.welcome-col {
+  margin-bottom: 24px;
+}
+.welcome-card {
+  border-radius: 24px;
+}
+.welcome-card-features {
+  border-radius: 18px;
+}
+.welcome-title {
+  color: #1976d2;
+}
+.welcome-features-title {
+  color: #1565c0;
 }
 @media (max-width: 960px) {
   .v-col {

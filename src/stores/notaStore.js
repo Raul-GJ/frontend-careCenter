@@ -2,23 +2,36 @@ import { defineStore } from 'pinia'
 import { obtenerNota } from '@/services/apiNotas'
 import { useUsuarioStore } from './usuarioStore'
 
+/**
+ * @typedef {Object} Nota
+ * @property {String} id
+ * @property {String} sanitario
+ * @property {String} asunto
+ * @property {String} contenido
+ * @property {Boolean} privado
+ */
+
 export const useNotaStore = defineStore('notas', {
   state: () => ({
-    /** @type {{ id: String, sanitario: String, asunto: String, contenido: String, privado: Boolean}[]} */
+    /** @type {Nota[]} */
     notas: [],
-    isLoaded: false
   }),
   actions: {
-    addNota(n) {
-      this.notas.push(n)
+    addNota(nota) {
+      const index = this.notas.findIndex(n => n.id == nota.id)
+      if (index === -1) {
+        this.notas.push(nota)
+      } else {
+        this.notas[index] = { ...this.notas[index], ...nota }
+      }
     },
     async getNota(id) {
-      const nota = this.notas.find(n => n.id == id)
+      let nota = this.notas.find(n => n.id == id)
       if (!nota) {
         try {
           let response = await obtenerNota(id)
           this.addNota(response.data)
-          return response.data
+          nota = response.data
         } catch (error) {
           console.error('Error obteniendo nota:', error)
           throw error
@@ -27,35 +40,31 @@ export const useNotaStore = defineStore('notas', {
       return nota
     },
     setNota(id, nota) {
-      let n = this.getNota(id)
-      n.sanitario = nota.asunto
-      n.asunto = nota.asunto
-      n.contenido = nota.contenido
-      n.privado = nota.privado
+      const index = this.notas.findIndex(n => n.id == id)
+      if (index !== -1) {
+        this.notas[index] = { ...this.notas[index], ...nota, id }
+      }
     },
     deleteNota(id) {
       this.notas = this.notas.filter(n => n.id != id)
     },
-    async loadNotas() {
-      if (this.isLoaded)
-        return
+    async loadNotas(force = false) {
+      if (this.notas.length > 0 && !force) return
+      this.clearNotas()
       const usuarioStore = useUsuarioStore()
       let usuario = await usuarioStore.getUsuario()
-      console.log(JSON.stringify(usuario))
       try {
         for (let idNota of usuario.notas) {
           let response = await obtenerNota(idNota)
-          console.log(JSON.stringify(response.data))
           this.addNota(response.data)
         }
-        this.isLoaded = true
       } catch (error) {
         console.error('Error cargando notas: ', error)
+        throw error
       }
     },
     clearNotas() {
       this.notas = []
-      this.isLoaded = false
     }
-  },
+  }
 })

@@ -5,7 +5,7 @@ export const ENDPOINTS = {
     REGISTRO: (rol) => `/auth/registro/${rol}/`,
   },
   USUARIOS: {
-    OBTENER_USUARIO: (id, tipo) => `/usuarios/${tipo}/${id}/`,
+    OBTENER_USUARIO: (id) => `/usuarios/${id}/`,
     MODIFICAR_USUARIO: (id, tipo) => `/usuarios/${tipo}/${id}/`,
     ELIMINAR_USUARIO: (id) => `/usuarios/${id}/`,
     AGREGAR_ALERTAS: (id) => `/usuarios/${id}/alertas/`,

@@ -1,58 +1,88 @@
 import { defineStore } from 'pinia'
-import { obtenerAsignacionesPorEspecialista } from '@/services/apiAsignaciones'
+import { obtenerAsignacion, obtenerAsignacionesPorEspecialista, obtenerAsignacionesPorEstudio } from '@/services/apiAsignaciones'
 import { useUsuarioStore } from './usuarioStore'
+
+/**
+ * @typedef {Object} AsignacionEstudio
+ * @property {String} id
+ * @property {String} estudio
+ * @property {String} especialista
+ * @property {String} rol
+ */
 
 export const useAsignacionEstudioStore = defineStore('asignacionEstudios', {
   state: () => ({
-    /** @type {{ id: String, estudio: String, especialista: String, rol: String}[]} */
+    /** @type {AsignacionEstudio[]} */
     asignacionEstudios: [],
-    isLoaded: false
   }),
   actions: {
-    addAsignacionEstudio(e) {
-      this.asignacionEstudios.push(e)
+    addAsignacionEstudio(asignacion) {
+      const index = this.asignacionEstudios.findIndex(e => e.id == asignacion.id)
+      if (index === -1) {
+        this.asignacionEstudios.push(asignacion)
+      } else {
+        this.asignacionEstudios[index] = { ...this.asignacionEstudios[index], ...asignacion }
+      }
     },
     async getAsignacionEstudio(id) {
-      const asignacion = this.asignacionEstudios.find(e => e.id == id)
+      let asignacion = this.asignacionEstudios.find(e => e.id == id)
       if (!asignacion) {
         try {
-          // No hay un endpoint individual, así que devolvemos undefined o podrías lanzar un error
-          return undefined
+          const response = await obtenerAsignacion(id)
+          this.addAsignacion(response.data)
+          asignacion = response.data
         } catch (error) {
-          console.error('Error obteniendo asignación:', error)
+          console.error('Error obteniendo asignacion:', error)
           throw error
         }
       }
       return asignacion
     },
     setAsignacionEstudio(id, asignacion) {
-      let e = this.getAsignacionEstudio(id)
-      e.estudio = asignacion.estudio
-      e.especialista = asignacion.especialista
-      e.rol = asignacion.rol
+      const index = this.asignacionEstudios.findIndex(e => e.id == id)
+      if (index !== -1) {
+        this.asignacionEstudios[index] = { ...this.asignacionEstudios[index], ...asignacion, id }
+      }
     },
     deleteAsignacionEstudio(id) {
       this.asignacionEstudios = this.asignacionEstudios.filter(e => e.id != id)
     },
-    async loadAsignaciones() {
-      if (this.isLoaded)
-        return
+    async loadAsignacionesEspecialista(force = false) {
+      if (this.asignacionEstudios.length > 0 && !force) return
       const usuarioStore = useUsuarioStore()
-      let idUsuario = await usuarioStore.getId()
+      const usuario = await usuarioStore.getUsuario()
       try {
-        let response = await obtenerAsignacionesPorEspecialista(idUsuario)
-        console.log(JSON.stringify(response.data))
+        let response = await obtenerAsignacionesPorEspecialista(usuario.id)
         for (let asignacion of response.data) {
           this.addAsignacionEstudio(asignacion)
         }
-        this.isLoaded = true
       } catch (error) {
         console.error('Error cargando asignaciones: ', error)
+        throw error
+      }
+    },
+    async loadAsignacionesEstudio(force = false) {
+      if (this.asignacionEstudios.length > 0 && !force) return
+      const usuarioStore = useUsuarioStore()
+      const usuario = await usuarioStore.getUsuario()
+      try {
+        let response = await obtenerAsignacionesPorEstudio(usuario.id)
+        for (let asignacion of response.data) {
+          this.addAsignacionEstudio(asignacion)
+        }
+      } catch (error) {
+        console.error('Error cargando asignaciones: ', error)
+        throw error
       }
     },
     clearAsignaciones() {
       this.asignacionEstudios = []
-      this.isLoaded = false
+    },
+    getAsignacionesPorEspecialista(especialistaId) {
+      return this.asignacionEstudios.filter(a => a.especialista == especialistaId)
+    },
+    getAsignacionesPorEstudio(estudioId) {
+      return this.asignacionEstudios.filter(a => a.estudio == estudioId)
     }
-  },
+  }
 })

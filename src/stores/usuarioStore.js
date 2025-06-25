@@ -1,60 +1,64 @@
 // stores/userStore.js
 import { defineStore } from 'pinia'
-import { obtenerUsuario } from '@/services/apiUsuarios'
-import { logout } from '@/services/apiAuth'
+import { obtenerUsuario, modificarUsuario } from '@/services/apiUsuarios'
+
+/**
+ * @typedef {Object} Usuario
+ * @property {String} id
+ * @property {String} nombre
+ * @property {String} apellidos
+ * @property {String} email
+ * @property {String} telefono
+ * @property {Date} fechaNacimiento
+ * @property {String} sexo
+ * @property {String} direccion
+ * @property {String} dni
+ * // Campos adicionales según el tipo de usuario
+ */
 
 export const useUsuarioStore = defineStore('usuario', {
   state: () => ({
-    id: null,
-    tipo: null, // 'pacientes', 'medicos', 'especialistas'
-    usuario: null,
+    /** @type {Usuario[]} */
+    usuarios: [],
   }),
   actions: {
-    getId() {
-      return this.id
-    },
-    setId(id) {
-      this.id = id
-    },
-    getTipo() {
-      return this.tipo
-    },
-    setTipo(tipo) {
-      this.tipo = tipo
-    },
-    async getUsuario() {
-      console.log(`Cargando usuario con ID: ${this.id} y tipo: ${this.tipo}`)
-      if (!this.usuario) {
-        await this.loadUsuario()
+    addUsuario(usuario) {
+      const index = this.usuarios.findIndex(u => u.id == usuario.id)
+      if (index === -1) {
+        this.usuarios.push(usuario)
+      } else {
+        // Actualiza el usuario si ya existe
+        this.usuarios[index] = { ...this.usuarios[index], ...usuario }
       }
-      return this.usuario
     },
-    setUsuario(usuario) {
-      this.usuario = usuario
-    },
-    async loadUsuario() {
-      if (!this.id || !this.tipo) {
-        console.warn("ID o tipo de usuario no definidos, no se puede cargar el usuario")
-        return
+    async getUsuario(id) {
+      let usuario = this.usuarios.find(u => u.id == id)
+      if (!usuario) {
+        try {
+          const response = await obtenerUsuario(id)
+          this.addUsuario(response.data)
+          usuario = response.data
+        } catch (error) {
+          console.error('Error obteniendo usuario:', error)
+          throw error
+        }
       }
-      let response = await obtenerUsuario(this.id, this.tipo)
-      if (response.status != 200) {
-        console.log("Error al cargar el usuario")
-        return
-      }
-      this.usuario = response.data
+      return usuario
     },
-    logout() {
+    async setUsuario(id, usuario) {
       try {
-        logout()
-        this.usuario = null
-        this.id = null
-        localStorage.removeItem('token')
-        localStorage.removeItem('token_expiry')
+        await modificarUsuario(id, usuario)
       } catch (error) {
-        console.error('Error during logout:', error)
+        console.error('Error modificando usuario:', error)
+        throw error
       }
+      this.addUsuario({ ...usuario, id }) // Asegura que el usuario esté actualizado
+    },
+    deleteUsuario(id) {
+      this.usuarios = this.usuarios.filter(u => u.id != id)
+    },
+    clearUsuarios() {
+      this.usuarios = []
     }
-  },
-  persist: true
+  }
 })

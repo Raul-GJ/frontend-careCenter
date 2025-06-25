@@ -32,8 +32,7 @@
     >
       <thead>
         <tr>
-          <th>Id</th>
-          <th>Nombre</th>
+          <th>Motivo</th>
           <th>Fecha</th>
           <th>Opciones</th>
         </tr>
@@ -43,8 +42,7 @@
           v-for="seguimiento in seguimientos"
           :key="seguimiento.id"
         >
-          <td>{{ seguimiento.id }}</td>
-          <td>{{ seguimiento.formulario.plantilla }}</td>
+          <td>{{ seguimiento.motivo }}</td>
           <td>{{ seguimiento.fecha }}</td>
           <td>
             <router-link :to="`/verSeguimiento/${seguimiento.id}`">

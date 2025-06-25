@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { obtenerConsultasUsuario } from '@/services/apiConsultas'
 import { useUsuarioStore } from './usuarioStore'
-import { obtenerUsuario } from '@/services/apiUsuarios'
+import { useMedicoStore } from './medicoStore'
+import { useEspecialistaStore } from './especialistaStore'
 import { obtenerConsulta } from '@/services/apiConsultas'
 
 export const useConsultaStore = defineStore('consultas', {
@@ -40,6 +41,8 @@ export const useConsultaStore = defineStore('consultas', {
       if (this.isLoaded)
         return
       const usuarioStore = useUsuarioStore()
+      const medicoStore = useMedicoStore()
+      const especialistaStore = useEspecialistaStore()
       let usuario = await usuarioStore.getUsuario()
       let idUsuario = usuario.id
       try {
@@ -48,8 +51,14 @@ export const useConsultaStore = defineStore('consultas', {
         for (let consulta of response.data) {
           let consulta2 = consulta
           consulta2.emisor = usuario
+          let response2
           if (consulta.receptor) {
-            let response2 = await obtenerUsuario(consulta.receptor)
+            try {
+              response2 = await medicoStore.getMedico(consulta.receptor)
+            } catch {
+              response2 = await especialistaStore.getEspecialista(consulta.receptor)
+              consulta2.receptor = response2.data
+            }
             consulta2.receptor = response2.data
           }
           this.addConsulta(consulta2)

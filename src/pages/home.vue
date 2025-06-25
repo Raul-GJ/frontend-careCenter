@@ -116,8 +116,7 @@
 <template>
   <v-container
     v-if="!loadingStore.loading"
-    class="fill-height d-flex align-center justify-center"
-    style="min-height: 100vh;"
+    class="fill-height d-flex align-center justify-center home-container"
   >
     <v-row
       justify="center"
@@ -130,9 +129,8 @@
         lg="6"
       >
         <v-card
-          class="pa-8"
+          class="pa-8 home-card"
           elevation="10"
-          style="border-radius: 24px;"
         >
           <v-row
             align="center"
@@ -145,14 +143,12 @@
             </v-col>
             <v-col>
               <h2
-                class="mb-0 font-weight-bold"
-                style="color: #1976d2;"
+                class="mb-0 font-weight-bold home-title"
               >
                 Hola{{ usuario && usuario.nombre ? `, ${usuario.nombre}` : '' }} 👋
               </h2>
               <div
-                class="text-body-1"
-                style="color: #555;"
+                class="text-body-1 home-subtitle"
               >
                 Bienvenido a tu espacio personal en <b>CareCenter</b>
               </div>
@@ -189,5 +185,16 @@
 </template>
 
 <style scoped>
-/* ...existing code or leave empty... */
+.home-container {
+  min-height: 100vh;
+}
+.home-card {
+  border-radius: 24px;
+}
+.home-title {
+  color: #1976d2;
+}
+.home-subtitle {
+  color: #555;
+}
 </style>

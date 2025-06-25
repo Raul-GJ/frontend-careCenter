@@ -2,23 +2,36 @@ import { defineStore } from 'pinia'
 import { obtenerPlantilla } from '@/services/apiPlantillas'
 import { useUsuarioStore } from './usuarioStore'
 
+/**
+ * @typedef {Object} Plantilla
+ * @property {String} id
+ * @property {String} nombre
+ * @property {String} descripcion
+ * @property {Boolean} publico
+ * @property {Array} preguntas
+ */
+
 export const usePlantillaStore = defineStore('plantillas', {
   state: () => ({
-    /** @type {{ id: String, nombre: String, descripcion: String, publico: Boolean, preguntas: Array}[]} */
+    /** @type {Plantilla[]} */
     plantillas: [],
-    isLoaded: false
   }),
   actions: {
-    addPlantilla(p) {
-      this.plantillas.push(p)
+    addPlantilla(plantilla) {
+      const index = this.plantillas.findIndex(p => p.id == plantilla.id)
+      if (index === -1) {
+        this.plantillas.push(plantilla)
+      } else {
+        this.plantillas[index] = { ...this.plantillas[index], ...plantilla }
+      }
     },
     async getPlantilla(id) {
-      const plantilla = this.plantillas.find(p => p.id == id)
+      let plantilla = this.plantillas.find(p => p.id == id)
       if (!plantilla) {
         try {
           let response = await obtenerPlantilla(id)
           this.addPlantilla(response.data)
-          return response.data
+          plantilla = response.data
         } catch (error) {
           console.error('Error obteniendo plantilla:', error)
           throw error
@@ -27,34 +40,31 @@ export const usePlantillaStore = defineStore('plantillas', {
       return plantilla
     },
     setPlantilla(id, plantilla) {
-      let p = this.getPlantilla(id)
-      p.nombre = plantilla.nombre
-      p.descripcion = plantilla.descripcion
-      p.publico = plantilla.publico
-      p.preguntas = plantilla.preguntas
+      const index = this.plantillas.findIndex(p => p.id == id)
+      if (index !== -1) {
+        this.plantillas[index] = { ...this.plantillas[index], ...plantilla, id }
+      }
     },
     deletePlantilla(id) {
       this.plantillas = this.plantillas.filter(p => p.id != id)
     },
-    async loadPlantillas() {
-      if (this.isLoaded)
-        return
+    async loadPlantillas(force = false) {
+      if (this.plantillas.length > 0 && !force) return
+      this.clearPlantillas()
       const usuarioStore = useUsuarioStore()
       let usuario = await usuarioStore.getUsuario()
       try {
         for (let idPlantilla of usuario.plantillas) {
           let response = await obtenerPlantilla(idPlantilla)
-          console.log(JSON.stringify(response.data))
           this.addPlantilla(response.data)
         }
-        this.isLoaded = true
       } catch (error) {
         console.error('Error cargando plantillas: ', error)
+        throw error
       }
     },
     clearPlantillas() {
       this.plantillas = []
-      this.isLoaded = false
     }
-  },
+  }
 })

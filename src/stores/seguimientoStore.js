@@ -2,15 +2,27 @@ import { defineStore } from 'pinia'
 import { obtenerSeguimiento } from '@/services/apiSeguimientos'
 import { useUsuarioStore } from './usuarioStore'
 
+/**
+ * @typedef {Object} Seguimiento
+ * @property {String} id
+ * @property {Date} fecha
+ * @property {Date} plazo
+ * @property {Object} formulario
+ */
+
 export const useSeguimientoStore = defineStore('seguimientos', {
   state: () => ({
-    /** @type {{ id: String, fecha: Date, plazo: Date, formulario: Object}[]} */
+    /** @type {Seguimiento[]} */
     seguimientos: [],
-    isLoaded: false
   }),
   actions: {
-    addSeguimiento(s) {
-      this.seguimientos.push(s)
+    addSeguimiento(seguimiento) {
+      const index = this.seguimientos.findIndex(s => s.id == seguimiento.id)
+      if (index === -1) {
+        this.seguimientos.push(seguimiento)
+      } else {
+        this.seguimientos[index] = { ...this.seguimientos[index], ...seguimiento }
+      }
     },
     async getSeguimiento(id) {
       let seguimiento = this.seguimientos.find(s => s.id == id)
@@ -18,7 +30,7 @@ export const useSeguimientoStore = defineStore('seguimientos', {
         try {
           let response = await obtenerSeguimiento(id)
           this.addSeguimiento(response.data)
-          return response.data
+          seguimiento = response.data
         } catch (error) {
           console.error('Error obteniendo seguimiento:', error)
           throw error
@@ -27,34 +39,31 @@ export const useSeguimientoStore = defineStore('seguimientos', {
       return seguimiento
     },
     setSeguimiento(id, seguimiento) {
-      let s = this.getSeguimiento(id)
-      s.fecha = seguimiento.fecha
-      s.plazo = seguimiento.plazo
-      s.formulario = seguimiento.formulario
+      const index = this.seguimientos.findIndex(s => s.id == id)
+      if (index !== -1) {
+        this.seguimientos[index] = { ...this.seguimientos[index], ...seguimiento, id }
+      }
     },
     deleteSeguimiento(id) {
       this.seguimientos = this.seguimientos.filter(s => s.id != id)
     },
-    async loadSeguimientos() {
-      if (this.isLoaded)
-        return
+    async loadSeguimientos(force = false) {
+      if (this.seguimientos.length > 0 && !force) return
+      this.clearSeguimientos()
       const usuarioStore = useUsuarioStore()
       let usuario = await usuarioStore.getUsuario()
       try {
         for (let idSeguimiento of usuario.seguimientos) {
           let response = await obtenerSeguimiento(idSeguimiento)
-          console.log(JSON.stringify(response.data))
           this.addSeguimiento(response.data)
         }
-        this.isLoaded = true
       } catch (error) {
         console.error('Error cargando seguimientos: ', error)
+        throw error
       }
     },
     clearSeguimientos() {
       this.seguimientos = []
-      this.isLoaded = false
     }
-  },
-  
+  }
 })
