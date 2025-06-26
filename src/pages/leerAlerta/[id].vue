@@ -1,36 +1,25 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLoadingStore } from '@/stores/loadingStore'
-import { obtenerAlerta } from '@/services/apiAlertas'
+import { useAlertaStore } from '@/stores/alertaStore'
 
 const route = useRoute()
+const id = route.params.id
 const loadingStore = useLoadingStore()
+const alertaStore = useAlertaStore()
 
 const alerta = ref(null)
 const error = ref(null)
 
-async function fetchAlerta() {
+async function load() {
   loadingStore.start()
-  error.value = null
-  try {
-    const id = route.params.id
-    const response = await obtenerAlerta(id)
-    if (!response || response.status !== 200 || !response.data) {
-      error.value = 'No se encontró la alerta'
-      alerta.value = null
-      return
-    }
-    alerta.value = response.data
-  } catch (error) {
-    error.value = 'Error al cargar la alerta'
-    alerta.value = null
-  } finally {
-    loadingStore.stop()
-  }
+  alerta.value = await alertaStore.getAlerta(id)
+  alertaStore.leerAlerta(id)
+  loadingStore.stop()
 }
 
-onMounted(fetchAlerta)
+load()
 </script>
 
 <template>

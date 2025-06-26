@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { obtenerAlerta, obtenerAlertasUsuario, modificarAlerta } from '@/services/apiAlertas'
-import { useUsuarioStore } from './usuarioStore'
+import { crearAlerta, leerAlerta, obtenerAlerta, obtenerAlertasUsuario } from '@/services/apiAlertas'
+import { useSesionStore } from './sesionStore'
 
 /**
  * @typedef {Object} Alerta
@@ -15,23 +15,22 @@ export const useAlertaStore = defineStore('alertas', {
   state: () => ({
     /** @type {Alerta[]} */
     alertas: [],
+    isLoaded: false
   }),
   actions: {
     addAlerta(alerta) {
       const index = this.alertas.findIndex(a => a.id == alerta.id)
       if (index === -1) {
-        this.alertas.push(alerta)
-      } else {
-        this.alertas[index] = { ...this.alertas[index], ...alerta }
+        this.alertas.push(alerta) // Para las alertas no existe opción de modificar
       }
     },
-    async getAlerta(id) {
+    async getAlerta(id, force = false) {
       let alerta = this.alertas.find(a => a.id == id)
-      if (!alerta) {
+      if (!alerta || force) {
         try {
           const response = await obtenerAlerta(id)
-          this.addAlerta(response.data)
           alerta = response.data
+          this.addAlerta(alerta)
         } catch (error) {
           console.error('Error obteniendo alerta:', error)
           throw error
@@ -39,16 +38,11 @@ export const useAlertaStore = defineStore('alertas', {
       }
       return alerta
     },
-    async setAlerta(id, alerta) {
-      try {
-        await modificarAlerta(id, alerta)
-      } catch (error) {
-        console.error('Error modificando alerta:', error)
-        throw error
-      }
-      this.addAlerta({ ...alerta, id })
-    },
     async leerAlerta(id) {
+      const response = await leerAlerta(id)
+      if (response.status !== 204) {
+        throw new Error('Error al marcar alerta como leída')
+      }
       let alerta = await this.getAlerta(id)
       if (alerta) {
         alerta.leida = true
@@ -59,12 +53,14 @@ export const useAlertaStore = defineStore('alertas', {
       this.alertas = this.alertas.filter(a => a.id != id)
     },
     async loadAlertas(force = false) {
-      if (this.alertas.length > 0 && !force) {
+      console.log("Cargando alertas:", this.isLoaded, force)
+      
+      if (this.isLoaded && !force) {
         return // Ya están cargadas
       }
       this.clearAlertas()
-      const usuarioStore = useUsuarioStore()
-      let usuario = await usuarioStore.getUsuario()
+      const sesionStore = useSesionStore()
+      let usuario = await sesionStore.getUsuario()
       try {
         const response = await obtenerAlertasUsuario(usuario.id)
         for (let alerta of response.data) {
@@ -74,9 +70,27 @@ export const useAlertaStore = defineStore('alertas', {
         console.error('Error cargando alertas: ', error)
         throw error
       }
+      this.isLoaded = true
     },
     clearAlertas() {
       this.alertas = []
+      this.isLoaded = false
+    },
+    async crearAlerta(alerta) {
+      try {
+        const response = await crearAlerta(alerta)
+        if (response.status !== 201) {
+          throw new Error('Error al crear alerta')
+        }
+        let location = response.headers.get("location")
+        let id = location.split("/").at(-1)
+        await this.getAlerta(id)
+        return id
+      }
+      catch (error) {
+        console.error('Error creando alerta:', error)
+        throw error
+      }
     }
   }
 })

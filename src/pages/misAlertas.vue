@@ -1,12 +1,9 @@
 <script setup>
   import { computed } from 'vue'
-  import { useRouter } from 'vue-router'
   import { useAlertaStore } from '@/stores/alertaStore'
   import { storeToRefs } from 'pinia'
-  import { leerAlerta } from '@/services/apiAlertas'
   import { useLoadingStore } from '@/stores/loadingStore'
   const loadingStore = useLoadingStore()
-  const router = useRouter()
 
   const alertaStore = useAlertaStore()
   const { alertas } = storeToRefs(alertaStore)
@@ -18,14 +15,6 @@
   const alertasLeidas = computed(() => {
     return alertas.value.filter((c) => c.leida)
   })
-
-  async function goToLeerAlerta(alerta) {
-    loadingStore.start()
-    await leerAlerta(alerta.id)
-    alertaStore.leerAlerta(alerta.id)
-    router.push(`/leerAlerta/${alerta.id}`)
-    loadingStore.stop()
-  }
 
   async function loadAlertas() {
     loadingStore.start()
@@ -46,9 +35,6 @@
       <thead>
         <tr>
           <th>
-            Id
-          </th>
-          <th>
             Asunto
           </th>
           <th>
@@ -64,15 +50,18 @@
           v-for="alerta in alertasSinLeer"
           :key="alerta.id"
         >
-          <td>{{ alerta.id }}</td>
           <td>{{ alerta.asunto }}</td>
           <td>{{ alerta.fecha }}</td>
           <td>
-            <v-btn
-              icon="mdi-folder-open"
-              title="Ver alerta"
-              @click="goToLeerAlerta(alerta)"
-            />
+            <router-link
+              :to="`/leerAlerta/${alerta.id}`"
+              class="text-decoration-none"
+            >
+              <v-btn
+                icon="mdi-folder-open"
+                title="Ver alerta"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>
@@ -84,9 +73,6 @@
     >
       <thead>
         <tr>
-          <th>
-            Id
-          </th>
           <th>
             Asunto
           </th>
@@ -103,15 +89,18 @@
           v-for="alerta in alertasLeidas"
           :key="alerta.id"
         >
-          <td>{{ alerta.id }}</td>
           <td>{{ alerta.asunto }}</td>
           <td>{{ alerta.fecha }}</td>
           <td>
-            <v-btn
-              icon="mdi-folder-open"
-              title="Ver alerta"
-              @click="goToLeerAlerta(alerta)"
-            />
+            <router-link
+              :to="`/leerAlerta/${alerta.id}`"
+              class="text-decoration-none"
+            >
+              <v-btn
+                icon="mdi-folder-open"
+                title="Ver alerta"
+              />
+            </router-link>
           </td>
         </tr>
       </tbody>

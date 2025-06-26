@@ -1,22 +1,26 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useDate } from 'vuetify'
+  import { useSesionStore } from '@/stores/sesionStore'
   import { useUsuarioStore } from '@/stores/usuarioStore'
-  import { usePacienteStore } from '@/stores/pacienteStore'
+  import { useEstudioStore } from '@/stores/estudioStore'
+  import { useSeguimientoStore } from '@/stores/seguimientoStore'
+  import { useAlertaStore } from '@/stores/alertaStore'
+  import { useAsignacionEstudioStore } from '@/stores/asignacionEstudioStore'
   import { usePlantillaStore } from '@/stores/plantillaStore'
   import { storeToRefs } from 'pinia'
-  import { crearEstudio, agregarPacientesEstudio, agregarAlertasEstudio, agregarSeguimientosEstudio } from '@/services/apiEstudios'
-  import { crearAsignacion } from '@/services/apiAsignaciones'
-  import { crearSeguimiento } from '@/services/apiSeguimientos'
-  import { crearAlerta } from '@/services/apiAlertas'
   import { useLoadingStore } from '@/stores/loadingStore'
-  const loadingStore = useLoadingStore()
 
-  const usuarioStore = useUsuarioStore();
+  const loadingStore = useLoadingStore()
+  const estudioStore = useEstudioStore()
+  const sesionStore = useSesionStore()
+  const seguimientoStore = useSeguimientoStore()
+  const alertaStore = useAlertaStore()
+  const asignacionEstudioStore = useAsignacionEstudioStore()
   
   const adapter = useDate()
 
-  const especialista = ref(usuarioStore.getUsuario())
+  const especialista = ref(null)
 
   const nombre = ref("")
   const descripcion = ref("")
@@ -38,8 +42,8 @@
   const asuntoAlerta = ref("")
   const mensajeAlerta = ref("")
   
-  const pacienteStore = usePacienteStore()
-  const { pacientes } = storeToRefs(pacienteStore)
+  const usuarioStore = useUsuarioStore()
+  const { pacientes } = ref([])
   const plantillaStore = usePlantillaStore()
   const { plantillas } = storeToRefs(plantillaStore)
 
@@ -87,7 +91,7 @@
       descripcion: descripcion.value, 
       fechaAlta: adapter.toISO(fechaAltaLocal.value) + "T09:00:00",
       fechaFin: adapter.toISO(fechaFinLocal.value) + "T09:00:00" }
-    let response = await crearEstudio(estudio)
+    let response = await estudioStore.crearEstudio(estudio)
 
     if (response.status != 201) {
       console.log("Error al crear el estudio")
@@ -102,7 +106,7 @@
 
   async function doAgregarPacientesEstudio(idEstudio) {
     let pacientesIds = pacientesEstudio.value.map((p) => p.id)
-    let pacientesResponse = await agregarPacientesEstudio(idEstudio, pacientesIds)
+    let pacientesResponse = await estudioStore.agregarPacientes(idEstudio, pacientesIds)
     if (pacientesResponse.status != 204) {
       console.log("Error al agregar pacientes")
       loadingStore.stop()
@@ -114,18 +118,18 @@
     let seguimientosIds = []
     for (let seguimiento of seguimientosEstudio.value) {
       let body = { fecha: seguimiento.fecha, plazo: seguimiento.plazo, plantilla: seguimiento.formulario.id }
-      let seguimientoResponse = await crearSeguimiento(idEstudio, body)
+      let seguimientoResponse = await seguimientoStore.crearSeguimiento(body)
       if (seguimientoResponse.status != 201) {
         console.log("Error al crear el seguimiento " + seguimiento.id)
         loadingStore.stop()
         return
       }
       let locationSeguimiento = seguimientoResponse.headers.get("location")
-      let idSeguimiento = locationSeguimiento.split("/")[6]
+      let idSeguimiento = locationSeguimiento.split("/").at(-1)
       seguimientosIds.push(idSeguimiento)
     }
 
-    let seguimientosResponse = await agregarSeguimientosEstudio(idEstudio, seguimientosIds)
+    let seguimientosResponse = await estudioStore.agregarSeguimientos(idEstudio, seguimientosIds)
 
     if (seguimientosResponse.status != 204) {
       console.log("Error al agregar seguimientos al estudio")
@@ -138,18 +142,18 @@
     let alertasIds = []
     for (let alerta of alertasEstudio.value) {
       let body = { fecha: alerta.fecha, asunto: alerta.asunto, mensaje: alerta.mensaje }
-      let alertaResponse = await crearAlerta(idEstudio, body)
+      let alertaResponse = await alertaStore.crearAlerta(body)
       if (alertaResponse.status != 201) {
         console.log("Error al crear la alerta " + alerta.id)
         loadingStore.stop()
         return
       }
       let locationAlerta = alertaResponse.headers.get("location")
-      let idAlerta = locationAlerta.split("/")[6]
+      let idAlerta = locationAlerta.split("/").at(-1)
       alertasIds.push(idAlerta)
     }
 
-    let alertasResponse = await agregarAlertasEstudio(idEstudio, alertasIds)
+    let alertasResponse = await estudioStore.agregarAlertas(idEstudio, alertasIds)
 
     if (alertasResponse.status != 204) {
       console.log("Error al agregar alertas al estudio")
@@ -160,7 +164,7 @@
 
   async function asignarEstudio(idEstudio) {
     let body = { especialista: especialista.value.id, estudio: idEstudio, rol: 'CREADOR'}
-    let response = await crearAsignacion(body)
+    let response = await asignacionEstudioStore.crearAsignacion(body)
     if (response.status != 201) {
       console.log("Error al asignar el estudio al especialista")
       loadingStore.stop()
@@ -181,7 +185,11 @@
 
   async function load() {
     loadingStore.start()
-    await pacienteStore.loadPacientes()
+    especialista.value = await sesionStore.getUsuario()
+    for (let idPaciente of especialista.value.pacientes) {
+      let paciente = await usuarioStore.getUsuario(idPaciente)
+      pacientes.value.push(paciente)
+    }
     await plantillaStore.loadPlantillas()
     loadingStore.stop()
   }
@@ -227,8 +235,7 @@
           v-for="paciente in pacientesEstudio"
           :key="paciente.id"
         >
-          <p>Id: {{ paciente.id }}</p>
-          <p>Nombre: {{ paciente.nombre }}</p>
+          <p>Nombre: {{ paciente.nombre }} {{ paciente.apellidos }}</p>
         </v-list-item>
       </v-list>
 
@@ -244,9 +251,6 @@
           <thead>
             <tr>
               <th>
-                Id
-              </th>
-              <th>
                 Nombre
               </th>
               <th>
@@ -259,8 +263,7 @@
               v-for="paciente in pacientesRestantes"
               :key="paciente.id"
             >
-              <td>Id: {{ paciente.id }}</td>
-              <td>Id: {{ paciente.nombre }}</td>
+              <td>Nombre: {{ paciente.nombre }} {{ paciente.apellidos }}</td>
               <td>
                 <v-btn 
                   icon="mdi-plus" 
@@ -286,7 +289,6 @@
           v-for="seguimiento in seguimientosEstudio"
           :key="seguimiento.id"
         >
-          <p>Id: {{ seguimiento.id }}</p>
           <p>Fecha: {{ seguimiento.fecha }}</p>
           <p>Plazo: {{ seguimiento.plazo }}</p>
           <p>Formulario: {{ seguimiento.formulario.nombre }}</p>
@@ -342,7 +344,6 @@
           v-for="alerta in alertasEstudio"
           :key="alerta.id"
         >
-          <p>Id: {{ alerta.id }}</p>
           <p>Asunto: {{ alerta.asunto }}</p>
           <p>Mensaje: {{ alerta.mensaje }}</p>
           <p>Fecha: {{ alerta.fecha }}</p>

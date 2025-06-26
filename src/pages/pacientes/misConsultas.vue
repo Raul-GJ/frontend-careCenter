@@ -1,12 +1,12 @@
 <script setup>
-  import { computed } from 'vue'
+  import { ref, computed } from 'vue'
   import { useConsultaStore } from '@/stores/consultaStore'
-  import { storeToRefs } from 'pinia'
   import { useLoadingStore } from '@/stores/loadingStore'
+import { storeToRefs } from 'pinia'
   const loadingStore = useLoadingStore()
 
   const consultaStore = useConsultaStore()
-  const { consultas } = storeToRefs(consultaStore)
+  const consultas = ref(storeToRefs(consultaStore).consultas)
 
   const consultasSinRespuesta = computed(() => {
     return consultas.value.filter((c) => c.respuesta == null)
@@ -36,7 +36,7 @@
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="!loadingStore.loading">
     <router-link to="./escribirConsulta">
       <v-btn prepend-icon="mdi-plus-circle">
         Nueva consulta

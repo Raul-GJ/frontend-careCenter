@@ -12,12 +12,13 @@
 
   const idSeguimiento = route.params.id
   const seguimiento = ref(null)
+  const plantilla = ref(null)
 
   const preguntas = ref([])
 
   function loadPreguntas() {
-    for (let i = 0; i < seguimiento.value.formulario.plantilla.preguntas.length; i++) {
-      let pregunta = seguimiento.value.formulario.plantilla.preguntas[i]
+    for (let i = 0; i < plantilla.value.preguntas.length; i++) {
+      let pregunta = plantilla.value.preguntas[i]
       preguntas.value.push({
         id: pregunta.id,
         pregunta: pregunta.pregunta,
@@ -29,14 +30,9 @@
 
   async function loadSeguimiento() {
     loadingStore.start()
-    let seguimientoResponse = await seguimientoStore.getSeguimiento(idSeguimiento)
-    console.log(seguimientoResponse)
-    let plantilla = await plantillaStore.getPlantilla(seguimientoResponse.formulario.plantilla)
-    seguimientoResponse.formulario.plantilla = plantilla
-    seguimiento.value = seguimientoResponse
-    console.log(seguimiento.value)
+    seguimiento.value = await seguimientoStore.getSeguimiento(idSeguimiento)
+    plantilla.value = await plantillaStore.getPlantilla(seguimiento.value.formulario.plantilla)
     loadPreguntas()
-    console.log(preguntas.value)
     loadingStore.stop()
   }
 
@@ -44,7 +40,7 @@
 </script>
 <template>
   <v-container>
-    <div v-if="!loadingStore.loading">
+    <div v-if="!loadingStore.loading && plantilla">
       <p>Motivo: {{ seguimiento.motivo }}</p>
       <p>Fecha: {{ seguimiento.fecha }}</p>
       <p>Plazo: {{ seguimiento.plazo }}</p>

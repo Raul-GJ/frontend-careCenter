@@ -1,17 +1,16 @@
 <script setup>
   import { ref } from 'vue'
-  import { useUsuarioStore } from '@/stores/usuarioStore'
+  import { useSesionStore } from '@/stores/sesionStore'
   import { useLoadingStore } from '@/stores/loadingStore'
   import HomeCard from '@/components/HomeCard.vue'
   const loadingStore = useLoadingStore()
 
-  const usuarioStore = useUsuarioStore()
+  const sesionStore = useSesionStore()
   const usuario = ref(null)
 
   async function loadUsuario() {
     loadingStore.start()
-    await usuarioStore.loadUsuario()
-    usuario.value = await usuarioStore.getUsuario()
+    usuario.value = await sesionStore.getUsuario()
     console.log(usuario.value)
     loadingStore.stop()
   }
@@ -28,7 +27,7 @@
       desc: 'Revisa tus alertas y notificaciones importantes.'
     },
     {
-      to: '/pacietes/misSeguimientos',
+      to: '/pacientes/misSeguimientos',
       icon: 'mdi-account-heart',
       color: 'primary',
       title: 'Tus seguimientos',
@@ -39,7 +38,7 @@
       icon: 'mdi-stethoscope',
       color: 'success',
       title: 'Tus consultas',
-      desc: 'Consulta el historial de tus consultas médicas.'
+      desc: 'Revisa si tus consultas han sido respondidas.'
     },
     {
       to: '/pacientes/escribirConsulta',
@@ -59,21 +58,21 @@
       desc: 'Gestiona y revisa tus alertas médicas.'
     },
     {
-      to: '/medicos/misConsultas',
+      to: '/sanitarios/misConsultas',
       icon: 'mdi-stethoscope',
       color: 'success',
       title: 'Mis consultas',
       desc: 'Consulta y responde a las consultas de tus pacientes.'
     },
     {
-      to: '/medicos/misPacientes',
+      to: '/sanitarios/misPacientes',
       icon: 'mdi-account-group',
       color: 'primary',
       title: 'Mis pacientes',
       desc: 'Gestiona y consulta la información de tus pacientes.'
     },
     {
-      to: '/medicos/agregarAlertas',
+      to: '/sanitarios/agregarAlertas',
       icon: 'mdi-bell-plus',
       color: 'secondary',
       title: 'Agregar alertas',
@@ -90,25 +89,25 @@
       desc: 'Gestiona y revisa tus alertas médicas.'
     },
     {
-      to: '/especialistas/misConsultas',
+      to: '/sanitarios/misConsultas',
       icon: 'mdi-stethoscope',
       color: 'success',
       title: 'Mis consultas',
       desc: 'Consulta y responde a las consultas de tus pacientes.'
     },
     {
-      to: '/especialistas/misEstudios',
+      to: '/sanitarios/especialistas/misEstudios',
       icon: 'mdi-file-document-edit',
       color: 'primary',
       title: 'Mis estudios',
       desc: 'Gestiona y consulta tus estudios médicos.'
     },
     {
-      to: '/especialistas/misPlantillas',
+      to: '/sanitarios/especialistas/misPlantillas',
       icon: 'mdi-file-table-box-multiple',
       color: 'secondary',
       title: 'Mis plantillas',
-      desc: 'Crea y administra tus plantillas de estudios.'
+      desc: 'Crea y administra tus plantillas.'
     }
   ]
 </script>

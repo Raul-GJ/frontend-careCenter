@@ -1,17 +1,14 @@
 <script setup>
   import { ref } from 'vue'
-  import { modificarUsuario } from '@/services/apiUsuarios'
+  import { useSesionStore } from '@/stores/sesionStore'
   import { useUsuarioStore } from '@/stores/usuarioStore'
-  import { useMedicoStore } from '@/stores/medicoStore'
-  import { useEspecialistaStore } from '@/stores/especialistaStore'
   import { useLoadingStore } from '@/stores/loadingStore'
 
   const loadingStore = useLoadingStore()
+  const sesionStore = useSesionStore()
   const usuarioStore = useUsuarioStore()
-  const medicoStore = useMedicoStore()
-  const especialistaStore = useEspecialistaStore()
 
-  const idUsuario = usuarioStore.getId()
+  const idUsuario = sesionStore.getId()
   const usuario = ref(null)
   const medico = ref(null)
   const especialistas = ref([])
@@ -37,22 +34,24 @@
       email: usuario.value.email,
       telefono: usuario.value.telefono
     }
-    let response = await modificarUsuario(idUsuario, body)
+    let response = await usuarioStore.setUsuario(idUsuario, body)
     if (response.status != 204) {
       console.log("Error al modificar el usuario ")
     }
-    usuarioStore.loadUsuario()
+    await sesionStore.getUsuario(true) // Fuerza a actualizar el usuario
     editarPerfil.value = false
     loadingStore.stop()
   }
 
   async function loadUsuario() {
     loadingStore.start()
-    usuario.value = await usuarioStore.getUsuario()
-    medico.value = await medicoStore.getMedico(usuario.value.medicoCabecera)
-    for (let id of usuario.value.especialistas) {
-      let especialista = await especialistaStore.getEspecialista(id)
-      especialistas.value.push(especialista)
+    usuario.value = await sesionStore.getUsuario()
+    if (usuario.value.tipo === 'PACIENTE') {
+      medico.value = await usuarioStore.getUsuario(usuario.value.medicoCabecera)
+      for (let id of usuario.value.especialistas) {
+        let especialista = await usuarioStore.getUsuario(id)
+        especialistas.value.push(especialista)
+      }
     }
     console.log(usuario.value)
     loadingStore.stop()
@@ -158,7 +157,7 @@
             />
             <v-text-field
               v-if="usuario.tipo === 'MEDICO' || usuario.tipo === 'ESPECIALISTA'"
-              v-model="usuario.ncol"
+              v-model="usuario.nCol"
               variant="solo"
               :disabled="!editarPerfil"
               label="Nº Colegiado"
@@ -234,7 +233,7 @@
                 </v-list-item-title>
                 <v-list-item-subtitle v-if="medico">
                   {{ medico.nombre }} {{ medico.apellidos }}
-                  <router-link :to="`/pacientes/verMedico/${medico.id}`">
+                  <router-link :to="`/verSanitario/${medico.id}`">
                     <v-btn icon size="small" class="ml-2" title="Ver medico">
                       <v-icon>mdi-eye</v-icon>
                     </v-btn>
@@ -256,7 +255,7 @@
                       class="d-flex align-center"
                     >
                       <span>{{ especialista.nombre }} {{ especialista.apellidos }}</span>
-                      <router-link :to="`/pacientes/verEspecialista/${especialista.id}`">
+                      <router-link :to="`/verSanitario/${especialista.id}`">
                         <v-btn icon size="small" class="ml-2" title="Ver especialista">
                           <v-icon>mdi-eye</v-icon>
                         </v-btn>

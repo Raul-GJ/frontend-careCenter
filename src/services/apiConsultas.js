@@ -41,7 +41,11 @@ export async function obtenerConsultasUsuario(id) {
 }
 export async function responderConsulta(id, respuesta) {
   try {
-    let response = await api.post(ENDPOINTS.CONSULTAS.RESPONDER_CONSULTA(id), respuesta);
+    let body = {
+      mensaje: respuesta,
+    };
+    console.log("Respuesta a enviar:", body);
+    let response = await api.post(ENDPOINTS.CONSULTAS.RESPONDER_CONSULTA(id), body);
     if (response.status !== 204) {
       alert("Error al responder la consulta");
       return null;

@@ -1,11 +1,13 @@
 <script setup>
   import { ref } from 'vue'
+  import { useSesionStore } from '@/stores/sesionStore'
+  import { usePlantillaStore } from '@/stores/plantillaStore'
   import { useUsuarioStore } from '@/stores/usuarioStore'
-  import { crearPlantilla, agregarPregunta } from '@/services/apiPlantillas'
-  import { agregarPlantillasEspecialista } from '@/services/apiUsuarios'
   import { useLoadingStore } from '@/stores/loadingStore'
-  const loadingStore = useLoadingStore()
 
+  const loadingStore = useLoadingStore()
+  const sesionStore = useSesionStore()
+  const plantillaStore = usePlantillaStore()
   const usuarioStore = useUsuarioStore()
 
   const reglas = ref({
@@ -16,7 +18,7 @@
           },
         })
 
-  const idEspecialista = usuarioStore.getId()
+  const idEspecialista = sesionStore.getId()
 
   const nombre = ref("")
   const descripcion = ref("")
@@ -92,7 +94,7 @@
     
     console.log("Creando plantilla")
     
-    let response = await crearPlantilla( { nombre: nombre.value, descripcion: descripcion.value })
+    let response = await plantillaStore.crearPlantilla( { nombre: nombre.value, descripcion: descripcion.value })
     if (response.status != 201) {
       console.log("Ha habido un error al crear esta plantilla")
       loadingStore.stop()
@@ -121,7 +123,7 @@
     console.log("Agregando plantilla a especialista")
 
     let ids = [idPlantilla]
-    let response2 = await agregarPlantillasEspecialista(idEspecialista, ids)
+    let response2 = await usuarioStore.agregarPlantillasEspecialista(idEspecialista, ids)
     if (response2.status != 204) {
       console.log("Ha habido un error al crear esta plantilla")
       loadingStore.stop()
@@ -147,7 +149,7 @@
   async function publicarPregunta(idPlantilla, pregunta) {
     loadingStore.start()
     let body = JSON.stringify(pregunta, replacerPreguntas)
-    let response = await agregarPregunta(idPlantilla, pregunta.regla.tipoDato, body)
+    let response = await plantillaStore.agregarPregunta(idPlantilla, pregunta.regla.tipoDato, body)
     loadingStore.stop()
     if (response.status != 201)
       return false
@@ -175,7 +177,6 @@
           v-for="pregunta of preguntas"
           :key="pregunta.id"
         >
-          <p>Id: {{ pregunta.id }}</p>
           <p>Pregunta: {{ pregunta.pregunta }}</p>
           <p>Tipo: {{ pregunta.regla.tipoDato }}</p>
 

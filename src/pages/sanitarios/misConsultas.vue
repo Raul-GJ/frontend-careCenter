@@ -1,10 +1,9 @@
 <script setup>
-  import { computed } from 'vue'
-  import { storeToRefs } from 'pinia'
+  import { computed, onMounted } from 'vue'
   import { useConsultaStore } from '@/stores/consultaStore'
   import { useLoadingStore } from '@/stores/loadingStore'
+  import { storeToRefs } from 'pinia'
   const loadingStore = useLoadingStore()
-  
   const consultaStore = useConsultaStore()
   const { consultas } = storeToRefs(consultaStore)
 
@@ -22,11 +21,13 @@
     loadingStore.stop()
   }
 
-  loadConsultas()
+  onMounted(() => {
+    loadConsultas()
+  })
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="!loadingStore.loading">
     <p>Consultas sin responder</p>
     <v-table
       height="200"
@@ -53,7 +54,7 @@
           <td>{{ consulta.asunto }}</td>
           <td>{{ consulta.fecha }}</td>
           <td>
-            <router-link :to="`./verConsulta/${consulta.id}`">
+            <router-link :to="`/sanitarios/verConsulta/${consulta.id}`">
               <v-btn 
                 icon="mdi-folder-open" 
                 title="Abrir consulta"

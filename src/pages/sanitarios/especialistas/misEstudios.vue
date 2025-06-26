@@ -32,9 +32,6 @@
       <thead>
         <tr>
           <th>
-            Id
-          </th>
-          <th>
             Nombre
           </th>
           <th>
@@ -50,7 +47,6 @@
           v-for="estudio in estudios"
           :key="estudio.id"
         >
-          <td>{{ estudio.id }}</td>
           <td>{{ estudio.nombre }}</td>
           <td>{{ estudio.descripcion }}</td>
           <td>

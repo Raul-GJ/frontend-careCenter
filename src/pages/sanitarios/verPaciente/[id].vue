@@ -1,12 +1,12 @@
 <script setup>
   import { useRoute } from 'vue-router'
   import { computed, ref } from 'vue'
-  import { usePacienteStore } from '@/stores/pacienteStore'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
   import { useSeguimientoStore } from '@/stores/seguimientoStore'
   import { useLoadingStore } from '@/stores/loadingStore'
   const loadingStore = useLoadingStore()
 
-  const pacienteStore = usePacienteStore()
+  const usuarioStore = useUsuarioStore()
   const seguimientoStore = useSeguimientoStore()
 
   const route = useRoute()
@@ -32,7 +32,7 @@
 
   async function loadPaciente() {
     loadingStore.start()
-    paciente.value = await pacienteStore.getPaciente(idPaciente)
+    paciente.value = await usuarioStore.getUsuario(idPaciente)
     await loadSeguimientos()
     console.log(seguimientoStore.seguimientos)
     loadingStore.stop()

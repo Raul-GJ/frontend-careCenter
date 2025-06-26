@@ -21,15 +21,22 @@ export const useSesionStore = defineStore('sesion', {
   state: () => ({
     /** @type {Usuario} */
     usuario: null,
+    id: ''
   }),
   getters: {
     isLoggedIn: (state) => !!state.usuario,
   },
   actions: {
-    async getUsuario(id, force = false) {
+    getId() {
+      return this.id
+    },
+    setId(id) {
+      this.id = id
+    },
+    async getUsuario(force = false) {
       if (!this.usuario || force) {
         try {
-          const response = await obtenerUsuario(id)
+          const response = await obtenerUsuario(this.id)
           this.usuario = response.data
         } catch (error) {
           this.usuario = null

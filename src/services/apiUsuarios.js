@@ -2,9 +2,9 @@ import api from "./api";
 import { ENDPOINTS } from "@/constants";
 
 // Obtener usuario
-export async function obtenerUsuario(id, tipo) {
+export async function obtenerUsuario(id) {
   try {
-    const response = await api.get(ENDPOINTS.USUARIOS.OBTENER_USUARIO(id, tipo));
+    const response = await api.get(ENDPOINTS.USUARIOS.OBTENER_USUARIO(id));
     if (response.status !== 200) {
       alert("Error al obtener el usuario");
       return null;
@@ -46,41 +46,11 @@ export async function eliminarUsuario(id) {
   }
 }
 
-// Agregar alertas a usuario
-export async function agregarAlertas(id, alertas) {
-  try {
-    const response = await api.post(ENDPOINTS.USUARIOS.AGREGAR_ALERTAS(id), alertas);
-    if (response.status !== 200) {
-      alert("Error al agregar alertas al usuario");
-      return null;
-    }
-    return response;
-  } catch (error) {
-    console.error("Error al agregar alertas al usuario:", error);
-    throw error;
-  }
-}
-
-// Eliminar alerta de usuario
-export async function eliminarAlerta(id, alertaId) {
-  try {
-    const response = await api.delete(ENDPOINTS.USUARIOS.ELIMINAR_ALERTA(id, alertaId));
-    if (response.status !== 204) {
-      alert("Error al eliminar la alerta del usuario");
-      return null;
-    }
-    return response;
-  } catch (error) {
-    console.error("Error al eliminar la alerta del usuario:", error);
-    throw error;
-  }
-}
-
 // Pacientes: agregar seguimientos
 export async function agregarSeguimientosPaciente(id, seguimientos) {
   try {
     const response = await api.post(ENDPOINTS.USUARIOS.PACIENTES.AGREGAR_SEGUIMIENTOS(id), seguimientos);
-    if (response.status !== 200) {
+    if (response.status !== 204) {
       alert("Error al agregar seguimientos al paciente");
       return null;
     }

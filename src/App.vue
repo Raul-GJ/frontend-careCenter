@@ -92,6 +92,10 @@
     window.history.length > 1 && route.path !== '/' && route.path !== '/home')
 
   function volverAtras() {
+    if (route.path === '/auth/login' || route.path === '/auth/registro') {
+      router.replace('/')
+      return
+    }
     router.back()
   }
 </script>

@@ -2,15 +2,14 @@
   import { useRoute } from 'vue-router'
   import { computed, ref } from 'vue'
   import { useEstudioStore } from '@/stores/estudioStore'
-  import { usePacienteStore } from '@/stores/pacienteStore'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
   import { useSeguimientoStore } from '@/stores/seguimientoStore'
   import { useAlertaStore } from '@/stores/alertaStore'
   import { useLoadingStore } from '@/stores/loadingStore'
-  import { modificarEstudio } from '@/services/apiEstudios'
   const loadingStore = useLoadingStore()
 
   const estudioStore = useEstudioStore()
-  const pacienteStore = usePacienteStore()
+  const usuarioStore = useUsuarioStore()
   const alertaStore = useAlertaStore()
   const seguimientoStore = useSeguimientoStore()
 
@@ -49,7 +48,7 @@
   const especialistaRol = ref('OBSERVADOR')
 
   const pacientesRestantes = computed(() => {
-    return pacienteStore.pacientes.filter(paciente => 
+    return pacientes.value.filter(paciente => 
       !agregarPacientesArray.value.includes(paciente.id)
     )
   })
@@ -74,7 +73,7 @@
   async function guardarCambios() {
     loadingStore.start()
     try {
-      await modificarEstudio(estudio.value.id, estudio.value)
+      await estudioStore.setEstudio(estudio.value.id, estudio.value)
       editarEstudioValue.value = false
       console.log('Estudio modificado correctamente')
     } catch (error) {
@@ -105,7 +104,7 @@
 
   async function loadPacientes() {
     for (let pacienteId of estudio.value.pacientes) {
-      const paciente = await pacienteStore.getPaciente(pacienteId)
+      const paciente = await usuarioStore.getUsuario(pacienteId)
       pacientes.value.push(paciente)
     }
   }
@@ -141,7 +140,7 @@
 
 <template>
   <v-container>
-    <div v-if="!loadingStore.loading">
+    <div v-if="!loadingStore.loading && estudio">
       <v-container>
         <div v-if="editarEstudioValue">
           <p>Nombre</p>
@@ -244,7 +243,7 @@
               <td>{{ paciente.nombre }}</td>
               <td>{{ paciente.apellidos }}</td>
               <td>
-                <router-link :to="`../verPaciente/${paciente.id}`">
+                <router-link :to="`/sanitarios/verPaciente/${paciente.id}`">
                   <v-btn 
                     icon="mdi-folder-open" 
                     title="Ver paciente"
@@ -329,7 +328,7 @@
               <td>{{ alerta.asunto }}</td>
               <td>{{ alerta.fecha }}</td>
               <td>
-                <router-link :to="`./verAlerta/${alerta.id}`">
+                <router-link :to="`/leerAlerta/${alerta.id}`">
                   <v-btn 
                     icon="mdi-folder-open" 
                     title="Ver alerta"
@@ -402,7 +401,7 @@
               <td>{{ seguimiento.fecha }}</td>
               <td>{{ seguimiento.plazo }}</td>
               <td>
-                <router-link :to="`./verSeguimiento/${seguimiento.id}`">
+                <router-link :to="`/verSeguimiento/${seguimiento.id}`">
                   <v-btn 
                     icon="mdi-folder-open" 
                     title="Abrir seguimiento"
@@ -488,7 +487,7 @@
               <td>{{ especialista.especialidad }}</td>
               <td>{{ especialista.rol }}</td>
               <td>
-                <router-link :to="`./verEspecialista/${especialista.id}`">
+                <router-link :to="`/verSanitario/${especialista.id}`">
                   <v-btn 
                     icon="mdi-folder-open"
                     title="Ver especialista"

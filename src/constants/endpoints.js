@@ -8,8 +8,6 @@ export const ENDPOINTS = {
     OBTENER_USUARIO: (id) => `/usuarios/${id}/`,
     MODIFICAR_USUARIO: (id, tipo) => `/usuarios/${tipo}/${id}/`,
     ELIMINAR_USUARIO: (id) => `/usuarios/${id}/`,
-    AGREGAR_ALERTAS: (id) => `/usuarios/${id}/alertas/`,
-    ELIMINAR_ALERTA: (id, alertaId) => `/usuarios/${id}/alertas/${alertaId}/`,
     PACIENTES: {
       AGREGAR_SEGUIMIENTOS: (id) => `/usuarios/pacientes/${id}/seguimientos/`,
       ELIMINAR_SEGUIMIENTO: (id, seguimientoId) => `/usuarios/pacientes/${id}/seguimientos/${seguimientoId}/`,

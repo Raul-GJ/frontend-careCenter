@@ -22,9 +22,9 @@ export async function login(correo, contrasenya) {
       console.log('Error al iniciar sesión: token no recibido')
       return
     }
-    // Guardar token y expiración (1 hora)
+    // Guardar token y expiración (1 día)
     localStorage.setItem('token', token)
-    localStorage.setItem('token_expiry', (Date.now() + 3600 * 1000).toString())
+    localStorage.setItem('token_expiry', (Date.now() + 24* 3600 * 1000).toString())
     return response
   } catch (error) {
     console.error("Error during API authentication:", error);

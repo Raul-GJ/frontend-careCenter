@@ -14,10 +14,12 @@
   }
 
   function isRellenable(seguimiento) {
-    return seguimiento.formulario 
-      && seguimiento.formulario.respuestas.length === 0
-      && new Date(seguimiento.formulario.fecha) < new Date()
-      && new Date(seguimiento.formulario.plazo) > new Date()
+    if (!seguimiento.formulario) return false
+    const respuestasVacias = !seguimiento.formulario.respuestas || seguimiento.formulario.respuestas.length === 0
+    const ahora = new Date()
+    const fechaInicio = new Date(seguimiento.fecha)
+    const fechaFin = new Date(seguimiento.plazo)
+    return respuestasVacias && ahora >= fechaInicio && ahora <= fechaFin
   }
 
   loadSeguimientos()

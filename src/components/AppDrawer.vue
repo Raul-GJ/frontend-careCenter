@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useUsuarioStore } from '@/stores/usuarioStore'
+import { useSesionStore } from '@/stores/sesionStore'
 import { useLoadingStore } from '@/stores/loadingStore'
 import { useRouter } from 'vue-router'
 
@@ -16,19 +16,19 @@ const drawer = computed({
   set: val => emit('update:modelValue', val)
 })
 
-const usuarioStore = useUsuarioStore()
+const sesionStore = useSesionStore()
 const usuario = ref(null)
 const tipoUsuario = computed(() => usuario.value?.tipo)
 const router = useRouter()
 
-function cerrarSesion() {
-  usuarioStore.logout()
+async function cerrarSesion() {
+  await sesionStore.logout()
   router.push('/')
 }
 
 async function loadUsuario() {
   loadingStore.start()
-  usuario.value = await usuarioStore.getUsuario()
+  usuario.value = await sesionStore.getUsuario()
   loadingStore.stop()
 }
 

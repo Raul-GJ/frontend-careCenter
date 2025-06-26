@@ -1,23 +1,24 @@
 <script setup>
   import { ref } from 'vue'
+  import { useSesionStore } from '@/stores/sesionStore'
   import { useUsuarioStore } from '@/stores/usuarioStore'
-  import { storeToRefs } from 'pinia'
-  import { usePacienteStore } from '@/stores/pacienteStore'
   import { useLoadingStore } from '@/stores/loadingStore'
   const loadingStore = useLoadingStore()
   
-  const usuarioStore = useUsuarioStore()
+  const sesionStore = useSesionStore()
   
   const especialista = ref(null)
 
-  const pacienteStore = usePacienteStore()
-  const { pacientes } = storeToRefs(pacienteStore)
+  const usuarioStore = useUsuarioStore()
+  const pacientes = ref([])
 
   async function load() {
     loadingStore.start()
-    await usuarioStore.loadUsuario()
-    especialista.value = await usuarioStore.getUsuario()
-    await pacienteStore.loadPacientes()
+    especialista.value = await sesionStore.getUsuario()
+    for (let idUsuario of especialista.value.pacientes) {
+      const paciente = await usuarioStore.getUsuario(idUsuario)
+      pacientes.value.push(paciente)
+    }
     loadingStore.stop()
   }
 
@@ -25,16 +26,13 @@
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="!loadingStore.loading && pacientes.length > 0">
     <v-table
       height="200"
       fixed-header
     >
       <thead>
         <tr>
-          <th>
-            Id
-          </th>
           <th>
             Nombre
           </th>
@@ -48,8 +46,7 @@
           v-for="paciente in pacientes"
           :key="paciente.id"
         >
-          <td>{{ paciente.id }}</td>
-          <td>{{ paciente.nombre }}</td>
+          <td>{{ paciente.nombre }} {{ paciente.apellidos }}</td>
           <td>
             <v-btn
               icon="mdi-folder-plus"

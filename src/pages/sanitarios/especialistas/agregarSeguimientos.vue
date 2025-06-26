@@ -1,25 +1,28 @@
 <script setup>
   import { ref, computed } from 'vue';
-  import { usePacienteStore } from '@/stores/pacienteStore';
+  import { useSesionStore } from '@/stores/sesionStore';
+  import { useSeguimientoStore } from '@/stores/seguimientoStore';
+  import { useUsuarioStore } from '@/stores/usuarioStore';
   import { usePlantillaStore } from '@/stores/plantillaStore';
   import { storeToRefs } from 'pinia';
-  import { crearSeguimiento } from '@/services/apiSeguimientos';
-  import { agregarSeguimientosPaciente } from '@/services/apiUsuarios';
   import { useLoadingStore } from '@/stores/loadingStore';
   const loadingStore = useLoadingStore()
 
-  const pacienteStore = usePacienteStore()
+  const sesionStore = useSesionStore()
+  const seguimientoStore = useSeguimientoStore()
+  const usuarioStore = useUsuarioStore()
   const plantillaStore = usePlantillaStore()
 
+  const usuario = ref(null)
   const seguimientos = ref([])
-  const pacientes = storeToRefs(pacienteStore)
+  const pacientes = ref([])
   const plantillas = storeToRefs(plantillaStore)
   const pacientesAgregados = ref([])
   const idSeguimientos = ref([])
 
   const pacientesRestantes = computed(() => {
-    pacientes.pacientes.value
-    return pacientes.pacientes.value.filter((p) => !pacientesAgregados.value.includes(p))
+    pacientes.value
+    return pacientes.value.filter((p) => !pacientesAgregados.value.includes(p))
   })
 
   const agregarSeguimientoValue = ref(false)
@@ -65,34 +68,33 @@
         plazo: seguimiento.plazo, 
         plantilla: seguimiento.plantilla.id
       }
-      let response = await crearSeguimiento(body)
-      if (!response.status == 201) {
-        console.log("No se ha podido crear el seguimiento " + JSON.stringify(seguimiento))
-        loadingStore.stop()
-        return
-      }
+      let id = await seguimientoStore.crearSeguimiento(body)
 
-      let location = response.headers.get("location")
-      let idSeguimiento = location.split("/")[6]
-      idSeguimientos.value.push(idSeguimiento)
+      idSeguimientos.value.push(id)
     }
 
     // Agregar los seguimientos a los pacientes
     for (let paciente of pacientesAgregados.value) {
       console.log(JSON.stringify(idSeguimientos.value))
-      let response = await agregarSeguimientosPaciente(paciente.id, idSeguimientos.value)
-      if (!response.status == 204) {
-        console.log("No se ha podido agregar el seguimiento al usuario con id" + paciente.id)
-        loadingStore.stop()
-        return
-      }
+      await usuarioStore.agregarSeguimientosPaciente(paciente.id, idSeguimientos.value)
     }
+    alert("Seguimientos creados correctamente")
+    motivo.value = ''
+    fecha.value = null
+    plazo.value = null
+    plantilla.value = null
+    pacientesAgregados.value = []
+    seguimientos.value = []
     loadingStore.stop()
   }
 
   async function load() {
     loadingStore.start()
-    await pacienteStore.loadPacientes()
+    usuario.value = await sesionStore.getUsuario()
+    for (const idPaciente of usuario.value.pacientes) {
+      const paciente = await usuarioStore.getUsuario(idPaciente)
+      pacientes.value.push(paciente)
+    }
     await plantillaStore.loadPlantillas()
     loadingStore.stop()
   }
@@ -109,8 +111,7 @@
           v-for="paciente in pacientesAgregados"
           :key="paciente.id"
         >
-          <p>Id: {{ paciente.id }}</p>
-          <p>Nombre: {{ paciente.nombre }}</p>
+          <p>Nombre: {{ paciente.nombre }} {{ paciente.apellidos }}</p>
         </v-list-item>
       </v-list>
 
@@ -126,9 +127,6 @@
           <thead>
             <tr>
               <th>
-                Id
-              </th>
-              <th>
                 Nombre
               </th>
               <th>
@@ -141,8 +139,7 @@
               v-for="paciente in pacientesRestantes"
               :key="paciente.id"
             >
-              <td>Id: {{ paciente.id }}</td>
-              <td>Id: {{ paciente.nombre }}</td>
+              <td>Nombre: {{ paciente.nombre }} {{ paciente.apellidos }}</td>
               <td>
                 <v-btn 
                   icon="mdi-plus" 
@@ -160,7 +157,6 @@
           v-for="seguimiento in seguimientos"
           :key="seguimiento.id"
         >
-          <p>Id: {{ seguimiento.id }}</p>
           <p>Motivo: {{ seguimiento.motivo }}</p>
           <p>Fecha: {{ seguimiento.fecha }}</p>
           <p>Plazo: {{ seguimiento.plazo }}</p>

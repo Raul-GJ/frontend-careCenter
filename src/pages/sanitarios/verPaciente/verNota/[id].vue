@@ -3,11 +3,11 @@
   import { ref } from 'vue'
   import { useNotaStore } from '@/stores/notaStore'
   import { useLoadingStore } from '@/stores/loadingStore'
-  import { useEspecialistaStore } from '@/stores/especialistaStore'
+  import { useUsuarioStore } from '@/stores/usuarioStore'
   const route = useRoute()
   const notaStore = useNotaStore()
   const loadingStore = useLoadingStore()
-  const especialistaStore = useEspecialistaStore()
+  const usuarioStore = useUsuarioStore()
 
   const idNota = route.params.id
   const nota = ref(null)
@@ -17,7 +17,7 @@
     loadingStore.start()
     nota.value = await notaStore.getNota(idNota)
     if (nota.value) {
-      especialista.value = await especialistaStore.getEspecialista(nota.value.sanitario)
+      especialista.value = await usuarioStore.getUsuario(nota.value.sanitario)
     } else {
       console.error('Nota no encontrada')
     }

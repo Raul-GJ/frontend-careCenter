@@ -13,9 +13,9 @@
 
   const respondida = ref(false)
 
-  function loadConsulta() {
+  async function loadConsulta() {
     loadingStore.start()
-    consulta.value = consultaStore.getConsulta(idConsulta)
+    consulta.value = await consultaStore.getConsulta(idConsulta)
     if (consulta.value.respuesta != null)
       respondida.value = true
     loadingStore.stop()
@@ -25,7 +25,7 @@
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="!loadingStore.loading && consulta">
     <v-text-field 
       v-model="consulta.asunto"
       label="Asunto"

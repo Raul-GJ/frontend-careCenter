@@ -1,24 +1,23 @@
 <script setup>
-  import { useUsuarioStore } from '@/stores/usuarioStore';
+  import { useSesionStore } from '@/stores/sesionStore';
   import { useConsultaStore } from '@/stores/consultaStore';
-  import { useEspecialistaStore } from '@/stores/especialistaStore';
-  import { useMedicoStore } from '@/stores/medicoStore';
+  import { useUsuarioStore } from '@/stores/usuarioStore';
   import { ref } from 'vue';
-  import { crearConsulta, obtenerConsulta } from '@/services/apiConsultas';
   import { useLoadingStore } from '@/stores/loadingStore';
+  import { useRouter } from 'vue-router';
   const loadingStore = useLoadingStore();
+  const router = useRouter();
 
   const reglas = ref({
           necesario: value => !!value || 'Campo necesario.',
           limite: value => value.length <= 10000 || 'Máximo 10.000 caracteres',
         })
 
-  const usuarioStore = useUsuarioStore()
+  const sesionStore = useSesionStore()
   const consultaStore = useConsultaStore()
-  const especialistaStore = useEspecialistaStore()
-  const medicoStore = useMedicoStore()
+  const usuarioStore = useUsuarioStore()
 
-  const usuario = usuarioStore.getUsuario()
+  const usuario = ref(null)
   
   const sanitarios = ref([])
 
@@ -31,11 +30,13 @@
 
   async function load() {
     loadingStore.start()
-    await consultaStore.loadConsultas()
-    await especialistaStore.loadEspecialistas()
-    await medicoStore.loadMedicos()
-    sanitarios.value.push(medicoStore.getMedico(usuario.medicoCabecera))
-    especialistaStore.especialistas.forEach(e => sanitarios.value.push(e))
+    usuario.value = await sesionStore.getUsuario()
+    const medico = await usuarioStore.getUsuario(usuario.value.medicoCabecera)
+    sanitarios.value.push(medico)
+    for (let idEspecialista of usuario.value.especialistas) {
+      const especialista = await usuarioStore.getUsuario(idEspecialista)
+      sanitarios.value.push(especialista)
+    }
     loadingStore.stop()
   }
 
@@ -46,40 +47,20 @@
       loadingStore.stop()
       return
     }
-    let body = { emisor: usuario.id, receptor: receptor.value.id, asunto: asunto.value, mensaje: mensaje.value }
-    let response = await crearConsulta(body)
+    let body = { emisor: usuario.value.id, receptor: receptor.value.id, asunto: asunto.value, mensaje: mensaje.value }
+    console.log(body)
+    await consultaStore.crearConsulta(body)
 
-    if (response.status != 201) {
-      console.log("Error al crear la consulta")
-      loadingStore.stop()
-      return
-    }
-
-    let location = response.headers.get("location")
-    let idConsulta = location.split("/").at(-1)
-    console.log("Consulta creada con ID:", idConsulta)
-
-    let responseConsulta = await obtenerConsulta(idConsulta)
-
-    if (responseConsulta.status != 200) {
-      console.log("Error al recuperar la consulta")
-      loadingStore.stop()
-      return
-    }
-
-    consultaStore.addConsulta(responseConsulta.body)
     alert("Consulta enviada")
-    receptor.value = null
-    asunto.value = ''
-    mensaje.value = ''
     loadingStore.stop()
+    router.back()
   }
 
   load()
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="!loadingStore.loading">
     <v-form 
       ref="formulario" 
       v-model="formularioValido"

@@ -2,7 +2,6 @@
   import { useRoute, useRouter } from 'vue-router'
   import { ref } from 'vue'
   import { useConsultaStore } from '@/stores/consultaStore'
-  import { responderConsulta } from '@/services/apiConsultas'
   import { useLoadingStore } from '@/stores/loadingStore'
   const loadingStore = useLoadingStore()
 
@@ -37,14 +36,7 @@
       return
     }
 
-    let body = { mensaje: respuesta.value }
-    let response = await responderConsulta(idConsulta, body)
-
-    if (response.status != 204) {
-      console.log("Ha habido un error al intentar responder la consulta")
-    }
-    consultaStore.responderConsulta(consulta.value.id, respuesta.value)
-    respondida.value = true
+    await consultaStore.responderConsulta(idConsulta, respuesta.value)
     loadingStore.stop()
     router.push('/sanitarios/misConsultas')
   }
@@ -53,45 +45,43 @@
 </script>
 
 <template>
-  <v-container>
-    <v-container v-if="!loadingStore.loading">
-      <v-text-field 
-        v-model="consulta.asunto"
-        label="Asunto"
+  <v-container v-if="!loadingStore.loading && consulta">
+    <v-text-field 
+      v-model="consulta.asunto"
+      label="Asunto"
+      disabled
+    />
+    <v-container>
+      <v-textarea
+        v-model="consulta.mensaje"
+        label="Mensaje"
+        auto-grow
         disabled
       />
-      <v-container>
-        <v-textarea
-          v-model="consulta.mensaje"
-          label="Mensaje"
-          auto-grow
-          disabled
-        />
-      </v-container>
-      <p>Tu respuesta</p>
-      <v-container v-if="!respondida">
-        <v-textarea
-          v-model="respuesta"
-          label="Respuesta"
-          :rules="[reglas.necesario, reglas.limite]"
-          auto-grow
-          counter
-        />
-        <v-btn 
-          prepend-icon="mdi-send-variant"
-          @click="doResponderConsulta()"  
-        >
-          Enviar
-        </v-btn>
-      </v-container>
-      <v-container v-else>
-        <v-textarea
-          v-model="consulta.respuesta.mensaje"
-          label="Respuesta"
-          auto-grow
-          disabled
-        />
-      </v-container>
+    </v-container>
+    <p>Tu respuesta</p>
+    <v-container v-if="!consulta.respuesta">
+      <v-textarea
+        v-model="respuesta"
+        label="Respuesta"
+        :rules="[reglas.necesario, reglas.limite]"
+        auto-grow
+        counter
+      />
+      <v-btn 
+        prepend-icon="mdi-send-variant"
+        @click="doResponderConsulta()"  
+      >
+        Enviar
+      </v-btn>
+    </v-container>
+    <v-container v-else>
+      <v-textarea
+        v-model="consulta.respuesta.mensaje"
+        label="Respuesta"
+        auto-grow
+        disabled
+      />
     </v-container>
   </v-container>
 </template>

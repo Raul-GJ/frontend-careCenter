@@ -3,9 +3,6 @@
   import { ref } from 'vue'
   import { usePlantillaStore } from '@/stores/plantillaStore'
   import { useLoadingStore } from '@/stores/loadingStore'
-  import { modificarPlantilla } from '@/services/apiPlantillas'
-  import { agregarPregunta } from '@/services/apiPlantillas'
-  import { eliminarPregunta } from '@/services/apiPlantillas'
 
   const reglas = ref({
           necesario: value => !!value || 'Campo necesario.',
@@ -35,9 +32,17 @@
 
   const cont = ref(0)
 
-  const strPregunta = ref("")
   const tiposPregunta = ref(["Texto", "Número", "si/no", "rango numérico", "selección"])
   const tiposPreguntaFormal = ref(["TEXTO", "NUMERICO", "BOOLEANO", "RANGO", "ENUMERADO"])
+  function getTipoFormal(value) {
+    return tiposPreguntaFormal.value[tiposPregunta.value.indexOf(value)]
+  }
+
+  function getTipoNormal(value) {
+    return tiposPregunta.value[tiposPreguntaFormal.value.indexOf(value)]
+  }
+
+  const strPregunta = ref("")
   const tipoPregunta = ref("Texto")
 
   function addEnumValue() {
@@ -84,14 +89,6 @@
     
   }
 
-  function getTipoFormal(value) {
-    return tiposPreguntaFormal.value[tiposPregunta.value.indexOf(value)]
-  }
-
-  function getTipoNormal(value) {
-    return tiposPregunta.value[tiposPreguntaFormal.value.indexOf(value)]
-  }
-
   async function guardarCambios() {
     loadingStore.start()
     try {
@@ -99,14 +96,14 @@
         nombre: plantilla.value.nombre,
         descripcion: plantilla.value.descripcion,
       }
-      await modificarPlantilla(idPlantilla, body)
+      await plantillaStore.setPlantilla(idPlantilla, body)
       for (const pregunta of preguntasEliminadas.value) {
         console.log("Eliminando pregunta:", pregunta)
-        await eliminarPregunta(idPlantilla, pregunta)
+        await plantillaStore.eliminarPregunta(idPlantilla, pregunta)
       }
       for (const pregunta of nuevasPreguntas.value) {
         console.log("Agregando pregunta:", pregunta)
-        await agregarPregunta(idPlantilla, pregunta.regla.tipoDato, pregunta)
+        await plantillaStore.agregarPregunta(idPlantilla, pregunta.regla.tipoDato, pregunta)
       }
       guardarPlantillaBoolean.value = false
       alert("Cambios guardados correctamente")

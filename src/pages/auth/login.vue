@@ -1,13 +1,13 @@
 <script setup>
   import { ref } from 'vue'
-  import { useUsuarioStore } from '@/stores/usuarioStore'
+  import { useSesionStore } from '@/stores/sesionStore'
   import { useRouter } from 'vue-router'
   import { login } from '@/services/apiAuth'
   import { useLoadingStore } from '@/stores/loadingStore'
 
   const router = useRouter()
 
-  const usuarioStore = useUsuarioStore()
+  const sesionStore = useSesionStore()
   const loadingStore = useLoadingStore()
   
   const reglas = ref({
@@ -45,24 +45,9 @@
       return
     }
 
-    let tipo = ''
-    if (roles.includes('MEDICO')) {
-      tipo = 'medicos'
-    } else if (roles.includes('ESPECIALISTA')) {
-      tipo = 'especialistas'
-    } else if (roles.includes('PACIENTE')) {
-      tipo = 'pacientes'
-    } else {
-      console.error('Rol no reconocido:', roles)
-      errorValue.value = true
-      loadingStore.stop()
-      return
-    }
-
     localStorage.setItem('token', token);
-    usuarioStore.setId(id)
-    usuarioStore.setTipo(tipo)
-    const usuario = await usuarioStore.getUsuario()
+    sesionStore.setId(id)
+    const usuario = await sesionStore.getUsuario()
     if (usuario == null) {
       console.log('Error al cargar el usuario')
       loadingStore.stop()

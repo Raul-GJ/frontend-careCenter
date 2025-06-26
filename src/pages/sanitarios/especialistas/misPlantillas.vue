@@ -31,9 +31,6 @@
       <thead>
         <tr>
           <th>
-            Id
-          </th>
-          <th>
             Nombre
           </th>
           <th>
@@ -49,7 +46,6 @@
           v-for="plantilla in plantillas"
           :key="plantilla.id"
         >
-          <td>{{ plantilla.id }}</td>
           <td>{{ plantilla.nombre }}</td>
           <td>{{ plantilla.descripcion }}</td>
           <td>

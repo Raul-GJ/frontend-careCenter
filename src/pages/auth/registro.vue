@@ -1,12 +1,12 @@
 <script setup>
   import { ref } from 'vue'
-  import { useUsuarioStore } from '@/stores/usuarioStore'
+  import { useSesionStore } from '@/stores/sesionStore'
   import { useRouter } from 'vue-router'
   import { registro } from '@/services/apiAuth'
   import { useLoadingStore } from '@/stores/loadingStore'
   const loadingStore = useLoadingStore()
 
-  const usuarioStore = useUsuarioStore()
+  const sesionStore = useSesionStore()
   const router = useRouter()
 
   const nombre = ref('Nombre de prueba')
@@ -74,15 +74,13 @@
     let location = response.headers.get("location")
     let idUsuario = location.split("/").at(-1)
 
-    usuarioStore.setId(idUsuario)
-    await usuarioStore.loadUsuario()
-    if (usuarioStore.getUsuario() == null) {
+    sesionStore.setId(idUsuario)
+    let usuario = await sesionStore.getUsuario()
+    if (usuario == null) {
       console.log('Error al cargar el usuario')
       loadingStore.stop()
       return
     }
-
-    localStorage.setItem('token', response.data.token);
     loadingStore.stop()
     router.push('/home')
   }

@@ -1,22 +1,23 @@
 <script setup>
   import { ref, computed } from 'vue';
-  import { usePacienteStore } from '@/stores/pacienteStore';
-  import { storeToRefs } from 'pinia';
-  import { crearAlerta } from '@/services/apiAlertas';
-  import { agregarAlertas } from '@/services/apiUsuarios';
+  import { useSesionStore } from '@/stores/sesionStore';
+  import { useAlertaStore } from '@/stores/alertaStore';
+  import { useUsuarioStore } from '@/stores/usuarioStore';
   import { useLoadingStore } from '@/stores/loadingStore';
+
+  const sesionStore = useSesionStore()
   const loadingStore = useLoadingStore()
+  const usuarioStore = useUsuarioStore()
+  const alertaStore = useAlertaStore()
 
-  const pacienteStore = usePacienteStore()
-
+  const usuario = ref(null)
   const alertas = ref([])
-  const pacientes = storeToRefs(pacienteStore)
+  const pacientes = ref([])
   const pacientesAgregados = ref([])
-  const idAlertas = ref([])
 
   const pacientesRestantes = computed(() => {
-    pacientes.pacientes.value
-    return pacientes.pacientes.value.filter((p) => !pacientesAgregados.value.includes(p))
+    pacientes.value
+    return pacientes.value.filter((p) => !pacientesAgregados.value.includes(p))
   })
 
   const agregarAlertaValue = ref(false)
@@ -47,28 +48,20 @@
   async function publicarAlertas() {
     loadingStore.start()
     // Crear las alertas
-    for (let alerta of alertas.value) {
-      let body = { asunto: alerta.asunto, mensaje: alerta.mensaje, fecha: alerta.fecha}
-      let response = await crearAlerta(body)
-      if (!response.status == 201) {
-        console.log("No se ha podido crear la alerta " + JSON.stringify(alerta))
-        loadingStore.stop()
-        return
-      }
-
-      let location = response.headers.get("location")
-      let idAlerta = location.split("/")[6]
-      idAlertas.value.push(idAlerta)
-    }
-
-    // Agregar las alertas a los pacientes
     for (let paciente of pacientesAgregados.value) {
-      console.log(JSON.stringify(idAlertas.value))
-      let response = await agregarAlertas(paciente.id, idAlertas.value)
-      if (!response.status == 204) {
-        console.log("No se ha podido agregar la alerta al usuario con id" + paciente.id)
-        loadingStore.stop()
-        return
+      for (let alerta of alertas.value) {
+        let body = { 
+          emisor: usuario.value.id,
+          receptor: paciente.id,
+          asunto: alerta.asunto,
+          mensaje: alerta.mensaje,
+          fecha: alerta.fecha}
+        let response = await alertaStore.crearAlerta(body)
+        if (!response.status == 201) {
+          console.log("No se ha podido crear la alerta " + JSON.stringify(alerta))
+          loadingStore.stop()
+          return
+        }
       }
     }
     loadingStore.stop()
@@ -76,7 +69,11 @@
 
   async function loadPacientes() {
     loadingStore.start()
-    await pacienteStore.loadPacientes()
+    usuario.value = await sesionStore.getUsuario()
+    for (let idPaciente of usuario.value.pacientes) {
+      let paciente = await usuarioStore.getUsuario(idPaciente)
+      pacientes.value.push(paciente)
+    }
     loadingStore.stop()
   }
 
@@ -92,8 +89,7 @@
           v-for="paciente in pacientesAgregados"
           :key="paciente.id"
         >
-          <p>Id: {{ paciente.id }}</p>
-          <p>Nombre: {{ paciente.nombre }}</p>
+          <p>Nombre: {{ paciente.nombre }} {{ paciente.apellidos }}</p>
         </v-list-item>
       </v-list>
 
@@ -121,7 +117,7 @@
               v-for="paciente in pacientesRestantes"
               :key="paciente.id"
             >
-              <td>Nombre: {{ paciente.nombre }}</td>
+              <td>Nombre: {{ paciente.nombre }} {{ paciente.apellidos }}</td>
               <td>
                 <v-btn 
                   icon="mdi-plus" 
