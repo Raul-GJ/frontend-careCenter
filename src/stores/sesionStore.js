@@ -45,8 +45,8 @@ export const useSesionStore = defineStore('sesion', {
       }
       return this.usuario
     },
-    async logout() {
-      await logout()
+    logout() {
+      logout()
       this.usuario = null
       localStorage.removeItem('token')
       localStorage.removeItem('token_expiry')

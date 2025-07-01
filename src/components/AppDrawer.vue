@@ -21,8 +21,8 @@ const usuario = ref(null)
 const tipoUsuario = computed(() => usuario.value?.tipo)
 const router = useRouter()
 
-async function cerrarSesion() {
-  await sesionStore.logout()
+function cerrarSesion() {
+  sesionStore.logout()
   router.push('/')
 }
 

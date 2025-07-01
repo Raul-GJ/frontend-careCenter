@@ -177,20 +177,18 @@
           label="Motivo"
         />
         
-        <v-date-picker 
-          v-model="fecha"
-          :min="fechaActual"
-          color="primary"
-          show-adjacent-months
-          title="Seleccionar fecha"
+        <v-text-field 
+          v-model="fecha" 
+          label="Fecha"
+          type="datetime-local"
+          :min="fechaActual.toISOString().slice(0, 16)"
         />
 
-        <v-date-picker 
-          v-model="plazo"
+        <v-text-field 
+          v-model="plazo" 
+          label="Plazo"
+          type="datetime-local"
           :min="fecha"
-          color="primary"
-          show-adjacent-months
-          title="Seleccionar plazo"
         />
 
         <v-select

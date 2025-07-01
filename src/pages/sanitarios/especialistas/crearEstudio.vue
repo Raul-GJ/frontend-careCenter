@@ -211,21 +211,19 @@
       />
       <v-row>
         <v-col>
-          <v-date-picker 
-            v-model="fechaAltaLocal"
-            :min="fechaActual"
-            color="primary"
-            show-adjacent-months
-            title="Seleccionar fecha"
+          <v-text-field 
+            v-model="fechaAltaLocal" 
+            label="Plazo"
+            type="datetime-local"
+            :min="fechaActual.toISOString().slice(0, 16)"
           />
         </v-col>
         <v-col>
-          <v-date-picker 
-            v-model="fechaFinLocal"
-            :min="fechaAltaLocal"
-            color="primary"
-            show-adjacent-months
-            title="Seleccionar fecha"
+          <v-text-field 
+            v-model="fechaFinLocal" 
+            label="Plazo"
+            type="datetime-local"
+            :min="fechaAltaLocal.toISOString().slice(0, 16)"
           />
         </v-col>
       </v-row>
@@ -312,21 +310,19 @@
         />
         <v-row>
           <v-col>
-            <v-date-picker 
-              v-model="fechaSeguimiento"
-              :min="fechaActual"
-              color="primary"
-              show-adjacent-months
-              title="Seleccionar fecha"
+            <v-text-field 
+              v-model="fechaSeguimiento" 
+              label="Fecha"
+              type="datetime-local"
+              :min="fechaActual.toISOString().slice(0, 16)"
             />
           </v-col>
           <v-col>
-            <v-date-picker 
-              v-model="plazoSeguimiento"
+            <v-text-field 
+              v-model="plazoSeguimiento" 
+              label="Plazo"
+              type="datetime-local"
               :min="fechaSeguimiento"
-              color="primary"
-              show-adjacent-months
-              title="Seleccionar fecha"
             />
           </v-col>
         </v-row>
@@ -367,12 +363,11 @@
           label="Mensaje"
         />
         
-        <v-date-picker 
-          v-model="fechaAlerta"
-          :min="fechaActual"
-          color="primary"
-          show-adjacent-months
-          title="Seleccionar fecha"
+        <v-text-field 
+          v-model="fechaAlerta" 
+          label="Plazo"
+          type="datetime-local"
+          :min="fechaActual.toISOString().slice(0, 16)"
         />
         
         <v-btn 

@@ -349,12 +349,11 @@
               label="Mensaje"
             />
             
-            <v-date-picker 
-              v-model="fechaAlerta"
-              :min="fechaActual"
-              color="primary"
-              show-adjacent-months
-              title="Seleccionar fecha"
+            <v-text-field 
+              v-model="fechaAlerta" 
+              label="Fecha"
+              type="datetime-local"
+              :min="fechaActual.toISOString().slice(0, 16)"
             />
             
             <v-btn 
@@ -418,17 +417,18 @@
               label="Motivo"
             />
             
-            <v-date-picker 
-              v-model="fechaSeguimiento"
-              :min="fechaActual"
-              color="primary"
-              show-adjacent-months
-              title="Seleccionar fecha"
+            <v-text-field 
+              v-model="fechaSeguimiento" 
+              label="Fecha"
+              type="datetime-local"
+              :min="fechaActual.toISOString().slice(0, 16)"
             />
 
             <v-text-field 
               v-model="plazoSeguimiento" 
-              label="Plazo (días)"
+              label="Plazo"
+              type="datetime-local"
+              :min="fechaSeguimiento"
             />
 
             <v-select 
