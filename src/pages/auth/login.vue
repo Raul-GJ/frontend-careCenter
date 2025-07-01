@@ -62,7 +62,7 @@
 
 <template>
   <v-container>
-    <h1>Página de Login</h1>
+    <h1>Iniciar sesión</h1>
     <p>* Indica que un campo es obligatorio</p>
     <v-form 
       @submit.prevent 

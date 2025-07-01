@@ -45,8 +45,9 @@ export async function logout() {
 }
 
 export async function registro(rol, body) {
+  
   try {
-    let response = await api.post(ENDPOINTS.AUTH.REGISTRO(rol), body)
+    let response = await api.post(ENDPOINTS.AUTH.REGISTRO(rol.toLowerCase()), body)
     if (response.status != 201) {
       alert("Error al registrar el usuario")
       return null;
