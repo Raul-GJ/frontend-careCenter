@@ -58,8 +58,8 @@
         <!-- Aquí se renderizan las páginas -->
         <router-view />
       </div>
-      <AppFooter />
     </v-main>
+    <AppFooter />
   </v-app>
 </template>
 
@@ -103,8 +103,7 @@
 <style>
 /* Fondo de pantalla global */
 .global-background {
-  min-height: 100vh;
-  min-width: 100vw;
+  min-height: calc(100vh - 104px); /* 64px app-bar + 40px footer */
   background: linear-gradient(135deg, #23272f 0%, #1a1d23 100%);
 }
 
