@@ -193,7 +193,7 @@
 
         <v-select
           v-model="plantilla"
-          label="Seleccionar plantilla"
+          label="Seleccionar formulario"
           item-title="nombre"
           :items="plantillas.plantillas.value"
           return-object

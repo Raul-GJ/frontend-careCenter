@@ -87,9 +87,9 @@ loadUsuario()
         </router-link>
       </v-list-item>
       <v-list-item v-if="tipoUsuario == 'ESPECIALISTA'">
-        <router-link to="/sanitarios/especialistas/misPlantillas">
+        <router-link to="/sanitarios/especialistas/misFormularios">
           <v-btn prepend-icon="mdi-list-box-outline">
-            Mis plantillas
+            Mis formularios
           </v-btn>
         </router-link>
       </v-list-item>

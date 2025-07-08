@@ -1,6 +1,6 @@
 // stores/userStore.js
 import { defineStore } from 'pinia'
-import { obtenerUsuario, modificarUsuario, agregarSeguimientosPaciente, agregarPlantillasEspecialista } from '@/services/apiUsuarios'
+import { obtenerUsuario, obtenerUsuarioPorCorreo, agregarSeguimientosPaciente, agregarPlantillasEspecialista } from '@/services/apiUsuarios'
 
 /**
  * @typedef {Object} Usuario
@@ -24,6 +24,8 @@ export const useUsuarioStore = defineStore('usuario', {
   actions: {
     async addUsuario(usuario) {
       const index = this.usuarios.findIndex(u => u.id == usuario.id)
+      console.log('Añadiendo usuario:', usuario)
+      console.log('Índice encontrado:', index)
       if (index === -1) {
         this.usuarios.push(usuario)
       } else {
@@ -45,13 +47,23 @@ export const useUsuarioStore = defineStore('usuario', {
       }
       return usuario
     },
-    async setUsuario(id, usuario) {
-      try {
-        await modificarUsuario(id, usuario)
-      } catch (error) {
-        console.error('Error modificando usuario:', error)
-        throw error
+    async getUsuarioPorCorreo(correo, force = false) {
+      let usuario = this.usuarios.find(u => u.email == correo)
+      if (!usuario || force) {
+        try {
+          const response = await obtenerUsuarioPorCorreo(correo)
+          this.addUsuario(response.data)
+          usuario = response.data
+          console.log('Usuario obtenido por correo:', usuario)
+        } catch (error) {
+          console.error('Error obteniendo usuario:', error)
+          throw error
+        }
       }
+      return usuario
+    },
+    async setUsuario(id, usuario) {
+      // No se pueden modificar otros usuarios desde el store, solo el usuario actual
       const index = this.usuarios.findIndex(s => s.id == id)
       if (index !== -1) {
         this.usuarios[index] = { ...this.usuarios[index], ...usuario, id }

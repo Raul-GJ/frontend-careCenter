@@ -18,12 +18,12 @@
 
 <template>
   <v-container>
-    <router-link to="./crearPlantilla">
+    <router-link to="./crearFormulario">
       <v-btn prepend-icon="mdi-plus-circle">
-        Crear plantilla
+        Crear formulario
       </v-btn>
     </router-link>
-    <h1>Mis plantillas de formularios</h1>
+    <h1>Mis formularios</h1>
     <v-table
       height="200"
       fixed-header
@@ -49,10 +49,10 @@
           <td>{{ plantilla.nombre }}</td>
           <td>{{ plantilla.descripcion }}</td>
           <td>
-            <router-link :to="`./verPlantilla/${plantilla.id}`">
+            <router-link :to="`./verFormulario/${plantilla.id}`">
               <v-btn 
                 icon="mdi-list-box-outline" 
-                title="Ver plantilla"
+                title="Ver formulario"
               />
             </router-link>
           </td>

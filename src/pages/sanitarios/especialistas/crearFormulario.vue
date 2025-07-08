@@ -162,7 +162,7 @@
 
 <template>
   <v-container>
-    <h1>Crear plantilla de formulario</h1>
+    <h1>Crear formulario</h1>
     <v-form :submit="publicarPlantilla">
       <v-text-field 
         v-model="nombre" 

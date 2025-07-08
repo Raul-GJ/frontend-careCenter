@@ -6,6 +6,7 @@ export const ENDPOINTS = {
   },
   USUARIOS: {
     OBTENER_USUARIO: (id) => `/usuarios/${id}/`,
+    OBTENER_USUARIO_POR_CORREO: (correo) => `/usuarios/correo/${correo}/`,
     MODIFICAR_USUARIO: (id, tipo) => `/usuarios/${tipo}/${id}/`,
     ELIMINAR_USUARIO: (id) => `/usuarios/${id}/`,
     PACIENTES: {

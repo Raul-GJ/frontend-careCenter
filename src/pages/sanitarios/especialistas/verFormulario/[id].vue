@@ -60,16 +60,17 @@
     if (strPregunta.value != "" && tiposPregunta.value.includes(tipoPregunta.value)) {
       let nuevoTipo = getTipoFormal(tipoPregunta.value)
       let regla = { tipoDato: nuevoTipo }
-      if (tipoPregunta.value == "RANGO") {
+      if (nuevoTipo == "RANGO") {
         regla.minValue = rangoMinValue.value 
         regla.maxValue = rangoMaxValue.value
         rangoMinValue.value = 1
         rangoMaxValue.value = 100
-      } else if (tipoPregunta.value == "ENUMERADO") {
+      } else if (nuevoTipo == "ENUMERADO") {
         regla.values = enumValues.value
         enumValues.value = []
       }
       let pregunta = { id: cont.value, pregunta: strPregunta.value, regla: regla }
+      console.log("Agregando pregunta:", pregunta)
       cont.value++;
       preguntas.value.push(pregunta)
       nuevasPreguntas.value.push(pregunta)

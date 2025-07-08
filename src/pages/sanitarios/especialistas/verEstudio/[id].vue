@@ -436,7 +436,7 @@
               :items="seguimientoStore.plantillas" 
               item-text="nombre" 
               item-value="id" 
-              label="Seleccionar plantilla"
+              label="Seleccionar formulario"
             />
 
             <v-btn 

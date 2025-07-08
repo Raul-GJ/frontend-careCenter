@@ -103,11 +103,11 @@
       desc: 'Gestiona y consulta tus estudios médicos.'
     },
     {
-      to: '/sanitarios/especialistas/misPlantillas',
+      to: '/sanitarios/especialistas/misFormularios',
       icon: 'mdi-file-table-box-multiple',
       color: 'secondary',
-      title: 'Mis plantillas',
-      desc: 'Crea y administra tus plantillas.'
+      title: 'Mis formularios',
+      desc: 'Crea y administra tus formularios.'
     }
   ]
 </script>

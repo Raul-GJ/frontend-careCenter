@@ -16,6 +16,21 @@ export async function obtenerUsuario(id) {
   }
 }
 
+// Obtener usuario por correo
+export async function obtenerUsuarioPorCorreo(correo) {
+  try {
+    const response = await api.get(ENDPOINTS.USUARIOS.OBTENER_USUARIO_POR_CORREO(correo));
+    if (response.status !== 200) {
+      alert("Error al obtener el usuario");
+      return null;
+    }
+    return response;
+  } catch (error) {
+    console.error("Error al obtener el usuario:", error);
+    throw error;
+  }
+}
+
 // Modificar usuario
 export async function modificarUsuario(id, tipo, usuario) {
   try {

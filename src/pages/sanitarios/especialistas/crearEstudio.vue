@@ -303,7 +303,7 @@
       <v-container v-if="agregarSeguimientoValue">
         <v-select 
           v-model="plantilla" 
-          label="Plantilla"
+          label="Formulario"
           :items="plantillas"
           item-title="nombre"
           return-object
