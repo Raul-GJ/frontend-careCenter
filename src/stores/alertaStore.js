@@ -4,6 +4,8 @@ import { useSesionStore } from './sesionStore'
 
 /**
  * @typedef {Object} Alerta
+ * @property {String} emisor
+ * @property {String} receptor
  * @property {String} id
  * @property {String} asunto
  * @property {String} mensaje
@@ -78,17 +80,26 @@ export const useAlertaStore = defineStore('alertas', {
     },
     async crearAlerta(alerta) {
       try {
+        console.log("Store - Creando alerta:", alerta)
         const response = await crearAlerta(alerta)
-        if (response.status !== 201) {
-          throw new Error('Error al crear alerta')
+        console.log("Store - Respuesta alerta:", response)
+        
+        if (!response) {
+          console.error("Store - No se recibió respuesta para alerta")
+          throw new Error('No se recibió respuesta del servidor')
         }
-        let location = response.headers.get("location")
-        let id = location.split("/").at(-1)
-        await this.getAlerta(id)
-        return id
+        
+        if (response.status !== 201) {
+          console.error("Store - Status incorrecto alerta:", response.status)
+          throw new Error(`Error al crear la alerta. Status: ${response.status}`)
+        }
+        
+        console.log("Store - Alerta creada exitosamente")
+        return response
       }
       catch (error) {
         console.error('Error creando alerta:', error)
+        console.error('Stack trace:', error.stack)
         throw error
       }
     }

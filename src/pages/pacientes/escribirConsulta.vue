@@ -32,9 +32,14 @@
     loadingStore.start()
     usuario.value = await sesionStore.getUsuario()
     const medico = await usuarioStore.getUsuario(usuario.value.medicoCabecera)
+    // Agregar etiqueta descriptiva al médico de cabecera
+    medico.nombreCompleto = `${medico.nombre} ${medico.apellidos} (médico de cabecera)`
     sanitarios.value.push(medico)
+    
     for (let idEspecialista of usuario.value.especialistas) {
       const especialista = await usuarioStore.getUsuario(idEspecialista)
+      // Agregar especialidad al nombre del especialista
+      especialista.nombreCompleto = `${especialista.nombre} ${especialista.apellidos} (${especialista.especialidad})`
       sanitarios.value.push(especialista)
     }
     loadingStore.stop()
@@ -68,7 +73,7 @@
       <v-select
         v-model="receptor"
         label="Seleccionar destinatario"
-        item-title="nombre"
+        item-title="nombreCompleto"
         :items="sanitarios"
         :rules="[reglas.necesario]"
         return-object

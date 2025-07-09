@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia'
-import { crearSeguimiento, modificarSeguimiento, obtenerSeguimiento, rellenarFormulario } from '@/services/apiSeguimientos'
+import { crearSeguimiento, obtenerSeguimiento, modificarSeguimiento, rellenarFormulario } from '@/services/apiSeguimientos'
 import { useSesionStore } from './sesionStore'
 
 /**
  * @typedef {Object} Seguimiento
  * @property {String} id
- * @property {Date} fecha
- * @property {Date} plazo
+ * @property {String} fecha
+ * @property {String} plazo
+ * @property {String} motivo
+ * @property {String} plantilla
  * @property {Object} formulario
  */
 
@@ -22,14 +24,14 @@ export const useSeguimientoStore = defineStore('seguimientos', {
       if (index === -1) {
         this.seguimientos.push(seguimiento)
       } else {
-        await this.setSeguimiento(seguimiento.id, seguimiento)
+        this.seguimientos[index] = { ...this.seguimientos[index], ...seguimiento }
       }
     },
     async getSeguimiento(id, force = false) {
       let seguimiento = this.seguimientos.find(s => s.id == id)
       if (!seguimiento || force) {
         try {
-          let response = await obtenerSeguimiento(id)
+          const response = await obtenerSeguimiento(id)
           this.addSeguimiento(response.data)
           seguimiento = response.data
         } catch (error) {
@@ -42,13 +44,13 @@ export const useSeguimientoStore = defineStore('seguimientos', {
     async setSeguimiento(id, seguimiento) {
       try {
         await modificarSeguimiento(id, seguimiento)
+        const index = this.seguimientos.findIndex(s => s.id == id)
+        if (index !== -1) {
+          this.seguimientos[index] = { ...this.seguimientos[index], ...seguimiento, id }
+        }
       } catch (error) {
         console.error('Error modificando seguimiento:', error)
         throw error
-      }
-      const index = this.seguimientos.findIndex(s => s.id == id)
-      if (index !== -1) {
-        this.seguimientos[index] = { ...this.seguimientos[index], ...seguimiento, id }
       }
     },
     deleteSeguimiento(id) {
@@ -58,15 +60,16 @@ export const useSeguimientoStore = defineStore('seguimientos', {
       if (this.isLoaded && !force) return
       this.clearSeguimientos()
       const sesionStore = useSesionStore()
-      let usuario = await sesionStore.getUsuario()
       try {
-        console.log(usuario.seguimientos)
-        for (let idSeguimiento of usuario.seguimientos) {
-          let response = await obtenerSeguimiento(idSeguimiento)
-          this.addSeguimiento(response.data)
+        const usuario = await sesionStore.getUsuario()
+        if (usuario.seguimientos && usuario.seguimientos.length > 0) {
+          for (let idSeguimiento of usuario.seguimientos) {
+            const seguimiento = await this.getSeguimiento(idSeguimiento)
+            this.addSeguimiento(seguimiento)
+          }
         }
       } catch (error) {
-        console.error('Error cargando seguimientos: ', error)
+        console.error('Error cargando seguimientos:', error)
         throw error
       }
       this.isLoaded = true
@@ -75,34 +78,64 @@ export const useSeguimientoStore = defineStore('seguimientos', {
       this.seguimientos = []
       this.isLoaded = false
     },
-    async rellenarFormulario(idSeguimiento, datos) {
+    async crearSeguimiento(nuevoSeguimiento) {
       try {
-        const response = await rellenarFormulario(idSeguimiento, datos)
-        if (response.status !== 204) {
-          throw new Error('Error al rellenar el formulario')
+        console.log("Store - Creando seguimiento:", nuevoSeguimiento)
+        const response = await crearSeguimiento(nuevoSeguimiento)
+        console.log("Store - Respuesta seguimiento:", response)
+        
+        if (!response) {
+          console.error("Store - No se recibió respuesta para seguimiento")
+          throw new Error('No se recibió respuesta del servidor')
         }
-        const seguimiento = this.seguimientos.find(s => s.id == idSeguimiento)
-        console.log('Rellenando formulario:', seguimiento)
-        seguimiento.formulario.respuestas = datos
-        seguimiento.formulario.rellenado = true
-        console.log('Formulario rellenado:', seguimiento.formulario)
+        
+        if (response.status !== 201) {
+          console.error("Store - Status incorrecto seguimiento:", response.status)
+          throw new Error(`Error al crear el seguimiento. Status: ${response.status}`)
+        }
+        
+        console.log("Store - Seguimiento creado exitosamente")
+        return response
       } catch (error) {
-        console.error('Error rellenando formulario:', error)
+        console.error('Store - Error creando seguimiento:', error)
+        console.error('Store - Stack trace:', error.stack)
         throw error
       }
     },
-    async crearSeguimiento(seguimiento) {
+    async rellenarFormulario(idSeguimiento, respuestas) {
       try {
-        const response = await crearSeguimiento(seguimiento)
-        if (response.status !== 201) {
-          throw new Error('Error al crear seguimiento')
+        console.log("Store - Rellenando formulario:", { idSeguimiento, respuestas })
+        const response = await rellenarFormulario(idSeguimiento, respuestas)
+        console.log("Store - Respuesta rellenar formulario:", response)
+        
+        if (!response) {
+          console.error("Store - No se recibió respuesta para rellenar formulario")
+          throw new Error('No se recibió respuesta del servidor')
         }
-        let location = response.headers.get("location")
-        let id = location.split("/").at(-1)
-        await this.getSeguimiento(id)
-        return id
+        
+        if (response.status !== 204) {
+          console.error("Store - Status incorrecto rellenar formulario:", response.status)
+          throw new Error(`Error al rellenar el formulario. Status: ${response.status}`)
+        }
+        
+        // Actualizar el seguimiento en el store
+        const index = this.seguimientos.findIndex(s => s.id == idSeguimiento)
+        if (index !== -1) {
+          // Marcar como rellenado
+          this.seguimientos[index] = { 
+            ...this.seguimientos[index], 
+            formulario: { 
+              ...this.seguimientos[index].formulario, 
+              respuestas: respuestas.respuestas 
+            }
+          }
+        }
+        
+        console.log("Store - Formulario rellenado exitosamente")
+        return response
       } catch (error) {
-        console.error('Error creando seguimiento:', error)
+        console.error('Error rellenando formulario:', error)
+        console.error('Stack trace:', error.stack)
         throw error
       }
     }

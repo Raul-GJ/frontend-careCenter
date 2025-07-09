@@ -56,7 +56,7 @@ export async function eliminarEstudio(id) {
 export async function agregarPacientesEstudio(id, pacientes) {
   try {
     let response = await api.post(ENDPOINTS.ESTUDIOS.AGREGAR_PACIENTES(id), pacientes);
-    if (response.status !== 200) {
+    if (response.status !== 204) {
       alert("Error al agregar pacientes al estudio");
       return null;
     }
@@ -82,7 +82,7 @@ export async function eliminarPacienteEstudio(idEstudio, idPaciente) {
 export async function agregarEspecialistasEstudio(id, especialistas) {
   try {
     let response = await api.post(ENDPOINTS.ESTUDIOS.AGREGAR_ESPECIALISTAS(id), especialistas);
-    if (response.status !== 200) {
+    if (response.status !== 204) {
       alert("Error al agregar especialistas al estudio");
       return null;
     }
@@ -108,7 +108,7 @@ export async function eliminarEspecialistaEstudio(idEstudio, idEspecialista) {
 export async function agregarAlertasEstudio(id, alertas) {
   try {
     let response = await api.post(ENDPOINTS.ESTUDIOS.AGREGAR_ALERTAS(id), alertas);
-    if (response.status !== 200) {
+    if (response.status !== 204) {
       alert("Error al agregar alertas al estudio");
       return null;
     }
@@ -134,7 +134,7 @@ export async function eliminarAlertaEstudio(idEstudio, idAlerta) {
 export async function agregarSeguimientosEstudio(id, seguimientos) {
   try {
     let response = await api.post(ENDPOINTS.ESTUDIOS.AGREGAR_SEGUIMIENTOS(id), seguimientos);
-    if (response.status !== 200) {
+    if (response.status !== 204) {
       alert("Error al agregar seguimientos al estudio");
       return null;
     }

@@ -105,31 +105,35 @@ export const useEstudioStore = defineStore('estudios', {
     },
     async crearEstudio(nuevoEstudio) {
       try {
+        console.log("Store - Creando estudio:", nuevoEstudio)
         const response = await crearEstudio(nuevoEstudio)
-        if (response.status !== 201) {
-          throw new Error('Error al crear el estudio')
+        console.log("Store - Respuesta recibida:", response)
+        
+        if (!response) {
+          console.error("Store - No se recibió respuesta")
+          throw new Error('No se recibió respuesta del servidor')
         }
-        let location = response.headers.get("location")
-        let id = location.split("/").at(-1)
-        await this.getEstudio(id)
-        return id
+        
+        if (response.status !== 201) {
+          console.error("Store - Status incorrecto:", response.status)
+          throw new Error(`Error al crear el estudio. Status: ${response.status}`)
+        }
+        
+        console.log("Store - Estudio creado exitosamente")
+        return response
       } catch (error) {
-        console.error('Error creando estudio:', error)
+        console.error('Store - Error creando estudio:', error)
+        console.error('Store - Stack trace:', error.stack)
         throw error
       }
     },
     async agregarPacientes(idEstudio, pacientes) {
       try {
-        const estudio = await this.getEstudio(idEstudio)
-        if (!estudio) {
-          throw new Error('Estudio no encontrado')
-        }
         const response = await agregarPacientesEstudio(idEstudio, pacientes)
-        if (response.status !== 204) {
+        if (!response || response.status !== 204) {
           throw new Error('Error al agregar pacientes al estudio')
         }
-        estudio.pacientes.push(...pacientes)
-        await this.setEstudio(idEstudio, estudio)
+        return response
       } catch (error) {
         console.error('Error agregando pacientes al estudio:', error)
         throw error
@@ -137,16 +141,11 @@ export const useEstudioStore = defineStore('estudios', {
     },
     async agregarAlertas(idEstudio, alertas) {
       try {
-        const estudio = await this.getEstudio(idEstudio)
-        if (!estudio) {
-          throw new Error('Estudio no encontrado')
-        }
         const response = await agregarAlertasEstudio(idEstudio, alertas)
-        if (response.status !== 204) {
+        if (!response || response.status !== 204) {
           throw new Error('Error al agregar alertas al estudio')
         }
-        estudio.alertas.push(...alertas)
-        await this.setEstudio(idEstudio, estudio)
+        return response
       } catch (error) {
         console.error('Error agregando alertas al estudio:', error)
         throw error
@@ -154,16 +153,11 @@ export const useEstudioStore = defineStore('estudios', {
     },
     async agregarSeguimientos(idEstudio, seguimientos) {
       try {
-        const estudio = await this.getEstudio(idEstudio)
-        if (!estudio) {
-          throw new Error('Estudio no encontrado')
-        }
         const response = await agregarSeguimientosEstudio(idEstudio, seguimientos)
-        if (response.status !== 204) {
+        if (!response || response.status !== 204) {
           throw new Error('Error al agregar seguimientos al estudio')
         }
-        estudio.seguimientos.push(...seguimientos)
-        await this.setEstudio(idEstudio, estudio)
+        return response
       } catch (error) {
         console.error('Error agregando seguimientos al estudio:', error)
         throw error

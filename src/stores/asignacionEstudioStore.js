@@ -30,7 +30,7 @@ export const useAsignacionEstudioStore = defineStore('asignacionEstudios', {
       if (!asignacion || force) {
         try {
           const response = await obtenerAsignacion(id)
-          this.addAsignacion(response.data)
+          this.addAsignacionEstudio(response.data)
           asignacion = response.data
         } catch (error) {
           console.error('Error obteniendo asignacion:', error)
@@ -95,17 +95,26 @@ export const useAsignacionEstudioStore = defineStore('asignacionEstudios', {
     },
     async crearAsignacion(asignacion) {
       try {
+        console.log("Store - Creando asignación:", asignacion)
         const response = await crearAsignacion(asignacion)
-        if (response.status !== 201) {
-          throw new Error('Error al crear alerta')
+        console.log("Store - Respuesta asignación:", response)
+        
+        if (!response) {
+          console.error("Store - No se recibió respuesta para asignación")
+          throw new Error('No se recibió respuesta del servidor')
         }
-        let location = response.headers.get("location")
-        let id = location.split("/").at(-1)
-        await this.getAsignacionEstudio(id)
-        return id
+        
+        if (response.status !== 201) {
+          console.error("Store - Status incorrecto asignación:", response.status)
+          throw new Error(`Error al crear la asignación. Status: ${response.status}`)
+        }
+        
+        console.log("Store - Asignación creada exitosamente")
+        return response
       }
       catch (error) {
         console.error('Error creando asignacion:', error)
+        console.error('Stack trace:', error.stack)
         throw error
       }
     }

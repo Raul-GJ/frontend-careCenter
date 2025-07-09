@@ -35,6 +35,7 @@
   
   const fechaSeguimiento = ref(new Date().toISOString().slice(0, 16))
   const plazoSeguimiento = ref(new Date().toISOString().slice(0, 16))
+  const motivoSeguimiento = ref("")
   const fechaAlerta = ref(new Date().toISOString().slice(0, 16))
   const asuntoAlerta = ref("")
   const mensajeAlerta = ref("")
@@ -60,12 +61,14 @@
   function agregarSeguimiento() {
     seguimientosEstudio.value.push({ id: contSeguimientos.value, 
       fecha: fechaSeguimiento.value + ":00", 
-      plazo: plazoSeguimiento.value + ":00", 
+      plazo: plazoSeguimiento.value + ":00",
+      motivo: motivoSeguimiento.value,
       formulario: plantilla.value
     })
     plantilla.value = null
     fechaSeguimiento.value = new Date().toISOString().slice(0, 16)
     plazoSeguimiento.value = new Date().toISOString().slice(0, 16)
+    motivoSeguimiento.value = ""
     contSeguimientos.value++
     agregarSeguimientoValue.value = false
   }
@@ -84,66 +87,182 @@
   }
 
   async function doCrearEstudio() {
-    let estudio = { nombre: nombre.value, 
-      descripcion: descripcion.value, 
-      fechaAlta: fechaAltaLocal.value + ":00",
-      fechaFin: fechaFinLocal.value + ":00" }
-    let response = await estudioStore.crearEstudio(estudio)
+    try {
+      let estudio = { nombre: nombre.value, 
+        descripcion: descripcion.value, 
+        fechaInicio: fechaAltaLocal.value + ":00",
+        fechaFin: fechaFinLocal.value + ":00" }
+      
+      console.log("Creando estudio con datos:", estudio)
+      
+      // Validar que los campos requeridos no estén vacíos
+      if (!estudio.nombre || !estudio.descripcion) {
+        console.error("Faltan campos requeridos")
+        alert("Por favor, complete todos los campos requeridos")
+        loadingStore.stop()
+        return null
+      }
+      
+      let response = await estudioStore.crearEstudio(estudio)
+      console.log("Respuesta de creación:", response)
 
-    if (response.status != 201) {
-      console.log("Error al crear el estudio")
+      if (!response) {
+        console.error("No se recibió respuesta del servidor")
+        loadingStore.stop()
+        return null
+      }
+
+      if (response.status != 201) {
+        console.error("Error al crear el estudio - Status:", response.status)
+        loadingStore.stop()
+        return null
+      }
+
+      let location = response.headers.get("location")
+      console.log("Location header:", location)
+      
+      if (!location) {
+        console.error("No se recibió el header Location")
+        loadingStore.stop()
+        return null
+      }
+      
+      let idEstudio = location.split("/").at(-1)
+      console.log("ID extraído:", idEstudio)
+      
+      if (!idEstudio) {
+        console.error("No se pudo obtener el ID del estudio creado")
+        loadingStore.stop()
+        return null
+      }
+      
+      return idEstudio
+    } catch (error) {
+      console.error("Error en doCrearEstudio:", error)
+      console.error("Stack trace:", error.stack)
+      alert("Error al crear el estudio: " + error.message)
       loadingStore.stop()
-      return
+      return null
     }
-
-    let location = response.headers.get("location")
-    let idEstudio = location.split("/").at(-1)
-    return idEstudio
   }
 
   async function doAgregarPacientesEstudio(idEstudio) {
+    if (!idEstudio) {
+      console.error("ID de estudio no válido para agregar pacientes")
+      return false
+    }
+    
     let pacientesIds = pacientesEstudio.value.map((p) => p.id)
     let pacientesResponse = await estudioStore.agregarPacientes(idEstudio, pacientesIds)
     if (pacientesResponse.status != 204) {
       console.log("Error al agregar pacientes")
       loadingStore.stop()
-      return
+      return false
     }
+    return true
   }
 
   async function doAgregarSeguimientosEstudio(idEstudio) {
-    let seguimientosIds = []
-    for (let seguimiento of seguimientosEstudio.value) {
-      let body = { fecha: seguimiento.fecha, plazo: seguimiento.plazo, plantilla: seguimiento.formulario.id }
-      let seguimientoResponse = await seguimientoStore.crearSeguimiento(body)
-      if (seguimientoResponse.status != 201) {
-        console.log("Error al crear el seguimiento " + seguimiento.id)
-        loadingStore.stop()
-        return
-      }
-      let locationSeguimiento = seguimientoResponse.headers.get("location")
-      let idSeguimiento = locationSeguimiento.split("/").at(-1)
-      seguimientosIds.push(idSeguimiento)
+    if (!idEstudio) {
+      console.error("ID de estudio no válido para agregar seguimientos")
+      return false
     }
+    
+    try {
+      let seguimientosIds = []
+      for (let seguimiento of seguimientosEstudio.value) {
+        let body = { 
+          fecha: seguimiento.fecha, 
+          plazo: seguimiento.plazo, 
+          motivo: seguimiento.motivo,
+          plantilla: seguimiento.formulario.id 
+        }
+        console.log("Creando seguimiento con body:", body)
+        
+        try {
+          let seguimientoResponse = await seguimientoStore.crearSeguimiento(body)
+          console.log("Respuesta crear seguimiento:", seguimientoResponse)
+          
+          if (!seguimientoResponse) {
+            console.error("No se recibió respuesta al crear seguimiento")
+            loadingStore.stop()
+            return false
+          }
+          
+          if (seguimientoResponse.status && seguimientoResponse.status != 201) {
+            console.error("Error al crear el seguimiento", seguimiento.id, "Status:", seguimientoResponse.status)
+            loadingStore.stop()
+            return false
+          }
+          
+          let locationSeguimiento = seguimientoResponse.headers?.get("location")
+          console.log("Location header seguimiento:", locationSeguimiento)
+          
+          if (!locationSeguimiento) {
+            console.error("No se recibió location header para seguimiento")
+            loadingStore.stop()
+            return false
+          }
+          
+          let idSeguimiento = locationSeguimiento.split("/").at(-1)
+          console.log("ID seguimiento extraído:", idSeguimiento)
+          seguimientosIds.push(idSeguimiento)
+        } catch (seguimientoError) {
+          console.error("Error específico al crear seguimiento:", seguimientoError)
+          console.error("Stack trace seguimiento:", seguimientoError.stack)
+          loadingStore.stop()
+          return false
+        }
+      }
 
-    let seguimientosResponse = await estudioStore.agregarSeguimientos(idEstudio, seguimientosIds)
+      console.log("IDs de seguimientos a agregar:", seguimientosIds)
+      
+      if (seguimientosIds.length === 0) {
+        console.log("No hay seguimientos para agregar al estudio")
+        return true
+      }
+      
+      let seguimientosResponse = await estudioStore.agregarSeguimientos(idEstudio, seguimientosIds)
+      console.log("Respuesta agregar seguimientos al estudio:", seguimientosResponse)
 
-    if (seguimientosResponse.status != 204) {
-      console.log("Error al agregar seguimientos al estudio")
+      if (!seguimientosResponse || seguimientosResponse.status != 204) {
+        console.error("Error al agregar seguimientos al estudio. Status:", seguimientosResponse?.status)
+        loadingStore.stop()
+        return false
+      }
+      return true
+    } catch (error) {
+      console.error("Error en doAgregarSeguimientosEstudio:", error)
+      console.error("Stack trace:", error.stack)
       loadingStore.stop()
-      return
+      return false
     }
   }
 
   async function doAgregarAlertasEstudio(idEstudio) {
+    if (!idEstudio) {
+      console.error("ID de estudio no válido para agregar alertas")
+      return false
+    }
+    
     let alertasIds = []
     for (let alerta of alertasEstudio.value) {
-      let body = { fecha: alerta.fecha, asunto: alerta.asunto, mensaje: alerta.mensaje }
+      let body = { 
+        fecha: alerta.fecha, 
+        asunto: alerta.asunto, 
+        mensaje: alerta.mensaje,
+        emisor: especialista.value.id,
+        receptor: "6855a468e35152597a19ac5b"
+      }
+      console.log("Creando alerta con body:", body)
+      
       let alertaResponse = await alertaStore.crearAlerta(body)
-      if (alertaResponse.status != 201) {
+      console.log("Respuesta crear alerta:", alertaResponse)
+      
+      if (!alertaResponse || alertaResponse.status != 201) {
         console.log("Error al crear la alerta " + alerta.id)
         loadingStore.stop()
-        return
+        return false
       }
       let locationAlerta = alertaResponse.headers.get("location")
       let idAlerta = locationAlerta.split("/").at(-1)
@@ -155,27 +274,65 @@
     if (alertasResponse.status != 204) {
       console.log("Error al agregar alertas al estudio")
       loadingStore.stop()
-      return
+      return false
     }
+    return true
   }
 
   async function asignarEstudio(idEstudio) {
+    if (!idEstudio) {
+      console.error("ID de estudio no válido para asignar")
+      return false
+    }
+    
     let body = { especialista: especialista.value.id, estudio: idEstudio, rol: 'CREADOR'}
     let response = await asignacionEstudioStore.crearAsignacion(body)
     if (response.status != 201) {
       console.log("Error al asignar el estudio al especialista")
       loadingStore.stop()
-      return
+      return false
     }
+    return true
   }
 
   async function publicarEstudio() {
     loadingStore.start()
+    
     let idEstudio = await doCrearEstudio()
-    await doAgregarPacientesEstudio(idEstudio)
-    await doAgregarSeguimientosEstudio(idEstudio)
-    await doAgregarAlertasEstudio(idEstudio)
-    await asignarEstudio(idEstudio)
+    if (!idEstudio) {
+      console.error("No se pudo crear el estudio")
+      loadingStore.stop()
+      return
+    }
+    
+    const pacientesResult = await doAgregarPacientesEstudio(idEstudio)
+    if (!pacientesResult) {
+      console.error("Error agregando pacientes")
+      loadingStore.stop()
+      return
+    }
+    
+    const seguimientosResult = await doAgregarSeguimientosEstudio(idEstudio)
+    if (!seguimientosResult) {
+      console.error("Error agregando seguimientos")
+      loadingStore.stop()
+      return
+    }
+    
+    const alertasResult = await doAgregarAlertasEstudio(idEstudio)
+    if (!alertasResult) {
+      console.error("Error agregando alertas")
+      loadingStore.stop()
+      return
+    }
+    
+    const asignacionResult = await asignarEstudio(idEstudio)
+    if (!asignacionResult) {
+      console.error("Error asignando estudio")
+      loadingStore.stop()
+      return
+    }
+    
     loadingStore.stop()
     console.log("Estudio creado con éxito")
   }
@@ -210,7 +367,7 @@
         <v-col>
           <v-text-field 
             v-model="fechaAltaLocal" 
-            label="Fecha de alta"
+            label="Fecha de inicio"
             type="datetime-local"
             :min="fechaActual.toISOString().slice(0, 16)"
           />
@@ -284,6 +441,7 @@
           v-for="seguimiento in seguimientosEstudio"
           :key="seguimiento.id"
         >
+          <p>Motivo: {{ seguimiento.motivo }}</p>
           <p>Fecha: {{ seguimiento.fecha }}</p>
           <p>Plazo: {{ seguimiento.plazo }}</p>
           <p>Formulario: {{ seguimiento.formulario.nombre }}</p>
@@ -298,6 +456,10 @@
       </v-btn>
 
       <v-container v-if="agregarSeguimientoValue">
+        <v-text-field 
+          v-model="motivoSeguimiento" 
+          label="Motivo del seguimiento"
+        />
         <v-select 
           v-model="plantilla" 
           label="Formulario"

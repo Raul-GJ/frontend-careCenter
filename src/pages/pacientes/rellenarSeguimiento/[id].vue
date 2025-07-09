@@ -88,7 +88,13 @@
       return
     }
     try {
-      let body = { respuestas: [] }
+      let body = { 
+        fecha: seguimiento.value.fecha,
+        motivo: seguimiento.value.motivo,
+        plantilla: seguimiento.value.formulario.plantilla,
+        plazo: seguimiento.value.plazo,
+        respuestas: [] 
+      }
       if (plantilla.value && plantilla.value.preguntas) {
         for (let i = 0; i < plantilla.value.preguntas.length; i++) {
           const pregunta = plantilla.value.preguntas[i]

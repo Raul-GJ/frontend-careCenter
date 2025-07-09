@@ -4,7 +4,7 @@ import { ENDPOINTS } from "@/constants";
 // Crear un seguimiento
 export async function crearSeguimiento(seguimiento) {
   try {
-    const response = await api.post(ENDPOINTS.SEGUIMIENTOS.CREAR_SEGUIMIENTO, seguimiento);
+    let response = await api.post(ENDPOINTS.SEGUIMIENTOS.CREAR_SEGUIMIENTO, seguimiento);
     if (response.status !== 201) {
       alert("Error al crear el seguimiento");
       return null;
@@ -19,7 +19,7 @@ export async function crearSeguimiento(seguimiento) {
 // Obtener un seguimiento
 export async function obtenerSeguimiento(id) {
   try {
-    const response = await api.get(ENDPOINTS.SEGUIMIENTOS.OBTENER_SEGUIMIENTO(id));
+    let response = await api.get(ENDPOINTS.SEGUIMIENTOS.OBTENER_SEGUIMIENTO(id));
     if (response.status !== 200) {
       alert("Error al obtener el seguimiento");
       return null;
@@ -34,7 +34,7 @@ export async function obtenerSeguimiento(id) {
 // Modificar un seguimiento
 export async function modificarSeguimiento(id, seguimiento) {
   try {
-    const response = await api.patch(ENDPOINTS.SEGUIMIENTOS.MODIFICAR_SEGUIMIENTO(id), seguimiento);
+    let response = await api.patch(ENDPOINTS.SEGUIMIENTOS.MODIFICAR_SEGUIMIENTO(id), seguimiento);
     if (response.status !== 204) {
       alert("Error al modificar el seguimiento");
       return null;
@@ -49,7 +49,7 @@ export async function modificarSeguimiento(id, seguimiento) {
 // Eliminar un seguimiento
 export async function eliminarSeguimiento(id) {
   try {
-    const response = await api.delete(ENDPOINTS.SEGUIMIENTOS.ELIMINAR_SEGUIMIENTO(id));
+    let response = await api.delete(ENDPOINTS.SEGUIMIENTOS.ELIMINAR_SEGUIMIENTO(id));
     if (response.status !== 204) {
       alert("Error al eliminar el seguimiento");
       return null;
@@ -61,17 +61,16 @@ export async function eliminarSeguimiento(id) {
   }
 }
 
-// Rellenar formulario de seguimiento
-export async function rellenarFormulario(id, datos) {
+export async function rellenarFormulario(id, formulario) {
   try {
-    const response = await api.post(ENDPOINTS.SEGUIMIENTOS.RELLENAR_FORMULARIO(id), datos);
+    let response = await api.post(ENDPOINTS.SEGUIMIENTOS.RELLENAR_FORMULARIO(id), formulario);
     if (response.status !== 204) {
-      console.error("Error al rellenar el formulario del seguimiento");
+      alert("Error al rellenar el formulario");
       return null;
     }
     return response;
   } catch (error) {
-    console.error("Error al rellenar el formulario del seguimiento:", error);
+    console.error("Error al rellenar el formulario:", error);
     throw error;
   }
 }
