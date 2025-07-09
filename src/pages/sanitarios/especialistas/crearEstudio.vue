@@ -1,6 +1,5 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import { useDate } from 'vuetify'
   import { useSesionStore } from '@/stores/sesionStore'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { useEstudioStore } from '@/stores/estudioStore'
@@ -17,16 +16,14 @@
   const seguimientoStore = useSeguimientoStore()
   const alertaStore = useAlertaStore()
   const asignacionEstudioStore = useAsignacionEstudioStore()
-  
-  const adapter = useDate()
 
   const especialista = ref(null)
 
   const nombre = ref("")
   const descripcion = ref("")
   const fechaActual = ref(new Date())
-  const fechaAltaLocal = ref(new Date())
-  const fechaFinLocal = ref(fechaAltaLocal.value)
+  const fechaAltaLocal = ref(new Date().toISOString().slice(0, 16))
+  const fechaFinLocal = ref(new Date().toISOString().slice(0, 16))
 
   const plantilla = ref(null)
   const contSeguimientos = ref(0)
@@ -36,9 +33,9 @@
   const agregarSeguimientoValue = ref(false)
   const agregarAlertaValue = ref(false)
   
-  const fechaSeguimiento = ref(null)
-  const plazoSeguimiento = ref(null)
-  const fechaAlerta = ref(null)
+  const fechaSeguimiento = ref(new Date().toISOString().slice(0, 16))
+  const plazoSeguimiento = ref(new Date().toISOString().slice(0, 16))
+  const fechaAlerta = ref(new Date().toISOString().slice(0, 16))
   const asuntoAlerta = ref("")
   const mensajeAlerta = ref("")
   
@@ -62,13 +59,13 @@
 
   function agregarSeguimiento() {
     seguimientosEstudio.value.push({ id: contSeguimientos.value, 
-      fecha: adapter.toISO(fechaSeguimiento.value) + "T09:00:00", 
-      plazo: adapter.toISO(plazoSeguimiento.value) + "T09:00:00", 
+      fecha: fechaSeguimiento.value + ":00", 
+      plazo: plazoSeguimiento.value + ":00", 
       formulario: plantilla.value
     })
     plantilla.value = null
-    fechaSeguimiento.value = new Date()
-    plazoSeguimiento.value = new Date()
+    fechaSeguimiento.value = new Date().toISOString().slice(0, 16)
+    plazoSeguimiento.value = new Date().toISOString().slice(0, 16)
     contSeguimientos.value++
     agregarSeguimientoValue.value = false
   }
@@ -77,9 +74,9 @@
     alertasEstudio.value.push({ id: contAlertas.value, 
       asunto: asuntoAlerta.value, 
       mensaje: mensajeAlerta.value, 
-      fecha: adapter.toISO(fechaAlerta.value) + "T09:00:00"
+      fecha: fechaAlerta.value + ":00"
     })
-    fechaAlerta.value = new Date()
+    fechaAlerta.value = new Date().toISOString().slice(0, 16)
     asuntoAlerta.value = ""
     mensajeAlerta.value = ""
     contAlertas.value++
@@ -89,8 +86,8 @@
   async function doCrearEstudio() {
     let estudio = { nombre: nombre.value, 
       descripcion: descripcion.value, 
-      fechaAlta: adapter.toISO(fechaAltaLocal.value) + "T09:00:00",
-      fechaFin: adapter.toISO(fechaFinLocal.value) + "T09:00:00" }
+      fechaAlta: fechaAltaLocal.value + ":00",
+      fechaFin: fechaFinLocal.value + ":00" }
     let response = await estudioStore.crearEstudio(estudio)
 
     if (response.status != 201) {
@@ -213,7 +210,7 @@
         <v-col>
           <v-text-field 
             v-model="fechaAltaLocal" 
-            label="Plazo"
+            label="Fecha de alta"
             type="datetime-local"
             :min="fechaActual.toISOString().slice(0, 16)"
           />
@@ -221,9 +218,9 @@
         <v-col>
           <v-text-field 
             v-model="fechaFinLocal" 
-            label="Plazo"
+            label="Fecha de fin"
             type="datetime-local"
-            :min="fechaAltaLocal.toISOString().slice(0, 16)"
+            :min="fechaAltaLocal"
           />
         </v-col>
       </v-row>
@@ -312,7 +309,7 @@
           <v-col>
             <v-text-field 
               v-model="fechaSeguimiento" 
-              label="Fecha"
+              label="Fecha de seguimiento"
               type="datetime-local"
               :min="fechaActual.toISOString().slice(0, 16)"
             />
@@ -320,7 +317,7 @@
           <v-col>
             <v-text-field 
               v-model="plazoSeguimiento" 
-              label="Plazo"
+              label="Plazo límite"
               type="datetime-local"
               :min="fechaSeguimiento"
             />
@@ -365,7 +362,7 @@
         
         <v-text-field 
           v-model="fechaAlerta" 
-          label="Plazo"
+          label="Fecha de alerta"
           type="datetime-local"
           :min="fechaActual.toISOString().slice(0, 16)"
         />
