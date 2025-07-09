@@ -155,7 +155,7 @@ export async function eliminarPacienteEspecialista(id, pacienteId) {
 export async function agregarPlantillasEspecialista(id, plantillas) {
   try {
     const response = await api.post(ENDPOINTS.USUARIOS.ESPECIALISTAS.AGREGAR_PLANTILLAS(id), plantillas);
-    if (response.status !== 200) {
+    if (response.status !== 204) {
       alert("Error al agregar plantillas al especialista");
       return null;
     }

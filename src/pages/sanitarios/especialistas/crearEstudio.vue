@@ -43,7 +43,7 @@
   const mensajeAlerta = ref("")
   
   const usuarioStore = useUsuarioStore()
-  const { pacientes } = ref([])
+  const pacientes = ref([])
   const plantillaStore = usePlantillaStore()
   const { plantillas } = storeToRefs(plantillaStore)
 
@@ -198,7 +198,7 @@
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="!loadingStore.loading && especialista">
     <h1>Crear estudio</h1>
     <v-form :submit="publicarEstudio">
       <v-text-field 

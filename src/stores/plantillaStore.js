@@ -77,18 +77,31 @@ export const usePlantillaStore = defineStore('plantillas', {
     },
     async agregarPregunta(idPlantilla, tipo, pregunta) {
       try {
+        console.log('Enviando pregunta:', { idPlantilla, tipo, pregunta })
         let response = await agregarPregunta(idPlantilla, tipo, pregunta)
-        if (response.status !== 201) {
-          throw new Error('Error al agregar pregunta a plantilla')
+        console.log('Respuesta recibida:', response)
+        
+        if (!response) {
+          console.error('Response es null o undefined')
+          throw new Error('No se recibió respuesta del servidor')
         }
+        
+        if (response.status !== 201) {
+          console.error('Status incorrecto:', response.status)
+          throw new Error(`Error al agregar pregunta a plantilla. Status: ${response.status}`)
+        }
+        
+        console.log('Pregunta agregada exitosamente')
+        const index = this.plantillas.findIndex(p => p.id == idPlantilla)
+        if (index !== -1 && this.plantillas[index].preguntas) {
+          this.plantillas[index].preguntas.push(pregunta)
+        }
+        return response
       }
       catch (error) {
-        console.error('Error agregando pregunta a plantilla:', error)
+        console.error('Error en agregarPregunta store:', error)
+        console.error('Stack trace:', error.stack)
         throw error
-      }
-      const index = this.plantillas.findIndex(p => p.id == idPlantilla)
-      if (index !== -1) {
-        this.plantillas[index].preguntas.push(pregunta)
       }
     },
     async eliminarPregunta(idPlantilla, preguntaId) {
@@ -115,7 +128,7 @@ export const usePlantillaStore = defineStore('plantillas', {
         let location = response.headers.get("location")
         let id = location.split("/").at(-1)
         await this.getPlantilla(id)
-        return id
+        return response
       } catch (error) {
         console.error('Error creando plantilla:', error)
         throw error

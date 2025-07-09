@@ -56,7 +56,7 @@ export async function eliminarPlantilla(id) {
 export async function agregarPregunta(id, tipo, pregunta) {
   try {
     let response = await api.post(ENDPOINTS.PLANTILLAS.AGREGAR_PREGUNTA(id, tipo.toLowerCase()), pregunta);
-    if (response.status !== 200) {
+    if (response.status !== 201) {
       alert("Error al agregar la pregunta a la plantilla");
       return null;
     }

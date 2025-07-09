@@ -110,8 +110,9 @@
     let idPlantilla = location.split("/").at(-1)
 
     for (let pregunta of preguntas.value) {
-      if (!publicarPregunta(idPlantilla, pregunta)) {
-        console.log("Error en la regunta \"" + pregunta.pregunta + "\"")
+      let result = await publicarPregunta(idPlantilla, pregunta)
+      if (!result) {
+        console.log("Error en la pregunta \"" + pregunta.pregunta + "\"")
         loadingStore.stop()
         return
       }
@@ -125,8 +126,8 @@
 
     let ids = [idPlantilla]
     let response2 = await usuarioStore.agregarPlantillasEspecialista(idEspecialista, ids)
-    if (response2.status != 204) {
-      console.log("Ha habido un error al crear esta plantilla")
+    if (response2 && response2.status != 204) {
+      console.log("Ha habido un error al agregar la plantilla al especialista")
       loadingStore.stop()
       return
     }
@@ -148,14 +149,21 @@
   }
 
   async function publicarPregunta(idPlantilla, pregunta) {
-    loadingStore.start()
-    let body = JSON.stringify(pregunta, replacerPreguntas)
-    let response = await plantillaStore.agregarPregunta(idPlantilla, pregunta.regla.tipoDato, body)
-    loadingStore.stop()
-    if (response.status != 201)
+    try {
+      console.log('Preparando pregunta para enviar:', pregunta)
+      let body = JSON.stringify(pregunta, replacerPreguntas)
+      console.log('Body JSON:', body)
+      console.log('Tipo de dato:', pregunta.regla.tipoDato)
+      
+      let response = await plantillaStore.agregarPregunta(idPlantilla, pregunta.regla.tipoDato, body)
+      console.log('Respuesta en crearFormulario:', response)
+      
+      return response && response.status === 201
+    } catch (error) {
+      console.error("Error al publicar pregunta en crearFormulario:", error)
+      console.error("Stack trace:", error.stack)
       return false
-    return true
-
+    }
   }
 
   

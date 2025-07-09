@@ -89,12 +89,10 @@ export const useUsuarioStore = defineStore('usuario', {
     async agregarPlantillasEspecialista(especialistaId, plantillas) {
       try {
         const response = await agregarPlantillasEspecialista(especialistaId, plantillas)
-        if (response.status !== 204) {
+        if (response && response.status !== 204) {
           throw new Error('Error al agregar plantillas al especialista')
         }
-        for (let plantilla of plantillas) {
-          this.addPlantilla(plantilla)
-        }
+        return response
       } catch (error) {
         console.error('Error agregando plantillas al especialista:', error)
         throw error
