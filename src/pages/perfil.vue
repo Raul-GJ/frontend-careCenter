@@ -12,6 +12,9 @@
   const usuario = ref(null)
   const medico = ref(null)
   const especialistas = ref([])
+  const sanitarios = ref({})
+  const dialogNota = ref(false)
+  const notaSeleccionada = ref(null)
   
   const editarPerfil = ref(false)
 
@@ -43,6 +46,21 @@
     loadingStore.stop()
   }
 
+  async function loadSanitarios() {
+    if (usuario.value.notas) {
+      for (let nota of usuario.value.notas) {
+        if (nota.sanitario && !sanitarios.value[nota.sanitario]) {
+          try {
+            const sanitario = await usuarioStore.getUsuario(nota.sanitario)
+            sanitarios.value[nota.sanitario] = sanitario
+          } catch (error) {
+            console.error('Error cargando sanitario:', error)
+          }
+        }
+      }
+    }
+  }
+
   async function loadUsuario() {
     loadingStore.start()
     usuario.value = await sesionStore.getUsuario()
@@ -52,9 +70,20 @@
         let especialista = await usuarioStore.getUsuario(id)
         especialistas.value.push(especialista)
       }
+      await loadSanitarios()
     }
     console.log(usuario.value)
     loadingStore.stop()
+  }
+
+  function verNota(nota) {
+    notaSeleccionada.value = nota
+    dialogNota.value = true
+  }
+
+  function cerrarDialog() {
+    dialogNota.value = false
+    notaSeleccionada.value = null
   }
 
   loadUsuario()
@@ -316,7 +345,7 @@
                       <tr>
                         <th>Asunto</th>
                         <th>Sanitario</th>
-                        <th>Privado</th>
+                        <th>Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -325,14 +354,18 @@
                         :key="nota.id"
                       >
                         <td>{{ nota.asunto }}</td>
-                        <td>{{ nota.sanitario }}</td>
                         <td>
-                          <v-chip
-                            :color="nota.privado ? 'green' : 'red'"
-                            text-color="white"
-                          >
-                            {{ nota.privado ? "Privada" : "Pública" }}
-                          </v-chip>
+                          {{ sanitarios[nota.sanitario] ? 
+                              `${sanitarios[nota.sanitario].nombre} ${sanitarios[nota.sanitario].apellidos}` : 
+                              'Cargando...' }}
+                        </td>
+                        <td>
+                          <v-btn
+                            icon="mdi-text-box-outline"
+                            title="Ver contenido"
+                            size="small"
+                            @click="verNota(nota)"
+                          />
                         </td>
                       </tr>
                     </tbody>
@@ -345,6 +378,31 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Dialog para mostrar contenido de la nota -->
+    <v-dialog v-model="dialogNota" max-width="600px">
+      <v-card v-if="notaSeleccionada">
+        <v-card-title class="text-h5">
+          {{ notaSeleccionada.asunto }}
+        </v-card-title>
+        <v-card-subtitle>
+          Por: {{ sanitarios[notaSeleccionada.sanitario] ? 
+                  `${sanitarios[notaSeleccionada.sanitario].nombre} ${sanitarios[notaSeleccionada.sanitario].apellidos}` : 
+                  'Cargando...' }}
+        </v-card-subtitle>
+        <v-card-text>
+          <div class="nota-contenido">
+            {{ notaSeleccionada.contenido }}
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="cerrarDialog()">
+            Cerrar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -405,6 +463,15 @@
 }
 .perfil-table {
   margin-top: 8px;
+}
+.nota-contenido {
+  white-space: pre-wrap;
+  background-color: #ffffff;
+  color: #333333;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #1976d2;
 }
 @media (max-width: 960px) {
   .perfil-row {

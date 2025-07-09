@@ -14,10 +14,32 @@
   const paciente = ref(null)
 
   const seguimientos = ref([])
+  const sanitarios = ref({})
+  const dialogNota = ref(false)
+  const notaSeleccionada = ref(null)
 
   const nombreCompleto = computed(() => {
     if (paciente.value) {
       return `${paciente.value.nombre} ${paciente.value.apellidos}`
+    }
+    return ''
+  })
+
+  const fechaNacimientoConEdad = computed(() => {
+    if (paciente.value && paciente.value.fechaNacimiento) {
+      const fechaNac = new Date(paciente.value.fechaNacimiento)
+      const hoy = new Date()
+      let edad = hoy.getFullYear() - fechaNac.getFullYear()
+      const mesActual = hoy.getMonth()
+      const diaActual = hoy.getDate()
+      const mesNac = fechaNac.getMonth()
+      const diaNac = fechaNac.getDate()
+      
+      if (mesActual < mesNac || (mesActual === mesNac && diaActual < diaNac)) {
+        edad--
+      }
+      
+      return `${paciente.value.fechaNacimiento} (${edad} años)`
     }
     return ''
   })
@@ -30,12 +52,38 @@
     }
   }
 
+  async function loadSanitarios() {
+    if (paciente.value.notas) {
+      for (let nota of paciente.value.notas) {
+        if (nota.sanitario && !sanitarios.value[nota.sanitario]) {
+          try {
+            const sanitario = await usuarioStore.getUsuario(nota.sanitario)
+            sanitarios.value[nota.sanitario] = sanitario
+          } catch (error) {
+            console.error('Error cargando sanitario:', error)
+          }
+        }
+      }
+    }
+  }
+
   async function loadPaciente() {
     loadingStore.start()
     paciente.value = await usuarioStore.getUsuario(idPaciente)
     await loadSeguimientos()
+    await loadSanitarios()
     console.log(seguimientoStore.seguimientos)
     loadingStore.stop()
+  }
+
+  function verNota(nota) {
+    notaSeleccionada.value = nota
+    dialogNota.value = true
+  }
+
+  function cerrarDialog() {
+    dialogNota.value = false
+    notaSeleccionada.value = null
   }
 
   loadPaciente()
@@ -53,42 +101,50 @@
           <v-container>
             <v-text-field
               v-model="nombreCompleto"
+              label="Nombre completo"
               variant="solo"
               disabled
             />
             <v-text-field
               v-model="paciente.email"
+              label="Email"
               variant="solo"
               disabled
             />
             <v-text-field
               v-if="paciente.telefono"
               v-model="paciente.telefono"
+              label="Teléfono"
               variant="solo"
               disabled
             />
             <v-text-field
-              v-model="paciente.fechaNacimiento"
+              v-model="fechaNacimientoConEdad"
+              label="Fecha de nacimiento"
               variant="solo"
               disabled
             />
             <v-text-field
               v-model="paciente.sexo"
+              label="Sexo"
               variant="solo"
               disabled
             />
             <v-text-field
               v-model="paciente.direccion"
+              label="Dirección"
               variant="solo"
               disabled
             />
             <v-text-field
               v-model="paciente.dni"
+              label="DNI"
               variant="solo"
               disabled
             />
             <v-text-field
               v-model="paciente.nss"
+              label="NSS"
               variant="solo"
               disabled
             />
@@ -183,7 +239,11 @@
                 :key="nota.id"
               >
                 <td>{{ nota.asunto }}</td>
-                <td>{{ nota.sanitario }}</td>
+                <td>
+                  {{ sanitarios[nota.sanitario] ? 
+                      `${sanitarios[nota.sanitario].nombre} ${sanitarios[nota.sanitario].apellidos}` : 
+                      'Cargando...' }}
+                </td>
                 <td>
                   <v-chip
                     :color="nota.privado ? 'green' : 'red'"
@@ -193,6 +253,12 @@
                   </v-chip>
                 </td>
                 <td>
+                  <v-btn
+                    icon="mdi-text-box-outline"
+                    title="Ver contenido"
+                    class="mr-2"
+                    @click="verNota(nota)"
+                  />
                   <router-link :to="`./verNota/${nota.id}`">
                     <v-btn
                       icon="mdi-eye"
@@ -206,7 +272,51 @@
         </v-col>
       </v-row>
     </div>
+
+    <!-- Dialog para mostrar contenido de la nota -->
+    <v-dialog v-model="dialogNota" max-width="600px">
+      <v-card v-if="notaSeleccionada">
+        <v-card-title class="text-h5">
+          {{ notaSeleccionada.asunto }}
+        </v-card-title>
+        <v-card-subtitle>
+          Por: {{ sanitarios[notaSeleccionada.sanitario] ? 
+                  `${sanitarios[notaSeleccionada.sanitario].nombre} ${sanitarios[notaSeleccionada.sanitario].apellidos}` : 
+                  'Cargando...' }}
+        </v-card-subtitle>
+        <v-card-text>
+          <v-chip
+            :color="notaSeleccionada.privado ? 'green' : 'red'"
+            text-color="white"
+            class="mb-4"
+          >
+            {{ notaSeleccionada.privado ? "Nota Privada" : "Nota Pública" }}
+          </v-chip>
+          <div class="nota-contenido">
+            {{ notaSeleccionada.contenido }}
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="cerrarDialog()">
+            Cerrar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
+
+<style scoped>
+.nota-contenido {
+  white-space: pre-wrap;
+  background-color: #ffffff;
+  color: #333333;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #1976d2;
+}
+</style>
 
 

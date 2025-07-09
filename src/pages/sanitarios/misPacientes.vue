@@ -134,18 +134,6 @@
         >
           <td>{{ paciente.nombre }} {{ paciente.apellidos }}</td>
           <td>
-            <v-btn
-              icon="mdi-folder-plus"
-              title="Añadir a estudio"
-            />
-            <v-btn
-              icon="mdi-bell-plus"
-              title="Añadir alerta"
-            />
-            <v-btn
-              icon="mdi-text-box-plus"
-              title="Añadir seguimiento"
-            />
             <router-link :to="`./verPaciente/${paciente.id}`">
               <v-btn 
                 icon="mdi-list-box-outline" 

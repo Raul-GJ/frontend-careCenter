@@ -1,6 +1,6 @@
 <script setup>
   import { useRoute } from 'vue-router'
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import { useUsuarioStore } from '@/stores/usuarioStore'
   import { useLoadingStore } from '@/stores/loadingStore'
 
@@ -9,6 +9,25 @@
   const usuarioStore = useUsuarioStore()
   const idSanitario = route.params.id
   const sanitario = ref(null)
+
+  // Computed para calcular la edad
+  const edadSanitario = computed(() => {
+    if (!sanitario.value?.fechaNacimiento) return null
+    const fechaNacimiento = new Date(sanitario.value.fechaNacimiento)
+    const hoy = new Date()
+    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear()
+    const mes = hoy.getMonth() - fechaNacimiento.getMonth()
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+      edad--
+    }
+    return edad
+  })
+
+  // Computed para nombre completo
+  const nombreCompleto = computed(() => {
+    if (!sanitario.value) return ''
+    return `${sanitario.value.nombre || ''} ${sanitario.value.apellidos || ''}`.trim()
+  })
 
   async function loadSanitario() {
     loadingStore.start()
@@ -35,18 +54,33 @@
           />
           <v-container>
             <v-text-field
-              v-model="sanitario.nombre"
+              v-model="nombreCompleto"
+              label="Nombre completo"
               variant="solo"
               disabled
             />
             <v-text-field
               v-model="sanitario.centroDeSalud"
+              label="Centro de salud"
               variant="solo"
               disabled
             />
             <v-text-field
               v-if="sanitario.tipo === 'ESPECIALISTA'"
               v-model="sanitario.especialidad"
+              label="Especialidad"
+              variant="solo"
+              disabled
+            />
+            <v-text-field
+              v-model="sanitario.sexo"
+              label="Sexo"
+              variant="solo"
+              disabled
+            />
+            <v-text-field
+              :model-value="edadSanitario ? `${edadSanitario} años` : ''"
+              label="Edad"
               variant="solo"
               disabled
             />
