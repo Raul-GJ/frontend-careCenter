@@ -65,13 +65,14 @@
 
   function addPregunta() {
     if (strPregunta.value != "" && tiposPregunta.value.includes(tipoPregunta.value)) {
-      let regla = { tipoDato: tipoPregunta.value }
-      if (tipoPregunta.value == "RANGO") {
+      let tipoPreguntaFormal = tiposPreguntaFormal.value[tiposPregunta.value.indexOf(tipoPregunta.value)]
+      let regla = { tipoDato: tipoPreguntaFormal }
+      if (tipoPreguntaFormal == "RANGO") {
         regla.minValue = rangoMinValue.value 
         regla.maxValue = rangoMaxValue.value
         rangoMinValue.value = 1
         rangoMaxValue.value = 100
-      } else if (tipoPregunta.value == "ENUMERADO") {
+      } else if (tipoPreguntaFormal == "ENUMERADO") {
         regla.values = enumValues.value
         enumValues.value = []
       }
@@ -178,14 +179,14 @@
           :key="pregunta.id"
         >
           <p>Pregunta: {{ pregunta.pregunta }}</p>
-          <p>Tipo: {{ pregunta.regla.tipoDato }}</p>
+          <p>Tipo: {{ tiposPregunta[tiposPreguntaFormal.indexOf(pregunta.regla.tipoDato)] }}</p>
 
-          <v-container v-if="pregunta.regla.tipoDato == 'rango numérico'">
+          <v-container v-if="pregunta.regla.tipoDato == 'RANGO'">
             <p>Valor mínimo: {{ pregunta.regla.minValue }}</p>
             <p>Valor máximo: {{ pregunta.regla.maxValue }}</p>
           </v-container>
 
-          <v-container v-if="pregunta.regla.tipoDato == 'selección'">
+          <v-container v-if="pregunta.regla.tipoDato == 'ENUMERADO'">
             <p>Posibles valores:</p>
             <v-list>
               <v-list-item
